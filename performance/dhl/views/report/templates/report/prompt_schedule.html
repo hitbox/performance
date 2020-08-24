@@ -1,0 +1,16 @@
+{% extends "base.html" -%}
+
+{%- block main %}<article>
+    <h1>New Report</h1>
+    <h3>{{ report_date.strftime(config.DATEFMT) }}</h3>
+    <h3>From Schedule</h3>
+    {% for scheduled_report in scheduled_reports %}
+    <h4>
+        <a href="{{ url_for('report.prompt_operation', report_date=report_date, schedule_id=scheduled_report.id) }}">{{ scheduled_report.name }}</a>
+    </h4>
+    {% endfor %}
+    <h3>Blank</h3>
+    <h4>
+        <a href="{{ url_for('report.create_report_blank', report_date=report_date) }}">Create blank report</a>
+    </h4>
+</article>{% endblock main -%}

@@ -1,0 +1,41 @@
+{% extends 'pluggable/form.html' %}
+
+{% macro render_input_group(field) %}{{ field.label }}{{ field }}{% endmacro %}
+
+{% block inside_form %}
+    {{ form.hidden_tag() }}
+    <fieldset>
+        <legend>Flight</legend>
+        {{ render_input_group(form.flight_type) }}
+        {{ render_input_group(form.leg) }}
+        {{ render_input_group(form.flight_number) }}
+        {{ render_input_group(form.tail_number) }}
+        {{ render_input_group(form.weight) }}
+    </fieldset>
+    <fieldset>
+        <legend>Origin</legend>
+        {{ render_input_group(form.origin_station) }}
+        {{ render_input_group(form.origin_departure_estimated_date) }}
+        {{ render_input_group(form.origin_departure_estimated_time) }}
+        {{ render_input_group(form.origin_departure_actual_date) }}
+        {{ render_input_group(form.origin_departure_actual_time) }}
+        <div>{{ render_input_group(form.origin_delays) }}</div>
+    </fieldset>
+    <fieldset>
+        <legend>Destination</legend>
+        {{ render_input_group(form.destination_station) }}
+        {{ render_input_group(form.destination_arrival_estimated_date) }}
+        {{ render_input_group(form.destination_arrival_estimated_time) }}
+        {{ render_input_group(form.destination_arrival_actual_date) }}
+        {{ render_input_group(form.destination_arrival_actual_time) }}
+        <div>{{ render_input_group(form.destination_delays) }}</div>
+    </fieldset>
+    <fieldset>
+        <legend>Comment</legend>
+        <div>{{ form.comment }}</div>
+    </fieldset>
+    <div>
+        {% if form.submit %}{{ form.submit }}{% endif %}
+        {% if form.delete %}{{ form.delete }}{% endif %}
+    </div>
+{% endblock inside_form %}

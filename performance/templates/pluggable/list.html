@@ -1,0 +1,14 @@
+{%- extends "base.html" -%}
+
+{%- from "macros.html" import render_pagination -%}
+
+{%- block main -%}
+<article>
+    {% if page_title %}<h1>{{ page_title }}</h1>{% endif %}
+    {% if pagination.total %}<ul class="flat">{% for item in pagination.items %}
+        <li>{{ item_renderer(item) }}</li>{% endfor %}
+    </ul>{% else %}
+    <p>None</p>{% endif %}
+    {{ render_pagination(pagination) }}
+</article>
+{%- endblock -%}

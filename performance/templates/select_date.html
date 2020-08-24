@@ -1,0 +1,29 @@
+{%- extends "base.html" -%}
+
+{% block content %}
+<div>
+    <nav>
+        <h4>
+            <a href="{{ url_for('select_date.index', year=prevyear, month=prevmonth) }}">{{ month_names[prevmonth] }}{% if prevyear != year %}&nbsp;{{ prevyear }}{% endif %}</a>
+        </h4>
+        <h3>{{ month_names[month] }}&nbsp;{{ year }}</h3>
+        <h4>
+            <a href="{{ url_for('select_date.index', year=nextyear, month=nextmonth) }}">{{ month_names[nextmonth] }}{% if nextyear != year %}&nbsp;{{ nextyear }}{% endif %}</a>
+        </h4>
+    </nav>
+    <table>
+        <thead>
+            <tr>{% for day in calendar.iterweekdays() %}
+                <th>{{ weekday_abbr[day] }}</th>
+            {% endfor %}</tr>
+        </thead>
+        <tbody>{% for weekiter in calendar.monthdays2calendar(year, month) %}
+            <tr>{% for day, weekday in weekiter %}
+                <td class="date">{% if day %}
+                {%- set date = makedate(year, month, day) -%}
+                <a class="date{% if date == today %} today{% endif %}{% if date in reports %} has-report{% endif %}" href="{% if date in reports %}{{ url_for('report.view_report', id=reports[date].id) }}{% else %}{{ url_for('report.prompt_new', report_date=date) }}{% endif %}">{{ day }}</a>
+                {% endif %}</td>
+            {% endfor %}</tr>
+        {% endfor %}</tbody>
+    </table>
+</div>{% endblock content %}

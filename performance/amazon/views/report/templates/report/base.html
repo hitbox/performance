@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+{% block main_head %}<h3>{{ config.TITLE }}: {{ report.date.strftime(config.DATEFMT) }}</h3>{% endblock main_head %}
+
+
+{% block performance_table %}<table>
+    <thead>
+        <tr>
+            <th>{{ config.TITLE_PERFORMANCE }}</th>
+            <th>Percent</th>
+            <th>Lanes</th>
+            <th>Lates</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Today's Performance</td>
+            {% block performance_previous_days_performance_percent %}{% endblock %}
+            {% block performance_previous_days_performance_lanes %}{% endblock %}
+            {% block performance_previous_days_performance_late %}{% endblock %}
+        </tr>
+        <tr>
+            <td>Arrival Performance MTD &gt; 15</td>
+            {% block performance_arrival_performance_mtd_percent %}{% endblock %}
+            {% block performance_arrival_performance_mtd_lanes %}{% endblock %}
+            {% block performance_arrival_performance_mtd_late %}{% endblock %}
+        </tr>
+        <tr>
+            <td>Arrival Performance MTD &gt; 30</td>
+            {% block performance_arrival_performance_mtd_30_percent %}{% endblock %}
+            {% block performance_arrival_performance_mtd_30_lanes %}{% endblock %}
+            {% block performance_arrival_performance_mtd_30_late %}{% endblock %}
+        </tr>
+        <tr>
+            <td># days at 100%</td>
+            {% block performance_days_at_100_percent %}{% endblock %}
+            <td colspan=2></td>
+        </tr>
+        <tr>
+            <td>Assumed Best Arrival Performance for Month</td>
+            {% block performance_assumed_best_arrival_performance_for_month_percent %}{% endblock %}
+            <td colspan=2></td>
+        </tr>
+        <tr>
+            <td>QTD Performance</td>
+            {% block performance_qtd_performance_percent %}{% endblock %}
+            {% block performance_qtd_performance_lanes %}{% endblock %}
+            {% block performance_qtd_performance_late %}{% endblock %}
+        </tr>
+    </tbody>
+    {% block performance_table_tfoot %}{% endblock %}
+</table>{% endblock performance_table %}
+{% block flights %}{% endblock %}
+{% block comments %}{% endblock %}
+{% endblock main %}

@@ -1,0 +1,103 @@
+{%- macro render_nav_item(endpoint, text) %}<a class="nav{% if request.endpoint == endpoint %} active{% endif %}" href="{{ url_for(endpoint) }}">{{ text }}</a>{% endmacro -%}
+
+{%- macro nbsp(s) %}{% if s %}{{ s.replace(' ', '&nbsp;')|safe }}{% endif %}{% endmacro -%}
+
+{% set button_types = ['SubmitField', 'DeleteField'] %}
+
+
+{%- macro render_field(field) -%}
+    {%- set left, right = (field.label, field) -%}
+    {%- set lkwargs, rkwargs = ( {'title': field.description, 'class_': 'checkbox-label'}, field.render_kw if field.render_kw is not none else {} ) -%}
+    {%- if field.label.text == '' or field.type in button_types %}{% set left = none %}{% endif -%}
+    {# reverse field/label to put checkbox on left #}
+    {%- if field.type == "BooleanField" -%}
+        {%- set left, right = (right, left) -%}
+        {%- set lkwargs, rkwargs = (rkwargs, lkwargs) -%}
+    {%- endif -%}
+    {% if field.type not in ("HiddenField", "QuilljsDeltaField") %}
+    {%- if left is not none %}{{ left(**lkwargs) }}{% endif -%}
+    {% endif %}
+    {%- if field.errors -%}
+        {%- for error in field.errors -%}
+            <p class="help-block">{{ error }}</p>
+        {%- endfor -%}
+    {%- endif -%}
+    {%- if right is not none %}{{ right(**rkwargs) }}{% endif -%}
+{%- endmacro -%}
+
+
+{%- macro render_date_time_field(datefield, timefield) -%}
+<div class="form-group">
+    {{ datefield.label }}
+    {{ datefield }}
+    {{ timefield }}
+</div>
+{%- endmacro -%}
+
+
+{%- macro render_field_group(field) -%}
+{%- if field.type not in ('HiddenField', 'CSRFTokenField') -%}
+<div class="form-group{% if field.errors %} has-error{% endif %} {{ kwargs.pop('class_', '') }}">
+    {{ render_field(field) }}
+</div>
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_form(form) -%}
+{{ form.hidden_tag() }}
+<fieldset class="inputs">
+    <ul class="flat">{% for field in form.get_non_button_inputs() %}
+        <li>
+            <label>
+                <span class="normal {% if field.type == 'TextAreaField' %} label-for-textarea{% endif %}">{{ field.label.text }}</span>
+                {{ field() }}{% if field.errors %}{% for error in field.errors %}
+                <span>{{ error }}</span>
+            {% endfor %}{% endif %}</label>
+        </li>{% endfor %}
+    </ul>
+</fieldset>
+<ul class="flat buttons">{% for field in form.get_buttons() %}
+    <li>
+        {{ field }}
+    </li>{% endfor %}
+</ul>
+{%- endmacro -%}
+
+
+{%- macro render_pagination(pagination, endpoint) -%}
+{%- if pagination.pages > 1 -%}<div class="pagination rowwise centered">
+    {%- for page in pagination.iter_pages() %}
+    {% if page %}
+        {% if page != pagination.page %}
+            <a class="pill paginate" href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+        {% else %}
+            <strong class="pill paginate active">{{ page }}</strong>
+        {% endif %}
+    {% else %}
+        <span class="ellipsis pill paginate">…</span>
+    {% endif %}
+{%- endfor %}
+</div>{% endif %}{# pagination.pages > 1 #}
+{%- endmacro -%}
+
+
+{%- macro integer(v) %}{% if v %}{{ '{:,d}'.format(v) }}{% endif %}{% endmacro -%}
+
+{%- macro string(v) %}{% if v %}{{ v }}{% endif %}{% endmacro -%}
+
+
+{%- macro blank_if_none(s) %}{% if s is not none %}{{ s }}{% endif %}{% endmacro -%}
+
+{%- macro blank_if_falsy(s) %}{% if s %}{{ s }}{% endif %}{% endmacro -%}
+
+{%- macro diff_class(diff) %}{% if diff is not none %}{% if diff < 0 %} early{% elif diff > 0 %} late{% else %} ontime{% endif %}{% endif %}{% endmacro -%}
+
+{%- macro percent(v) %}{% if v %}{{ '%.2f%%' | format(v * 100) }}{% endif %}{% endmacro -%}
+
+{%- macro render_delaycodes(delays) %}{% for delay in delays %}{% if not loop.first %} {% endif %}{% if delay.code.controllable %}<span class="controllable">{% endif %}{{delay.code.name}}{% if delay.minutes %}({{delay.minutes}}){% endif %}{% if delay.code.controllable %}</span>{% endif %}{% endfor %}{% endmacro -%}
+
+{%- macro time(t) %}{% if t %}{{ t.strftime('%H:%M') }}{% endif %}{% endmacro -%}
+
+{%- macro yesno(bool) %}{% if bool %}Yes{% else %}No{% endif %}{% endmacro -%}
+
+{%- macro yes(bool) %}{% if bool %}Yes{% endif %}{% endmacro -%}

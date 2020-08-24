@@ -1,0 +1,12 @@
+{% extends "base.html" -%}
+
+{%- from "macros.html" import render_form -%}
+
+{%- block content %}
+<article>
+    <h3>{{ title }} Login</h3>
+    <form method="POST">
+        {{ render_form(form) }}
+    </form>
+</article>
+{% endblock content %}

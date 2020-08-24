@@ -1,0 +1,45 @@
+{%- extends "base.html" -%}
+
+{%- from "macros.html" import time -%}
+
+{%- block main -%}
+<article>{% set backurl = url_for(request.endpoint, **request.view_args) %}
+    <h3 class="nobr">{{ title }}</h3>
+    <h3>Schedule</h3>
+    <p>{{ scheduled_report.name }}</p>
+    {% for flight_type, flights in scheduled_report.flights_by_type() %}
+    <div{% if not flights %} class="noprint"{% endif %}>
+        <h3 class="nobr">{{ flight_type.name }}</h3>
+        <table class="expand">
+            <thead>
+                <tr>{% set ncols = 5 %}
+                    <th>Flight</th>
+                    <th>Orig</th>
+                    <th>ETD</th>
+                    <th>Dest</th>
+                    <th>ETA</th>
+                </tr>
+            </thead>
+            <tbody>{% if flights %}{% for scheduled_flight in flights %}
+                <tr{% if current_user.is_editor %} data-href="{{ url_for('scheduled_flight.edit', id=scheduled_flight.id, backurl=backurl) }}"{% endif %} tabindex=0>
+                    <td class="data">{{ scheduled_flight.flight_number }}</td>
+                    {#- orgin -#}
+                    <td class="data">{{ scheduled_flight.origin_station }}</td>
+                    <td class="data">{{ time(scheduled_flight.origin_departure_estimated_time) }}</td>
+                    {#- destination -#}
+                    <td class="data">{{ scheduled_flight.destination_station }}</td>
+                    <td class="data">{{ time(scheduled_flight.destination_arrival_estimated_time) }}</td>
+                </tr>{% endfor %}{% else %}
+                <tr>
+                    <td colspan="{{ ncols }}"><h4>None</h4></td>
+                </tr>
+                {% endif %}
+            </tbody>
+            <tfoot class="noprint">
+                <tr data-href="{{ url_for('scheduled_flight.create', scheduled_report_id=scheduled_report.id, flight_type_id=flight_type.id, backurl=backurl) }}">
+                    <td class="data" colspan="{{ ncols }}"><h4>Add Scheduled Flight</h4></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>{% endfor %}
+</article>{% endblock main -%}

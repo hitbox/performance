@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% from "macros.html" import render_form %}
+
+{% block content %}
+<article>
+    <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+        {% block inside_form %}{{ render_form(form) }}{% endblock %}
+    </form>
+    {% if 'backurl' in request.args %}<h4><a href="{{ request.args.backurl }}">Back</a></h4>{% endif %}
+</article>
+{% endblock content %}

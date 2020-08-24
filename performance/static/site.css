@@ -1,0 +1,214 @@
+:root {
+    --font-color: black;
+    --background-color: white;
+
+    --a-unvisited-color: MediumBlue;
+    --a-visited-color: RebeccaPurple;
+    --a-hover-color: Red;
+    --a-active-color: Plum;
+
+    /* select date for today */
+    --a-date-today-background-color: Bisque;
+
+    --data-href-background-color: #111;
+}
+
+[data-theme="dark"] {
+    --font-color: #ccc;
+    --background-color: #333;
+
+    --a-unvisited-color: Orange;
+    --a-visited-color: OrangeRed;
+    --a-hover-color: White;
+    --a-active-color: Red;
+
+    --a-date-today-background-color: DarkOliveGreen;
+
+    --data-href-background-color: #111;
+}
+
+body {
+    align-items: center;
+    background-color: var(--background-color);
+    color: var(--font-color);
+    display: flex;
+    flex-direction: column;
+    font-family: arial;
+    padding-bottom: 100%;
+}
+
+a:link {
+    color: var(--a-unvisited-color);
+}
+
+a:visited {
+    color: var(--a-visited-color);
+}
+
+a:hover {
+    color: var(--a-hover-color);
+}
+
+a:active {
+    color: var(--a-active-color);
+}
+
+/* select date link */
+a.date {
+    font-size: 1.25rem;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+/* today's date link */
+a.date.today {
+    background: var(--a-date-today-background-color);
+}
+
+/* top navigation links */
+a.nav {
+    padding: 0 2rem;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table.expand {
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid var(--font-color);
+}
+
+tr[data-href] {
+    cursor: pointer;
+}
+
+tr[data-href]:hover {
+    color: var(--a-hover-color);
+    background-color: var(--data-href-background-color);
+}
+
+th {
+    padding: 4px 6px;
+}
+
+td {
+    padding: 2px 4px;
+}
+
+td.date {
+    padding: 0;
+}
+
+tbody tr {
+    font-family: monospace;
+}
+
+ul.flat {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.flat > li {
+    margin: 1rem 0;
+}
+
+ul.buttons > li {
+    float: left;
+    margin-right: 1.5rem;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.width50 {
+    width: 50%;
+}
+
+input, textarea {
+    font-family: monospace;
+}
+
+input[type="submit"] {
+    margin: 4px 2px;
+}
+
+input[type="submit"]:first-child {
+    margin-left: 0;
+}
+
+.click:hover {
+    cursor: pointer;
+}
+
+/* all flashes container */
+.flashes {
+    color: White;
+}
+
+/* single flash item */
+.flash {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 15px;
+}
+
+/* flash close button */
+.close {
+    font-size: 25px;
+}
+
+.flash.info {
+    background-color: CornflowerBlue;
+}
+
+.flash.success {
+    background-color: ForestGreen;
+}
+
+.flash.warning {
+    background-color: DarkOrange;
+}
+
+.flash.error {
+    background-color: Crimson;
+}
+
+@media print {
+    * {
+        color: black;
+    }
+
+    *:hover {
+        background-color: white !important;
+    }
+
+    body {
+        background-color: white;
+    }
+
+    .noprint {
+        display: none !important;
+    }
+
+    body {
+        padding-bottom: 0 !important;
+    }
+
+}

@@ -1,0 +1,7 @@
+.session
+__pycache__
+instance
+performance/static/.webassets-cache
+performance/static/gen/*
+venv
+workzone
