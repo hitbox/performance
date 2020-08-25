@@ -13,10 +13,12 @@ class mdbreader:
     if sys.platform == 'win32':
         def read_table(self, table):
             import win32com.client
-            dao = win32com.client.Dispatch('DAO.DBEngine.36')
+            #dao = win32com.client.Dispatch('DAO.DBEngine.36')
+            #dao = win32com.client.Dispatch('DAO.DBEngine.120')
+            dao = win32com.client.Dispatch('Access.Application')
             Options = 0
             ReadOnly = True
-            db = dao.OpenDatabase(str(self.mdb), Options, ReadOnly)
+            db = dao.OpenCurrentDatabase(str(self.mdb), Options, ReadOnly)
             recordset = db.OpenRecordset(table)
             rows = []
             while not recordset.EOF:
