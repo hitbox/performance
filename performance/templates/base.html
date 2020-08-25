@@ -9,6 +9,8 @@
 <link rel="icon" href="data:,">
 <meta charset="utf-8">
 {% block head_last %}
+{% assets filters="cssmin", output="gen/base.css", "flatpickr.min.css", "site.css" %}<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">{% endassets %}
+{% assets filters="jsmin", output="gen/base.js", "flatpickr.min.js", "site.js" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 {# data injection for javascript #}{% if config.JAVASCRIPT_INJECTION %}<script>{% for key, value in config.JAVASCRIPT_INJECTION.items() %}
 {{ key }} = {{ value|tojson }};
 {% endfor %}</script>{% endif %}

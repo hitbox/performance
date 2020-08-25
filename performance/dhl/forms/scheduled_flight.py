@@ -46,5 +46,5 @@ class ScheduledFlightForm(
         'Flight Type',
         default = defaults.flight_type,
         get_label = 'name',
-        query_factory = lambda: FlightType.query.order_by(FlightType.order).all()
+        query_factory = lambda: FlightType.query.order_by(FlightType.report_order).all()
     )

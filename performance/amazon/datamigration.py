@@ -43,6 +43,12 @@ class Migrator:
             name = rowdict['name']
             if name not in cache['flight_types']:
                 flight_type = cache['flight_types'][name] = FlightType(name=name)
+                if name.lower() == 'scheduled':
+                    flight_type.report_order = 0
+                elif name.lower() == 'extra-cmi amz':
+                    flight_type.report_order = 1
+                elif name.lower() == 'extra non-cmi amz':
+                    flight_type.report_order = 2
                 db.session.add(flight_type)
 
         for rowdict in legacy['flights_delaycodes'].values():

@@ -87,7 +87,7 @@ class Migrator:
                 operation = cache['operations'][name] = Operation(name = name)
                 db.session.add(operation)
 
-        pkitems = ('operation_id', 'operation_date')
+        pkitems = ('operation_id', 'date')
         getpk = itemgetter(*pkitems)
 
         for table in ['comments', 'flights']:
@@ -104,10 +104,10 @@ class Migrator:
             return s.lower().replace(' ', '_')
 
         for detaildict in legacy['details']:
-            pk = operation_id, operation_date = getpk(detaildict)
+            pk = operation_id, date = getpk(detaildict)
 
             report = Report(
-                operation_date = operation_date,
+                date = date,
             )
 
             # operation
@@ -194,6 +194,7 @@ class Migrator:
                 operation = operation,
             )
             for flightdata in legacy['schedules_flights']:
+                bound_name = legacy['bounds'][flightdata['bound_id']]['name']
                 flight_type_name = legacy['flight_types'][flightdata['flight_type_id']]['name']
                 flight_type = cache['flight_types'][flight_type_name]
                 origin = legacy['stations'][flightdata['origin_station_id']]['name']
@@ -216,6 +217,10 @@ class Migrator:
                     bound_name = legacy['bounds'][flightdata['bound_id']]['name']
                     bound = cache['bounds'][bound_name]
                     scheduled_flight.bound = bound
+                if operation_id in legacy['operations']:
+                    operation_name = legacy['operations'][operation_id]['name']
+                    operation = cache['operations'][operation_name]
+                    scheduled_flight.operation = operation
                 scheduled_report.scheduled_flights.append(scheduled_flight)
             db.session.add(scheduled_report)
 
@@ -225,18 +230,23 @@ class Migrator:
         """
         legacy = defaultdict(dict)
 
-        def convert(table, conv, pk=None):
+        def convert(table, conv, pk=None, src=None):
             """
             :param table: mdb table name
             :param conv: dict of (field name, convert functon)
             :param pk: primary key name. if given the data is indexed by this
                        key. otherwise it is just appended in a list.
+            :param src: dict to lookup source key.
             """
             if pk is None:
                 legacy[table] = list()
             for rowdict in self.reader.read_table(table):
                 for key, func in conv.items():
-                    rowdict[key] = func(rowdict[key])
+                    if src and key in src:
+                        value = rowdict[src[key]]
+                    else:
+                        value = rowdict[key]
+                    rowdict[key] = func(value)
                 if pk is None:
                     legacy[table].append(rowdict)
                 else:
@@ -247,117 +257,156 @@ class Migrator:
         convert('operations', {'id': int, 'name': str}, pk='id')
         convert('stations', {'id': int, 'name': str}, pk='id')
         # details (reports)
-        convert('details', {
-            'operation_id': int,
-            'operation_date': datefromiso,
-        })
-        convert('comments', {
-            'operation_id': int,
-            'operation_date': datefromiso,
-            'order': int,
-            'key': str,
-            'value': str,
-        })
-        convert('details_abx_amazon_performance', {
-            'operation_id': int,
-            'operation_date': datefromiso,
-            'previous_days_performance_percent': float_or_none,
-            'previous_days_performance_lanes': int_or_none,
-            'previous_days_performance_late': int_or_none,
-            'arrival_performance_mtd_percent': float_or_none,
-            'arrival_performance_mtd_lanes': int_or_none,
-            'arrival_performance_mtd_late': int_or_none,
-            'days_at_100_percent': int_or_none,
-            'qtd_performance_percent': float_or_none,
-            'qtd_performance_lanes': int_or_none,
-            'qtd_performance_late': int_or_none,
-        })
-        convert('details_aircraft_spares', {
-            'operation_id': int,
-            'operation_date': datefromiso,
-            '1200': int_or_none,
-            '1800': int_or_none,
-            '2000': int_or_none,
-            '0300': int_or_none,
-        })
-        convert('details_crew_info', {
-            'operation_id': int,
-            'operation_date': datefromiso,
-            '1200': int_or_none,
-            '1800': int_or_none,
-            '2000': int_or_none,
-            '0300': int_or_none,
-        })
-        convert('details_dhl_performance', {
-            'operation_id': int,
-            'operation_date': datefromiso,
-            'previous_overall_performance': float_or_none,
-            'previous_overall_performance_lanes': int_or_none,
-            'previous_overall_performance_late': int_or_none,
-            'todays_arrival_performance_front_half': float_or_none,
-            'todays_arrival_performance_front_half_lanes': int_or_none,
-            'todays_arrival_performance_front_half_late': int_or_none,
-            'arrival_performance_mtd': float_or_none,
-            'arrival_performance_mtd_lanes': int_or_none,
-            'arrival_performance_mtd_late': int_or_none,
-            'assumed_best_arrival_performance_for_month': float_or_none,
-            'assumed_best_arrival_performance_for_month_lanes': int_or_none,
-            'assumed_best_arrival_performance_for_month_late': int_or_none,
-            'qtd_performance': float_or_none,
-            'qtd_performance_lanes': int_or_none,
-            'qtd_performance_late': int_or_none,
-            'arrival_performance_wtd': float_or_none,
-            'arrival_performance_wtd_lanes': int_or_none,
-            'arrival_performance_wtd_late': int_or_none,
-            'days_at_100_percent': int_or_none,
-            'arrival_performance_mtd_30_percent': float_or_none,
-            'arrival_performance_mtd_30_lanes': int_or_none,
-            'arrival_performance_mtd_30_late': int_or_none,
-        })
-        convert('flights', {
-            'operation_id': int,
-            'operation_date': datefromiso,
-            'bound_id': int,
-            'flight_number': str_or_none,
-            'leg': int_or_none,
-            'flight_type_id': int,
-            'tail': str_or_none,
-            'weight': int_or_none,
-            'comment': str_or_none,
-            'origin_station_id': int,
-            'departure_date_estimated': datefromiso,
-            'departure_time_estimated': timefromiso,
-            'departure_date_actual': datefromiso,
-            'departure_time_actual': timefromiso,
-            'destination_station_id': int,
-            'arrival_date_estimated': datefromiso,
-            'arrival_time_estimated': timefromiso,
-            'arrival_date_actual': datefromiso,
-            'arrival_time_actual': timefromiso,
-            'optimization_origin_delaycodes': str_or_none,
-            'optimization_destination_delaycodes': str_or_none,
-        })
+        convert('details',
+            {
+                'operation_id': int,
+                'date': datefromiso,
+            },
+            src = {
+                'date': 'operation_date',
+            })
+        convert('comments',
+            {
+                'operation_id': int,
+                'date': datefromiso,
+                'order': int,
+                'key': str,
+                'value': str,
+            },
+            src = {
+                'date': 'operation_date',
+            })
+        convert(
+            'details_abx_amazon_performance',
+            {
+                'operation_id': int,
+                'date': datefromiso,
+                'previous_days_performance_percent': float_or_none,
+                'previous_days_performance_lanes': int_or_none,
+                'previous_days_performance_late': int_or_none,
+                'arrival_performance_mtd_percent': float_or_none,
+                'arrival_performance_mtd_lanes': int_or_none,
+                'arrival_performance_mtd_late': int_or_none,
+                'days_at_100_percent': int_or_none,
+                'qtd_performance_percent': float_or_none,
+                'qtd_performance_lanes': int_or_none,
+                'qtd_performance_late': int_or_none,
+            },
+            src = {
+                'date': 'operation_date',
+            })
+        convert(
+            'details_aircraft_spares',
+            {
+                'operation_id': int,
+                'date': datefromiso,
+                '1200': int_or_none,
+                '1800': int_or_none,
+                '2000': int_or_none,
+                '0300': int_or_none,
+            },
+            src = {
+                'date': 'operation_date',
+            })
+        convert(
+            'details_crew_info',
+            {
+                'operation_id': int,
+                'date': datefromiso,
+                '1200': int_or_none,
+                '1800': int_or_none,
+                '2000': int_or_none,
+                '0300': int_or_none,
+            },
+            src = {
+                'date': 'operation_date',
+            }
+        )
+        convert(
+            'details_dhl_performance',
+            {
+                'operation_id': int,
+                'date': datefromiso,
+                'previous_overall_performance': float_or_none,
+                'previous_overall_performance_lanes': int_or_none,
+                'previous_overall_performance_late': int_or_none,
+                'todays_arrival_performance_front_half': float_or_none,
+                'todays_arrival_performance_front_half_lanes': int_or_none,
+                'todays_arrival_performance_front_half_late': int_or_none,
+                'arrival_performance_mtd': float_or_none,
+                'arrival_performance_mtd_lanes': int_or_none,
+                'arrival_performance_mtd_late': int_or_none,
+                'assumed_best_arrival_performance_for_month': float_or_none,
+                'assumed_best_arrival_performance_for_month_lanes': int_or_none,
+                'assumed_best_arrival_performance_for_month_late': int_or_none,
+                'qtd_performance': float_or_none,
+                'qtd_performance_lanes': int_or_none,
+                'qtd_performance_late': int_or_none,
+                'arrival_performance_wtd': float_or_none,
+                'arrival_performance_wtd_lanes': int_or_none,
+                'arrival_performance_wtd_late': int_or_none,
+                'days_at_100_percent': int_or_none,
+                'arrival_performance_mtd_30_percent': float_or_none,
+                'arrival_performance_mtd_30_lanes': int_or_none,
+                'arrival_performance_mtd_30_late': int_or_none,
+            },
+            src = {
+                'date': 'operation_date',
+            }
+        )
+        convert(
+            'flights',
+            {
+                'operation_id': int,
+                'date': datefromiso,
+                'bound_id': int,
+                'flight_number': str_or_none,
+                'leg': int_or_none,
+                'flight_type_id': int,
+                'tail': str_or_none,
+                'weight': int_or_none,
+                'comment': str_or_none,
+                'origin_station_id': int,
+                'departure_date_estimated': datefromiso,
+                'departure_time_estimated': timefromiso,
+                'departure_date_actual': datefromiso,
+                'departure_time_actual': timefromiso,
+                'destination_station_id': int,
+                'arrival_date_estimated': datefromiso,
+                'arrival_time_estimated': timefromiso,
+                'arrival_date_actual': datefromiso,
+                'arrival_time_actual': timefromiso,
+                'optimization_origin_delaycodes': str_or_none,
+                'optimization_destination_delaycodes': str_or_none,
+            },
+            src = {
+                'date': 'operation_date',
+            }
+        )
         # schedules (reports)
         convert('schedules', {'id': int, 'name': str, 'operation_id': int})
         # scheduled flights
-        convert('schedules_flights', {
-            'schedule_id': int,
-            'leg': int,
-            'flight_type_id': int,
-            'tail': str_or_none,
-            'bound_id': int,
-            'weight': int_or_none,
-            'comment': str,
-            'origin_station_id': int,
-            'departure_date_estimated': datefromiso,
-            'departure_time_estimated': timefromiso,
-            'departure_date_actual': datefromiso,
-            'departure_time_actual': timefromiso,
-            'destination_station_id': int,
-            'arrival_date_estimated': datefromiso,
-            'arrival_time_estimated': timefromiso,
-            'arrival_date_actual': datefromiso,
-            'arrival_time_actual': timefromiso,
-        })
+        convert(
+            'schedules_flights',
+            {
+                'schedule_id': int,
+                'leg': int,
+                'flight_type_id': int,
+                'tail': str_or_none,
+                'bound_id': int,
+                'weight': int_or_none,
+                'comment': str,
+                'origin_station_id': int,
+                'departure_date_estimated': datefromiso,
+                'departure_time_estimated': timefromiso,
+                'departure_date_actual': datefromiso,
+                'departure_time_actual': timefromiso,
+                'destination_station_id': int,
+                'arrival_date_estimated': datefromiso,
+                'arrival_time_estimated': timefromiso,
+                'arrival_date_actual': datefromiso,
+                'arrival_time_actual': timefromiso,
+            },
+        )
 
         return legacy

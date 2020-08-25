@@ -9,7 +9,7 @@ from ...views.pluggable import ModelView
 
 from ..models import ScheduledReport
 
-scheduled_report_bp = Blueprint('schedule', __name__)
+scheduled_report_bp = Blueprint('scheduled_report', __name__)
 
 def render_scheduled_report(scheduled_report):
     return Markup(

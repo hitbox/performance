@@ -1,0 +1,27 @@
+{%- from "macros.html" import diff_class -%}
+{%- from "macros.html" import integer -%}
+{%- from "macros.html" import string -%}
+{%- from "macros.html" import time -%}
+{%- from "macros.html" import yes -%}
+
+{# just the <td>s of a flight table row #}
+
+{% if with_edit %}<td><a href="{{ url_for('flight.edit', id=flight.id, backurl=thisurl) }}">edit</a></td>{% endif %}
+<td class="data">{{ string(flight.tail_number) }}</td>
+<td class="data">{{ string(flight.flight_number) }}</td>
+{#- orgin -#}
+<td class="data">{{ string(flight.origin_station) }}</td>
+<td class="data">{{ time(flight.origin_departure_estimated_time) }}</td>
+<td class="data">{{ time(flight.origin_departure_actual_time) }}</td>
+{% set diff = flight.origin_diff_minutes() %}<td class="data numeric{{ diff_class(diff) }}">{{ string(diff) }}</td>
+<td class="data">{{ string(flight.origin_delays) }}</td>
+{#- destination -#}
+<td class="data">{{ string(flight.destination_station) }}</td>
+<td class="data">{{ time(flight.destination_arrival_estimated_time) }}</td>
+<td class="data">{{ time(flight.destination_arrival_actual_time) }}</td>
+{% set diff = flight.destination_diff_minutes() %}<td class="data numeric{{ diff_class(diff) }}">{{ string(diff) }}</td>
+<td class="data">{{ string(flight.destination_delays) }}</td>
+{#- controllable delays -#}
+{% for minutes in [15, 30] %}{% set has_over = flight.controllable_over(minutes) %}<td{% if has_over %} class="data late"{% endif %}>{{ yes(has_over) }}</td>{% endfor %}
+{#- weight -#}
+<td class="data numeric">{{ integer(flight.weight) }}</td>

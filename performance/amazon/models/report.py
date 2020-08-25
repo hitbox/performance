@@ -1,11 +1,19 @@
 from collections import defaultdict
+from itertools import groupby
+from operator import attrgetter
 
 from ...extensions import db
 from ...models.flight_type import FlightType
 from ...models.mixin import MetaMixin
 from ...sorting import flight_sort_key
 
-class Report(MetaMixin, db.Model):
+flightsortkey = attrgetter('flight_type', 'flight_number_as_int')
+flightgroupkey = attrgetter('flight_type')
+
+class Report(
+    MetaMixin,
+    db.Model,
+):
     """
     Amazon Performance Report.
     """
@@ -45,29 +53,14 @@ class Report(MetaMixin, db.Model):
     arrival_performance_mtd_30_lanes = db.Column(db.Integer)
     arrival_performance_mtd_30_late = db.Column(db.Integer)
 
-    def flights_indexed_by_type(self):
-        indexed = defaultdict(list)
-        for flight in self.flights:
-            indexed[flight.flight_type].append(flight)
-        return indexed
+    def grouped_flights(self):
+        return groupby(sorted(self.flights, key=flightsortkey), flightgroupkey)
 
-    def flights_by_type(self):
-        indexed = self.flights_indexed_by_type()
-        result = [
-            # two-tuple (flight type, sorted list of flights)
-            (
-                flight_type,
-                sorted(indexed.get(flight_type, []), key=flight_sort_key),
-            )
-            # per sorted list of all flight types
-            for flight_type in FlightType.query.order_by(FlightType.report_order)
-        ]
-        return result
 
 
 class ScheduledReport(
-    db.Model,
     MetaMixin,
+    db.Model,
 ):
     """
     Scheduled reports hold minimal flights to populate new reports on the
@@ -77,22 +70,3 @@ class ScheduledReport(
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     scheduled_flights = db.relationship('ScheduledFlight', backref='scheduled_report')
-
-    def flights_indexed_by_type(self):
-        indexed = defaultdict(list)
-        for flight in self.scheduled_flights:
-            indexed[flight.flight_type].append(flight)
-        return indexed
-
-    def flights_by_type(self):
-        indexed = self.flights_indexed_by_type()
-        result = [
-            # two-tuple (flight type, sorted list of flights)
-            (
-                flight_type,
-                sorted(indexed.get(flight_type, []), key=flight_sort_key),
-            )
-            # per sorted list of all flight types
-            for flight_type in FlightType.query.order_by(FlightType.report_order)
-        ]
-        return result

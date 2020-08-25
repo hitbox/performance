@@ -1,4 +1,5 @@
 import datetime as dt
+import string
 
 from flask import current_app
 
@@ -16,6 +17,13 @@ class FlightBaseMixin:
             label = 'Flight',
         ),
     )
+
+    @property
+    def flight_number_as_int(self):
+        if self.flight_number:
+            s = ''.join(c for c in self.flight_number if c in string.digits)
+            if s:
+                return int(s)
 
     leg = db.Column(
         db.Integer,
@@ -134,8 +142,9 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         """
         controllable_codes = current_app.config['PERFORMANCE_CONTROLLABLE']
         items = []
-        if self.origin_delays:
-            items.extend(parse.delaystring(self.origin_delays))
+        # XXX: confirm it's only destination delays that count
+        #if self.origin_delays:
+        #    items.extend(parse.delaystring(self.origin_delays))
         if self.destination_delays:
             items.extend(parse.delaystring(self.destination_delays))
         items = [(code, delay_minutes)
