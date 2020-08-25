@@ -2,7 +2,7 @@
 
 {% block main %}
 
-{% block main_head %}<h3>{{ config.TITLE }}: {{ report.operation.name }}, {{ report.operation_date.strftime(config.DATEFMT) }}</h3>{% endblock main_head %}
+{% block main_head %}<h3>{{ config.TITLE }}: {{ report.operation.name }}, {{ report.date.strftime(config.DATEFMT) }}</h3>{% endblock main_head %}
 
 
 {% block dhl_performance_table %}
@@ -18,47 +18,47 @@
     </thead>
     <tbody>
         <tr>
-            <td>Previous Operation Overall Performance</td>
+            <td class="head">Previous Operation Overall Performance</td>
             {% block dhl_previous_overall_performance %}{% endblock %}
             {% block dhl_previous_overall_performance_lanes %}{% endblock %}
             {% block dhl_previous_overall_performance_late %}{% endblock %}
         </tr>
         <tr>
-            <td>Today's Arrival Performance Front Half</td>
+            <td class="head">Today's Arrival Performance Front Half</td>
             {% block dhl_todays_arrival_performance_front_half %}{% endblock %}
             {% block dhl_todays_arrival_performance_front_half_lanes %}{% endblock %}
             {% block dhl_todays_arrival_performance_front_half_late %}{% endblock %}
         </tr>
         <tr>
-            <td>Arrival Performance WTD</td>
+            <td class="head">Arrival Performance WTD</td>
             {% block dhl_arrival_performance_wtd %}{% endblock %}
             {% block dhl_arrival_performance_wtd_lanes %}{% endblock %}
             {% block dhl_arrival_performance_wtd_late %}{% endblock %}
         </tr>
         <tr>
-            <td>Arrival Performance MTD &gt; 15</td>
+            <td class="head">Arrival Performance MTD &gt; 15</td>
             {% block dhl_arrival_performance_mtd %}{% endblock %}
             {% block dhl_arrival_performance_mtd_lanes %}{% endblock %}
             {% block dhl_arrival_performance_mtd_late %}{% endblock %}
         </tr>
         <tr>
-            <td>Arrival Performance MTD &gt; 30</td>
+            <td class="head">Arrival Performance MTD &gt; 30</td>
             {% block dhl_arrival_performance_mtd_30_percent %}{% endblock %}
             {% block dhl_arrival_performance_mtd_30_lanes %}{% endblock %}
             {% block dhl_arrival_performance_mtd_30_late %}{% endblock %}
         </tr>
         <tr>
-            <td># days at 100%</td>
+            <td class="head"># days at 100%</td>
             {% block dhl_days_at_100_percent %}{% endblock %}
             <td colspan=2></td>
         </tr>
         <tr>
-            <td>Assumed Best Arrival Performance for Month</td>
+            <td class="head">Assumed Best Arrival Performance for Month</td>
             {% block dhl_assumed_best_arrival_performance_for_month_percent %}{% endblock %}
             <td colspan=2></td>
         </tr>
         <tr>
-            <td>QTD Performance</td>
+            <td class="head">QTD Performance</td>
             {% block dhl_qtd_performance %}{% endblock %}
             <td colspan=2></td>
         </tr>

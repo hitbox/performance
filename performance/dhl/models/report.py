@@ -14,7 +14,8 @@ from ...models.mixin import MetaMixin
 from .bound import BoundRelationshipMixin
 from .operation import OperationRelationshipMixin
 
-bound_flight_type_key = attrgetter('bound', 'flight_type')
+flightsortkey = attrgetter('bound', 'flight_type', 'flight_number_as_int')
+flightgroupkey = attrgetter('bound', 'flight_type')
 
 class CrewInfo(enum.Enum):
     FULL_CREW = 0
@@ -29,7 +30,7 @@ class CrewInfo(enum.Enum):
 CrewInfo.FULL_CREW.label = 'Full Crew'
 CrewInfo.CAPTAIN_ONLY.label = 'Captain Only'
 CrewInfo.FIRST_OFFICER_ONLY.label = 'First Officer Only'
-CrewInfo.NONE.label = 'None'
+CrewInfo.NONE.label = '(None)'
 
 def make_crew_info_column(label):
     return db.Column(
@@ -53,9 +54,7 @@ class Report(
     """
 
     id = db.Column(db.Integer, primary_key=True)
-
-    operation_date = db.Column(db.Date)
-
+    date = db.Column(db.Date)
     flights = db.relationship('performance.dhl.models.flight.Flight',
                               backref='report', cascade='all,delete-orphan')
 
@@ -133,29 +132,8 @@ class Report(
     dhl_qtd_performance_lanes = db.Column(db.Integer)
     dhl_qtd_performance_late = db.Column(db.Integer)
 
-    def flights_by_bound_flight_type(self):
-        return groupby(
-            sorted(self.flights, key=bound_flight_type_key),
-            bound_flight_type_key)
-
-    def flights_indexed_by_type(self):
-        indexed = defaultdict(list)
-        for flight in self.flights:
-            indexed[flight.flight_type].append(flight)
-        return indexed
-
-    def flights_by_type(self):
-        indexed = self.flights_indexed_by_type()
-        result = [
-            # two-tuple (flight type, sorted list of flights)
-            (
-                flight_type,
-                sorted(indexed.get(flight_type, []), key=flight_sort_key),
-            )
-            # per sorted list of all flight types
-            for flight_type in FlightType.query.order_by(FlightType.order)
-        ]
-        return result
+    def grouped_flights(self):
+        return groupby(sorted(self.flights, key=flightsortkey), flightgroupkey)
 
 
 class ScheduledReport(
@@ -174,21 +152,7 @@ class ScheduledReport(
         'performance.dhl.models.flight.ScheduledFlight',
         backref='scheduled_report')
 
-    def flights_indexed_by_type(self):
-        indexed = defaultdict(list)
-        for flight in self.scheduled_flights:
-            indexed[flight.flight_type].append(flight)
-        return indexed
-
-    def flights_by_type(self):
-        indexed = self.flights_indexed_by_type()
-        result = [
-            # two-tuple (flight type, sorted list of flights)
-            (
-                flight_type,
-                sorted(indexed.get(flight_type, []), key=flight_sort_key),
-            )
-            # per sorted list of all flight types
-            for flight_type in FlightType.query.order_by(FlightType.order)
-        ]
-        return result
+    def grouped_flights(self):
+        """
+        """
+        return groupby(sorted(self.scheduled_flights, key=flightsortkey), flightgroupkey)

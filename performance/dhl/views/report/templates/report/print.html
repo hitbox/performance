@@ -145,7 +145,7 @@
     {% set subs = ['1200', '2000', '0300'] %}
     <div>
         <h3>Crew Info</h3>
-        <table>
+        <table class="expand">
             <tbody>{% for s in subs %}
                 <tr>
                     <td>{{ s }}</td>
@@ -156,7 +156,7 @@
     </div>
     <div>
         <h3>Aircraft Spares</h3>
-        <table>
+        <table class="expand">
             <tbody>{% for s in subs %}
                 <tr>
                     <td>{{ s }}</td>
@@ -167,171 +167,3 @@
     </div>
 </div>
 {% endblock %}
-
-{% macro ignore() %}
-{% set backurl = url_for(request.endpoint, **request.view_args) %}
-<article>
-    <div class="rowwise centered buttongroup rounded noprint">
-        <a class="button info wide" href="javascript:;" onclick="window.print(); return false">Print</a>
-    </div>
-    <h3 class="nobr">{{ config.TITLE }}: {{ report.operation_date.strftime(config.DATEFMT) }}</h3>
-    <h4>TODO: aircraft spares</h4>
-    <h4>TODO: crew info</h4>
-    <h4>ABX/Amazon Performance</h4>
-    <table>
-        <thead>
-            <tr>
-                <th>ABX/Amazon Performance</th>
-                <th>Percent</th>
-                <th>Lanes</th>
-                <th>Lates</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Today's Performance</td>
-                <td class="data rightalign">{{ percent(report.abx_amazon_previous_days_performance_percent) }}</td>
-                <td class="data rightalign">{{ integer(report.abx_amazon_previous_days_performance_lanes) }}</td>
-                <td class="data rightalign">{{ integer(report.abx_amazon_previous_days_performance_late) }}</td>
-            </tr>
-            <tr>
-                <td>Arrival Performance MTD</td>
-                <td class="data rightalign">{{ percent(report.abx_amazon_arrival_performance_mtd_percent) }}</td>
-                <td class="data rightalign">{{ integer(report.abx_amazon_arrival_performance_mtd_lanes) }}</td>
-                <td class="data rightalign">{{ integer(report.abx_amazon_arrival_performance_mtd_late) }}</td>
-            </tr>
-            <tr>
-                <td>Arrival Performance QTD</td>
-                <td class="data rightalign">{{ percent(report.abx_amazon_qtd_performance_percent) }}</td>
-                <td class="data rightalign">{{ integer(report.abx_amazon_qtd_performance_lanes) }}</td>
-                <td class="data rightalign">{{ integer(report.abx_amazon_qtd_performance_late) }}</td>
-            </tr>
-            <tr>
-                <td># days at 100%</td>
-                <td class="data rightalign">{{ integer(report.abx_amazon_days_at_100_percent) }}</td>
-                <td colspan=2></td>
-            </tr>
-        </tbody>
-    </table>
-    <h4>DHL Performance</h4>
-    <table>
-        <thead>
-            <tr>
-                <th>DHL Performance</th>
-                <th>Percent</th>
-                <th>Lanes</th>
-                <th>Lates</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Previous Overall</td>
-                <td class="data rightalign">{{ percent(report.dhl_previous_overall_performance) }}</td>
-                <td class="data rightalign">{{ integer(report.dhl_previous_overall_performance_lanes) }}</td>
-                <td class="data rightalign">{{ integer(report.dhl_previous_overall_performance_late) }}</td>
-            </tr>
-            <tr>
-                <td>Today's Arrival Performance</td>
-                <td class="data rightalign">{{ percent(report.dhl_todays_arrival_performance_front_half) }}</td>
-                <td class="data rightalign">{{ integer(report.dhl_todays_arrival_performance_front_half_lanes) }}</td>
-                <td class="data rightalign">{{ integer(report.dhl_todays_arrival_performance_front_half_late) }}</td>
-            </tr>
-            <tr>
-                <td>Arrival Performance MTD &gt; 30</td>
-                <td class="data rightalign">{{ percent(report.dhl_arrival_performance_mtd_30_percent) }}</td>
-                <td class="data rightalign">{{ integer(report.dhl_arrival_performance_mtd_30_lanes) }}</td>
-                <td class="data rightalign">{{ integer(report.dhl_arrival_performance_mtd_30_late) }}</td>
-            </tr>
-            <tr>
-                <td># days at 100%</td>
-                <td class="data rightalign">{{ integer(report.dhl_days_at_100_percent) }}</td>
-                <td colspan=2></td>
-            </tr>
-            <tr>
-                <td>Assumed Best Arrival Performance for Month</td>
-                <td class="data rightalign">{{ percent(report.assumed_best_arrival_performance_for_month_percent) }}</td>
-                <td class="data rightalign">{{ percent(report.assumed_best_arrival_performance_for_month_lanes) }}</td>
-                <td class="data rightalign">{{ percent(report.assumed_best_arrival_performance_for_month_late) }}</td>
-            </tr>
-            <tr>
-                <td>QTD Performance</td>
-                <td class="data rightalign">{{ percent(report.dhl_qtd_performance) }}</td>
-                <td class="data rightalign">{{ integer(report.dhl_qtd_performance_lanes) }}</td>
-                <td class="data rightalign">{{ integer(report.dhl_qtd_performance_late) }}</td>
-            </tr>
-        </tbody>
-    </table>
-    {% if current_user.is_editor %}<h4 class="noprint"><a href="{{ url_for('report.edit_report', id=report.id, backurl=backurl) }}">Edit</a></h4>{% endif %}
-    <h3>Flights</h3>
-    {% for flight_type, flights in report.flights_by_type() %}
-    <div{% if not flights %} class="noprint"{% endif %}>
-        <h4 class="nobr">{{ flight_type.name }}</h4>
-        <table class="expand">
-            <thead>
-                <tr>
-                    <th colspan=12></th>
-                    <th colspan=2>ABX Controllable</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Tail</th>
-                    <th>Flight</th>
-                    <th>Orig</th>
-                    <th>ETD</th>
-                    <th>ATD</th>
-                    <th>(+/-)</th>
-                    <th>Delay Codes</th>
-                    <th>Dest</th>
-                    <th>ETA</th>
-                    <th>ATA</th>
-                    <th>(+/-)</th>
-                    <th>Delay Codes</th>
-                    <th>&gt; 15</th>
-                    <th>&gt; 30</th>
-                    <th>Weight</th>
-                </tr>
-            </thead>
-            <tbody>{% if flights %}{% for flight in flights %}
-                <tr{% if current_user.is_editor %} data-href="{{ url_for('flight.edit', id=flight.id, backurl=backurl) }}"{% endif %} tabindex=0>
-                    <td class="data">{{ flight.tail_number | upper if flight.tail_number else '' }}</td>
-                    <td class="data">{{ flight.flight_number }}</td>
-                    {#- orgin -#}
-                    <td class="data">{{ flight.origin_station }}</td>
-                    <td class="data">{{ time(flight.origin_departure_estimated_time) }}</td>
-                    <td class="data">{{ time(flight.origin_departure_actual_time) }}</td>
-                    {% set diff = flight.origin_diff_minutes() %}<td class="data rightalign{{ diff_class(diff) }}">{{ string(diff) }}</td>
-                    <td class="data">{{ string(flight.origin_delays) }}</td>
-                    {#- destination -#}
-                    <td class="data">{{ flight.destination_station }}</td>
-                    <td class="data">{{ time(flight.destination_arrival_estimated_time) }}</td>
-                    <td class="data">{{ time(flight.destination_arrival_actual_time) }}</td>
-                    {% set diff = flight.destination_diff_minutes() %}<td class="data rightalign{{ diff_class(diff) }}">{{ string(diff) }}</td>
-                    <td class="data">{{ string(flight.destination_delays) }}</td>
-                    {#- controllable delays -#}
-                    {% for minutes in [15, 30] %}{% set has_over = flight.controllable_over(minutes) %}<td class="data {% if has_over %}late{% endif %}">{{ yes(has_over) }}</td>{% endfor %}
-                    {#- weight -#}
-                    <td class="data rightalign">{{ integer(flight.weight) }}</td>
-                </tr>{% endfor %}{% else %}
-                <tr>
-                    <td colspan="15"><h4>None</h4></td>
-                </tr>
-                {% endif %}
-            </tbody>
-            <tfoot class="noprint">
-                <tr data-href="{{ url_for('flight.create', report_id=report.id, flight_type_id=flight_type.id, backurl=backurl) }}">
-                    <td class="data" colspan="15"><h4>Add flight</h4></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>{% endfor %}
-    <h3>System Detail</h3>
-    <pre id=system-detail class="textfield">{{ report.system_detail }}</pre>
-    <h3>Charter Detail</h3>
-    <pre id=charter-detail class="textfield">{{ report.charter_detail }}</pre>
-    <h3>Extra Section Detail</h3>
-    <pre id=extra-section-detail class="textfield">{{ report.extra_section_detail }}</pre>
-    <h3>Ferry Flight Detail</h3>
-    <pre id=ferry-flight-detail class="textfield">{{ report.ferry_flight_detail }}</pre>
-    {% if current_user.is_editor %}<h4 class="noprint"><a href="{{ url_for('report.edit_report', id=report.id, backurl=backurl) }}">Edit</a></h4>{% endif %}
-</article>
-{% endmacro %}

@@ -87,7 +87,7 @@ def create_report_from_schedule(report_date, schedule_id, operation_id):
     scheduled_report = ScheduledReport.query.get_or_404(schedule_id)
     operation = Operation.query.get_or_404(operation_id)
     report = Report(
-        operation_date = report_date,
+        date = report_date,
         operation = operation,
         flights = [
             Flight(

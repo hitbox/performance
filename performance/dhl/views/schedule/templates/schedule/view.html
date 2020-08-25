@@ -1,4 +1,8 @@
-{%- extends "base.html" -%}
+{% extends "base.html" %}
+{% from "macros.html" import integer %}
+{% from "macros.html" import string %}
+{% from "macros.html" import time %}
+{% from "macros.html" import yes %}
 
 {%- from "macros.html" import time -%}
 
@@ -7,12 +11,14 @@
     <h3 class="nobr">{{ title }}</h3>
     <h3>Schedule</h3>
     <p>{{ scheduled_report.name }}</p>
-    {% for flight_type, flights in scheduled_report.flights_by_type() %}
-    <div{% if not flights %} class="noprint"{% endif %}>
-        <h3 class="nobr">{{ flight_type.name }}</h3>
+    {% for (flight_type, bound), scheduled_flights in scheduled_report.grouped_flights() %}
+    <div{% if not scheduled_flights %} class="noprint"{% endif %}>
+        <h3>{{ flight_type.name }}&nbsp;{{ bound.altname }}</h3>
         <table class="expand">
             <thead>
-                <tr>{% set ncols = 5 %}
+                <tr>{% set ncols = 6 %}
+                    <th></th>
+                    <th>Operation</th>
                     <th>Flight</th>
                     <th>Orig</th>
                     <th>ETD</th>
@@ -20,14 +26,17 @@
                     <th>ETA</th>
                 </tr>
             </thead>
-            <tbody>{% if flights %}{% for scheduled_flight in flights %}
-                <tr{% if current_user.is_editor %} data-href="{{ url_for('scheduled_flight.edit', id=scheduled_flight.id, backurl=backurl) }}"{% endif %} tabindex=0>
-                    <td class="data">{{ scheduled_flight.flight_number }}</td>
+            {# XXX: left off here grouping the scheduled flights #}
+            <tbody>{% if scheduled_flights %}{% for scheduled_flight in scheduled_flights %}
+                <tr tabindex=0>
+                    <td class="data"><a href="{{ url_for('scheduled_flight.edit', id=scheduled_flight.id, backurl=backurl) }}">edit</a></td>
+                    <td>{{ scheduled_flight.operation.name }}</td>
+                    <td class="data">{{ string(scheduled_flight.flight_number) }}</td>
                     {#- orgin -#}
-                    <td class="data">{{ scheduled_flight.origin_station }}</td>
+                    <td class="data">{{ string(scheduled_flight.origin_station) }}</td>
                     <td class="data">{{ time(scheduled_flight.origin_departure_estimated_time) }}</td>
                     {#- destination -#}
-                    <td class="data">{{ scheduled_flight.destination_station }}</td>
+                    <td class="data">{{ string(scheduled_flight.destination_station) }}</td>
                     <td class="data">{{ time(scheduled_flight.destination_arrival_estimated_time) }}</td>
                 </tr>{% endfor %}{% else %}
                 <tr>

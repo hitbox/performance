@@ -1,6 +1,8 @@
 :root {
     --font-color: black;
     --background-color: white;
+    --input-font-color: black;
+    --input-background-color: white;
 
     --a-unvisited-color: MediumBlue;
     --a-visited-color: RebeccaPurple;
@@ -16,6 +18,8 @@
 [data-theme="dark"] {
     --font-color: #ccc;
     --background-color: #333;
+    --input-font-color: #ccc;
+    --input-background-color: #333;
 
     --a-unvisited-color: Orange;
     --a-visited-color: OrangeRed;
@@ -108,6 +112,11 @@ td {
     padding: 2px 4px;
 }
 
+/* field names that appear in rows of tables */
+td.head {
+    font-family: arial;
+}
+
 td.date {
     padding: 0;
 }
@@ -141,8 +150,14 @@ ul.buttons > li {
     width: 50%;
 }
 
-input, textarea {
+#crew_info_1200, #crew_info_2000, #crew_info_0300 {
+    width: 12rem;
+}
+
+input, select, textarea {
     font-family: monospace;
+    color: var(--input-font-color);
+    background-color: var(--input-background-color);
 }
 
 input[type="submit"] {
@@ -153,6 +168,127 @@ input[type="submit"]:first-child {
     margin-left: 0;
 }
 
+button, fieldset, input, label, select, textarea {
+    box-sizing: border-box;
+}
+
+input[type=date],
+input[type=datetime],
+input[type=number],
+input[type=text],
+select,
+textarea:not([cols]) {
+    width: 15rem;
+}
+
+input[type=date].narrower,
+input[type=datetime].narrower,
+input[type=number].narrower,
+input[type=text].narrower,
+select.narrower,
+textarea:not([cols]).narrower {
+    width: 10rem;
+}
+
+input[type=date].narrowest,
+input[type=datetime].narrowest,
+input[type=number].narrowest,
+input[type=text].narrowest,
+select.narrowest,
+textarea:not([cols]).narrowest {
+    width: 6rem;
+}
+
+button, input[type=submit] {
+    width: 10rem;
+}
+
+/* rename "sm" to "narrowest" */
+button.sm, input[type=submit].sm {
+    width: 5rem;
+}
+
+button.narrow, input[type=submit].narrow {
+    width: 7.5rem;
+}
+
+button.narrower, input[type=submit].narrower {
+    width: 7rem;
+}
+
+button, input, select, textarea {
+    padding: .5rem;
+}
+
+input[type=file] {
+    padding: 0;
+}
+
+form {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+form.expand {
+    display: block;
+}
+
+/* actual label text is inside a span */
+label > span {
+    display: inline-block;
+    text-align: right;
+    vertical-align: middle;
+}
+
+label > span.normal {
+    width: 150px;
+}
+
+label > span.narrow {
+    width: 100px;
+}
+
+label > span.narrower {
+    width: 50px;
+}
+
+label {
+    position: relative;
+}
+
+fieldset {
+    margin: .5rem 0;
+}
+
+.label-for-textarea {
+    vertical-align: top;
+}
+
+.date-entry {
+    width: 6rem !important;
+}
+
+.time-entry {
+    width: 6rem !important;
+}
+
+li.input-group {
+    margin-left: .5rem !important;
+}
+
+.single-line {
+    margin-left: 2rem;
+}
+
+input[data-autocomplete-varname=airports] {
+    width: 6rem;
+}
+
+/* flight form */
+
+input.flight, textarea.flight, select.flight {
+    margin: .5rem;
+}
 .click:hover {
     cursor: pointer;
 }

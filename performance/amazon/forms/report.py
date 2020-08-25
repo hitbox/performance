@@ -39,8 +39,8 @@ class ReportForm(
             for key in only
         }
 
-        field_args['system_detail']['render_kw']['cols'] = 100
-        field_args['system_detail']['render_kw']['rows'] = 12
+        field_args['system_detail']['render_kw']['cols'] = 120
+        field_args['system_detail']['render_kw']['rows'] = 15
 
         _percent_fields = ['previous_days_performance_percent',
                            'arrival_performance_mtd_percent',
