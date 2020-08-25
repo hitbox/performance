@@ -56,6 +56,14 @@ class Migrator:
             name = rowdict['name']
             if name not in cache['flight_types']:
                 flight_type = cache['flight_types'][name] = FlightType(name=name)
+                if name.lower() == 'scheduled':
+                    flight_type.report_order = 0
+                elif name.lower() == 'extra':
+                    flight_type.report_order = 1
+                elif name.lower() == 'extra cmi':
+                    flight_type.report_order = 2
+                elif name.lower() == 'extra non-cmi':
+                    flight_type.report_order = 3
                 db.session.add(flight_type)
 
         for rowdict in legacy['flights_delaycodes'].values():
@@ -65,6 +73,12 @@ class Migrator:
             name = rowdict['name']
             if name not in cache['bounds']:
                 bound = cache['bounds'][name] = Bound(name=name)
+                if name.lower() == 'inbound':
+                    bound.altname = 'Front Half'
+                    bound.report_order = 0
+                else:
+                    bound.altname = 'Back Half'
+                    bound.report_order = 1
                 db.session.add(bound)
 
         for data in legacy['operations'].values():

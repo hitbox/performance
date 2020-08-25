@@ -60,7 +60,7 @@ class Report(MetaMixin, db.Model):
                 sorted(indexed.get(flight_type, []), key=flight_sort_key),
             )
             # per sorted list of all flight types
-            for flight_type in FlightType.query.order_by(FlightType.order)
+            for flight_type in FlightType.query.order_by(FlightType.report_order)
         ]
         return result
 
@@ -93,6 +93,6 @@ class ScheduledReport(
                 sorted(indexed.get(flight_type, []), key=flight_sort_key),
             )
             # per sorted list of all flight types
-            for flight_type in FlightType.query.order_by(FlightType.order)
+            for flight_type in FlightType.query.order_by(FlightType.report_order)
         ]
         return result

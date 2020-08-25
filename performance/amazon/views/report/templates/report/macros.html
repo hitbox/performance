@@ -45,24 +45,24 @@
         <tbody>{% if flights %}
             {% for flight in flights %}<tr tabindex="0">
                 {% if with_edit %}<td><a href="{{ url_for('flight.edit', id=flight.id, backurl=thisurl) }}">edit</a></td>{% endif %}
-                <td>{{ flight.tail_number }}</td>
-                <td>{{ flight.flight_number }}</td>
+                <td class="data">{{ flight.tail_number }}</td>
+                <td class="data">{{ flight.flight_number }}</td>
                 {#- orgin -#}
-                <td>{{ flight.origin_station }}</td>
-                <td>{{ time(flight.origin_departure_estimated_time) }}</td>
-                <td>{{ time(flight.origin_departure_actual_time) }}</td>
-                {% set diff = flight.origin_diff_minutes() %}<td class="data rightalign{{ diff_class(diff) }}">{{ string(diff) }}</td>
-                <td>{{ string(flight.origin_delays) }}</td>
+                <td class="data">{{ flight.origin_station }}</td>
+                <td class="data">{{ time(flight.origin_departure_estimated_time) }}</td>
+                <td class="data">{{ time(flight.origin_departure_actual_time) }}</td>
+                {% set diff = flight.origin_diff_minutes() %}<td class="data numeric{{ diff_class(diff) }}">{{ string(diff) }}</td>
+                <td class="data">{{ string(flight.origin_delays) }}</td>
                 {#- destination -#}
-                <td>{{ flight.destination_station }}</td>
-                <td>{{ time(flight.destination_arrival_estimated_time) }}</td>
-                <td>{{ time(flight.destination_arrival_actual_time) }}</td>
-                {% set diff = flight.destination_diff_minutes() %}<td class="data rightalign{{ diff_class(diff) }}">{{ string(diff) }}</td>
-                <td>{{ string(flight.destination_delays) }}</td>
+                <td class="data">{{ flight.destination_station }}</td>
+                <td class="data">{{ time(flight.destination_arrival_estimated_time) }}</td>
+                <td class="data">{{ time(flight.destination_arrival_actual_time) }}</td>
+                {% set diff = flight.destination_diff_minutes() %}<td class="data numeric{{ diff_class(diff) }}">{{ string(diff) }}</td>
+                <td class="data">{{ string(flight.destination_delays) }}</td>
                 {#- controllable delays -#}
-                {% for minutes in [15, 30] %}{% set has_over = flight.controllable_over(minutes) %}<td{% if has_over %} class="late"{% endif %}>{{ yes(has_over) }}</td>{% endfor %}
+                {% for minutes in [15, 30] %}{% set has_over = flight.controllable_over(minutes) %}<td{% if has_over %} class="data late"{% endif %}>{{ yes(has_over) }}</td>{% endfor %}
                 {#- weight -#}
-                <td>{{ integer(flight.weight) }}</td>
+                <td class="data numeric">{{ integer(flight.weight) }}</td>
                 </tr>{% endfor %}
             {%- else -%}
             <tr>

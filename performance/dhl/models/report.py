@@ -1,6 +1,8 @@
 import enum
 
 from collections import defaultdict
+from itertools import groupby
+from operator import attrgetter
 
 from sqlalchemy_utils import ChoiceType
 
@@ -11,6 +13,8 @@ from ...models.mixin import MetaMixin
 
 from .bound import BoundRelationshipMixin
 from .operation import OperationRelationshipMixin
+
+bound_flight_type_key = attrgetter('bound', 'flight_type')
 
 class CrewInfo(enum.Enum):
     FULL_CREW = 0
@@ -128,6 +132,11 @@ class Report(
     dhl_qtd_performance = db.Column(db.Float)
     dhl_qtd_performance_lanes = db.Column(db.Integer)
     dhl_qtd_performance_late = db.Column(db.Integer)
+
+    def flights_by_bound_flight_type(self):
+        return groupby(
+            sorted(self.flights, key=bound_flight_type_key),
+            bound_flight_type_key)
 
     def flights_indexed_by_type(self):
         indexed = defaultdict(list)

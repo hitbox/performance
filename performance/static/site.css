@@ -91,17 +91,17 @@ table, th, td {
     border: 1px solid var(--font-color);
 }
 
-tr[data-href] {
-    cursor: pointer;
+.data.numeric {
+    text-align: right;
 }
 
-tr[data-href]:hover {
-    color: var(--a-hover-color);
-    background-color: var(--data-href-background-color);
+.data.late {
+    color: red;
 }
 
 th {
     padding: 4px 6px;
+    font-size: .8rem;
 }
 
 td {
