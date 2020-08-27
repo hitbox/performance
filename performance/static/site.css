@@ -68,8 +68,13 @@ a.date {
 }
 
 /* today's date link */
-a.date.today {
+.date.today {
     background: var(--a-date-today-background-color);
+}
+
+/* link to existing report */
+.date.has-report:after {
+    content: "*";
 }
 
 /* top navigation links */
