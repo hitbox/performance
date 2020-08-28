@@ -67,6 +67,10 @@ a.date {
     box-sizing: border-box;
 }
 
+.legend {
+    margin-top: 2rem;
+}
+
 /* today's date link */
 .date.today {
     background: var(--a-date-today-background-color);
