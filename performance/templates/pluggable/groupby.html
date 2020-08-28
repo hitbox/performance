@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% from "macros.html" import render_pagination %}
+
+{% block main %}
+<article>
+    {% if title %}<h1>{{ title }}</h1>{% endif %}
+    {% if items %}{% for group, groupeditems in items|groupby(attribute, items) %}
+    <h2>{{ group }}</h2>
+    <ul class="flat">{% for item in groupeditems %}
+        <li>{{ item }}</li>{% endfor %}
+    </ul>{% else %}
+    <p>None</p>{% endif %}
+    {{ render_pagination(pagination) }}
+</article>
+{% endblock %}

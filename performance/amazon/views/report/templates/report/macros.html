@@ -9,7 +9,7 @@
 {% set thisurl = url_for(request.endpoint, **request.view_args) %}
 {% set ncols = 16 if with_edit else 15 %}
 {# different grouping than DHL #}
-{% for flight_type, flights in report.grouped_flights() %}
+{% for flight_type, flights in grouped %}
 <div{% if not flights %} class="noprint"{% endif %}>
     <h3>{{ flight_type.name }}</h3>
     <table class="expand">

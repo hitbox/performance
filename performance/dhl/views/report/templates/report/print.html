@@ -136,7 +136,11 @@
 
 
 {% block flights %}
-{{ render_flights_table(report) }}
+{% for (flight_type, bound), flights in grouped %}
+    {% if flights %}
+        {% include "report/flight_table.html" with context %}
+    {% endif %}
+{% endfor %}
 {% endblock flights %}
 
 

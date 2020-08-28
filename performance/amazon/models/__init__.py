@@ -1,4 +1,4 @@
-from .report import Report
-from .report import ScheduledReport
 from .flight import Flight
-from .flight import ScheduledFlight
+from .report import Report
+from .scheduled_flight import ScheduledFlight
+from .scheduled_report import ScheduledReport

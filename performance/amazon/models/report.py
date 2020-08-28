@@ -1,14 +1,7 @@
-from collections import defaultdict
-from itertools import groupby
-from operator import attrgetter
+from performance.extensions import db
+from performance.models.mixin import MetaMixin
 
-from ...extensions import db
-from ...models.flight_type import FlightType
-from ...models.mixin import MetaMixin
-from ...sorting import flight_sort_key
-
-flightsortkey = attrgetter('flight_type', 'flight_number_as_int')
-flightgroupkey = attrgetter('flight_type')
+from .util import grouped_flights
 
 class Report(
     MetaMixin,
@@ -21,8 +14,11 @@ class Report(
     id = db.Column(db.Integer, primary_key=True)
 
     date = db.Column(db.Date)
-    flights = db.relationship('performance.amazon.models.flight.Flight',
-                              backref='report', cascade='all,delete-orphan')
+    flights = db.relationship(
+        'performance.amazon.models.flight.Flight',
+        backref = 'report',
+        cascade = 'all,delete-orphan',
+    )
     system_detail = db.Column(
         db.Text,
         info = dict(
@@ -54,19 +50,4 @@ class Report(
     arrival_performance_mtd_30_late = db.Column(db.Integer)
 
     def grouped_flights(self):
-        return groupby(sorted(self.flights, key=flightsortkey), flightgroupkey)
-
-
-
-class ScheduledReport(
-    MetaMixin,
-    db.Model,
-):
-    """
-    Scheduled reports hold minimal flights to populate new reports on the
-    effective datetime start.
-    """
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    scheduled_flights = db.relationship('ScheduledFlight', backref='scheduled_report')
+        return grouped_flights(self.flights)

@@ -82,7 +82,11 @@
 {% endblock %}
 
 {% block flights %}
-{{ render_flights_table(report) }}
+{% for flight_type, flights in grouped %}
+    {% if flights %}
+        {% include "report/flight_table.html" %}
+    {% endif %}
+{% endfor %}
 {% endblock flights %}
 
 

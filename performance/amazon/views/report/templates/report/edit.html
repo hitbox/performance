@@ -100,6 +100,8 @@
 
 
 {% block flights %}
-<h2>Flights</h2>
-{{ render_flights_table(report, with_edit=true) }}
+{% set with_edit=true %}
+{% for flight_type, flights in grouped %}
+{% include "report/flight_table.html" with context %}
+{% endfor %}
 {% endblock flights %}

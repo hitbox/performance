@@ -1,41 +1,101 @@
+from operator import attrgetter
+
 from flask import Blueprint
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import url_for
 
-from ....authorization import basic_check
-from ....authorization import edit_check
-from ....extensions import db
-from ....views.pluggable import ModelView
-from ....views.pluggable import UpdateDeleteView
+from performance.authorization import basic_check
+from performance.authorization import edit_check
+from performance.extensions import db
+from performance.models import FlightType
+from performance.views.pluggable import ModelView
+from performance.views.pluggable import UpdateDeleteView
 
-from ...forms import ReportForm
-from ...models import Flight
-from ...models import Report
-from ...models import ScheduledReport
+from performance.amazon.forms import ReportForm
+from performance.amazon.models import Flight
+from performance.amazon.models import Report
+from performance.amazon.models import ScheduledReport
 
 report_bp = Blueprint('report', __name__, template_folder='templates')
 
-report_bp.add_url_rule(
-    '/edit/<int:id>',
-    view_func = edit_check(
-        UpdateDeleteView.as_view(
-            'edit_report',
-            ReportForm,
-            model = Report,
-            template = 'report/edit.html',
-            instance_name = 'report',
-        )))
+@report_bp.route('/view/<int:id>')
+@basic_check
+def view_report(id):
+    """
+    View Report object.
+    """
+    report = Report.query.get_or_404(id)
+    # [(flight_type, flight of that type), ...]
+    grouped = [
+        (flight_type,
+         sorted(
+             (flight for flight in report.flights
+              if flight.flight_type == flight_type),
+             key = attrgetter('flight_number')))
+        for flight_type in FlightType.query.order_by(FlightType.report_order)
+    ]
+    context = dict(
+        report = report,
+        grouped = grouped,
+    )
+    return render_template('report/print.html', **context)
 
-report_bp.add_url_rule(
-    '/view/<int:id>',
-    view_func = basic_check(
-        ModelView.as_view(
-            'view_report',
-            Report,
-            'report/print.html',
-            instance_name = 'report',
-        )))
+@report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
+@edit_check
+def edit_report(id):
+    report = Report.query.get_or_404(id)
+    form = ReportForm(obj=report)
+
+    if form.validate_on_submit():
+        if form.delete.data:
+            db.session.delete(report)
+        elif form.submit.data:
+            form.populate_obj(report)
+        db.session.commit()
+        if hasattr(form, 'backurl') and form.backurl.data:
+            return redirect(form.backurl.data)
+    elif request.method == 'GET':
+        form.submit.label.text = 'Update'
+
+    # [(flight_type, flight of that type), ...]
+    grouped = [
+        (flight_type,
+         sorted(
+             (flight for flight in report.flights
+              if flight.flight_type == flight_type),
+             key = attrgetter('flight_number')))
+        for flight_type in FlightType.query.order_by(FlightType.report_order)
+    ]
+    context = dict(
+        form = form,
+        grouped = grouped,
+        report = report,
+    )
+    return render_template('report/edit.html', **context)
+
+def trash():
+    report_bp.add_url_rule(
+        '/edit/<int:id>',
+        view_func = edit_check(
+            UpdateDeleteView.as_view(
+                'edit_report',
+                ReportForm,
+                model = Report,
+                template = 'report/edit.html',
+                instance_name = 'report',
+            )))
+
+    report_bp.add_url_rule(
+        '/view/<int:id>',
+        view_func = basic_check(
+            ModelView.as_view(
+                'view_report',
+                Report,
+                'report/print.html',
+                instance_name = 'report',
+            )))
 
 @report_bp.route('/delete/<int:report_id>')
 @edit_check

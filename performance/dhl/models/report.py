@@ -1,47 +1,12 @@
-import enum
-
-from collections import defaultdict
 from itertools import groupby
-from operator import attrgetter
 
-from sqlalchemy_utils import ChoiceType
-
-from ...extensions import db
-from ...sorting import flight_sort_key
-from ...models.flight_type import FlightType
-from ...models.mixin import MetaMixin
+from performance.extensions import db
+from performance.models.mixin import MetaMixin
 
 from .bound import BoundRelationshipMixin
+from .crewinfo import make_crew_info_column
 from .operation import OperationRelationshipMixin
-
-flightsortkey = attrgetter('bound', 'flight_type', 'flight_number_as_int')
-flightgroupkey = attrgetter('bound', 'flight_type')
-
-class CrewInfo(enum.Enum):
-    FULL_CREW = 0
-    CAPTAIN_ONLY = 1
-    FIRST_OFFICER_ONLY = 2
-    NONE = 3
-
-    def __str__(self):
-        return self.label
-
-
-CrewInfo.FULL_CREW.label = 'Full Crew'
-CrewInfo.CAPTAIN_ONLY.label = 'Captain Only'
-CrewInfo.FIRST_OFFICER_ONLY.label = 'First Officer Only'
-CrewInfo.NONE.label = '(None)'
-
-def make_crew_info_column(label):
-    return db.Column(
-        ChoiceType(
-            CrewInfo,
-            impl = db.Integer()),
-        default = CrewInfo.NONE,
-        info = dict(
-            label = label,
-        )
-    )
+from .util import grouped_flights
 
 class Report(
     BoundRelationshipMixin,
@@ -55,8 +20,11 @@ class Report(
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date)
-    flights = db.relationship('performance.dhl.models.flight.Flight',
-                              backref='report', cascade='all,delete-orphan')
+    flights = db.relationship(
+        'performance.dhl.models.flight.Flight',
+        backref = 'report',
+        cascade = 'all,delete-orphan',
+    )
 
     # comments/details
     system_detail = db.Column(
@@ -133,26 +101,4 @@ class Report(
     dhl_qtd_performance_late = db.Column(db.Integer)
 
     def grouped_flights(self):
-        return groupby(sorted(self.flights, key=flightsortkey), flightgroupkey)
-
-
-class ScheduledReport(
-    MetaMixin,
-    OperationRelationshipMixin,
-    db.Model,
-):
-    """
-    Scheduled reports hold minimal flights to populate new reports on the
-    effective datetime start.
-    """
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    scheduled_flights = db.relationship(
-        'performance.dhl.models.flight.ScheduledFlight',
-        backref='scheduled_report')
-
-    def grouped_flights(self):
-        """
-        """
-        return groupby(sorted(self.scheduled_flights, key=flightsortkey), flightgroupkey)
+        return grouped_flights(self.flights)

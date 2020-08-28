@@ -126,7 +126,10 @@
 
 
 {% block flights %}
-{{ render_flights_table(report, with_edit=true) }}
+{% set with_edit = true %}
+{% for (flight_type, bound), flights in grouped %}
+{% include "report/flight_table.html" with context %}
+{% endfor %}
 {% endblock flights %}
 
 {% block dhl_performance_table %}

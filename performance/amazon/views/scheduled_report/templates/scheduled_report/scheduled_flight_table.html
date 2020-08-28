@@ -1,0 +1,43 @@
+{% from "macros.html" import string %}
+{% from "macros.html" import time %}
+
+{# requires `flight_type`, `scheduled_flights` and `backurl` in context #}
+
+<table class="expand">
+    <thead>
+        <tr>{% set ncols = 6 %}
+            <th></th>
+            <th>Flight</th>
+            <th>Orig</th>
+            <th>ETD</th>
+            <th>Dest</th>
+            <th>ETA</th>
+        </tr>
+    </thead>
+    <tbody>{% if scheduled_flights %}{% for scheduled_flight in scheduled_flights %}
+        <tr>
+            <td class="data">
+                <a href="{{ url_for('scheduled_flight.edit', id=scheduled_flight.id, backurl=backurl) }}">edit</a>
+            </td>
+            <td class="data">{{ string(scheduled_flight.flight_number) }}</td>
+            <td class="data">{{ string(scheduled_flight.origin_station) }}</td>
+            <td class="data">{{ time(scheduled_flight.origin_departure_estimated_time) }}</td>
+            <td class="data">{{ string(scheduled_flight.destination_station) }}</td>
+            <td class="data">{{ time(scheduled_flight.destination_arrival_estimated_time) }}</td>
+        </tr>{% endfor %}{% else %}
+        <tr>
+            <td colspan="{{ ncols }}">
+                <h4>None</h4>
+            </td>
+        </tr>
+    {% endif %}</tbody>
+    <tfoot class="noprint">
+        <tr>
+            <td class="data" colspan="{{ ncols }}">
+                <h4>
+                    <a href="{{ url_for('scheduled_flight.create', scheduled_report_id=scheduled_report.id, flight_type_id=flight_type.id, backurl=backurl) }}">Add {{ flight_type.name }} Flight</a>
+                </h4>
+            </td>
+        </tr>
+    </tfoot>
+</table>

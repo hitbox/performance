@@ -1,15 +1,15 @@
 from flask import Blueprint
-from flask import request
-from flask import render_template
 from flask import redirect
+from flask import render_template
+from flask import request
 
-from ...authorization import edit_check
-from ...extensions import db
-from ...models import FlightType
-from ...views.pluggable import CreateView
-from ...views.pluggable import UpdateDeleteView
+from performance.authorization import edit_check
+from performance.extensions import db
+from performance.models import FlightType
+from performance.views.pluggable import CreateView
+from performance.views.pluggable import UpdateDeleteView
 
-from ..forms import ScheduledFlightForm
+from performance.dhl.forms import ScheduledFlightForm
 
 scheduled_flight_bp = Blueprint('scheduled_flight', __name__)
 

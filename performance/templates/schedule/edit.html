@@ -12,7 +12,6 @@
 {%- block content -%}
 <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
     {{ form.hidden_tag() }}
-    {# XXX share with view_print.html #}
     <table>
         <thead>
             <tr>

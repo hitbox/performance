@@ -6,14 +6,15 @@ from wtforms import SelectField
 from wtforms_alchemy import ClassMap
 from wtforms_alchemy import QuerySelectField
 
-from ...forms import defaults
-from ...forms.base import ModelForm
-from ...forms.fields import StringTimeField
-from ...forms.mixins import BackLinkMixin
-from ...forms.mixins import SubmitUpdateDeleteMixin
-from ...models import FlightType
+from performance.forms import defaults
+from performance.forms.base import ModelForm
+from performance.forms.fields import StringTimeField
+from performance.forms.mixins import BackLinkMixin
+from performance.forms.mixins import SubmitUpdateDeleteMixin
+from performance.models import FlightType
 
-from ..models import Flight
+from performance.dhl.models import Bound
+from performance.dhl.models import Flight
 
 def report_id_from_view_args():
     return request.view_args['report_id']
@@ -46,6 +47,7 @@ class FlightForm(
             'comment',
         ]
         fields_order = [
+            'bound',
             'flight_type',
             'leg',
             'flight_number',
@@ -192,6 +194,15 @@ class FlightForm(
 
     report_id = HiddenField(default=report_id_from_view_args)
 
+    bound = QuerySelectField(
+        'Bound',
+        get_label = 'name',
+        query_factory = lambda: Bound.query.order_by(Bound.report_order).all(),
+        render_kw = {
+            'class': 'narrower flight',
+            'autofocus': True,
+        }
+    )
     flight_type = QuerySelectField(
         'Flight Type',
         default = defaults.flight_type,

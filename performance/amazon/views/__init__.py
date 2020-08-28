@@ -1,14 +1,6 @@
-import humanize
-import werkzeug
+from performance.views import select_date
 
-from flask import current_app
-from flask import flash
-from flask import render_template
-from flask import url_for
-
-from ...views import select_date
-
-from ..models import Report
+from performance.amazon.models import Report
 
 from .flight import flight_bp
 from .report.views import report_bp

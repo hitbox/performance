@@ -1,0 +1,57 @@
+{% from "macros.html" import diff_class %}
+{% from "macros.html" import integer %}
+{% from "macros.html" import string %}
+{% from "macros.html" import time %}
+{% from "macros.html" import yes %}
+
+{% set thisurl = url_for(request.endpoint, **request.view_args) %}
+{% set ncols = 16 if with_edit else 15 %}
+
+{# different grouping than DHL #}
+<h3>{{ flight_type.name }}&nbsp;{{ bound.altname }}</h3>
+<table class="expand">
+    <thead>
+        <tr>
+            <th colspan="{{ ncols - 3 }}"></th>
+            <th colspan="2">ABX Controllable</th>
+            <th></th>
+        </tr>
+        <tr>
+            {% if with_edit %}<th class="noprint"></th>{% endif %}
+            <th>Tail</th>
+            <th>Flight</th>
+            <th>Orig</th>
+            <th>ETD</th>
+            <th>ATD</th>
+            <th>(+/-)</th>
+            <th>Delay Codes</th>
+            <th>Dest</th>
+            <th>ETA</th>
+            <th>ATA</th>
+            <th>(+/-)</th>
+            <th>Delay Codes</th>
+            <th>&gt;&nbsp;15</th>
+            <th>&gt;&nbsp;30</th>
+            <th>Weight</th>
+        </tr>
+    </thead>
+    <tbody>{% if flights %}
+        {% for flight in flights %}<tr tabindex="0">
+            {% include "flight_table_data.html" %}
+        </tr>{% endfor %}
+        {%- else -%}
+        <tr>
+            <td colspan="{{ ncols }}"><h4>None</h4></td>
+        </tr>
+        {% endif %}
+    </tbody>
+    {% if with_edit %}<tfoot class="noprint">
+        <tr>
+            <td colspan="{{ ncols }}">
+                <h4>
+                    <a href="{{ url_for('flight.create', report_id=report.id, flight_type_id=flight_type.id, backurl=thisurl) }}">Add {{ flight_type.name }} {{ bound.altname }}</a>
+                </h4>
+            </td>
+        </tr>
+    </tfoot>{% endif %}
+</table>

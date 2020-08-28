@@ -9,18 +9,53 @@ class ListView(View):
     methods = ['GET']
     template = 'pluggable/list.html'
 
-    def __init__(self, model, template=None, item_renderer=None, page_title=None):
+    def __init__(
+        self,
+        model,
+        template = None,
+        item_renderer = None,
+        page_title = None,
+        query = None,
+    ):
         self.model = model
         self.template = template or self.template
         self.item_renderer = item_renderer or str
         self.page_title = page_title
+        if query is None:
+            query = self.model.query
+        self.query = query
 
     def dispatch_request(self):
-        pagination = self.model.query.paginate()
+        pagination = self.query.paginate()
         context = dict(
             pagination = pagination,
             item_renderer = self.item_renderer,
             page_title = self.page_title,
+        )
+        return render_template(self.template, **context)
+
+
+class GroupbyView(View):
+    methods = ['GET']
+    template = 'pluggable/groupby.html'
+
+    def __init__(self, query, attribute, title=None, template=None):
+        """
+        :param query: callable returning items to list.
+        :param attribute: attribute of items to group by.
+        :param title: page title.
+        :param template: html template.
+        """
+        self.query = query
+        self.attribute = attribute
+        self.title = title
+        self.template = template or self.template
+
+    def dispatch_request(self):
+        context = dict(
+            items = self.query(),
+            attribute = self.attribute,
+            title = self.title,
         )
         return render_template(self.template, **context)
 
@@ -31,21 +66,28 @@ class ModelView(View):
     """
     methods = ['GET']
 
-    def __init__(self, model, template, instance_name=None):
+    def __init__(self, model, template, instance_name=None,
+                 context_processors=None):
         """
         :param model: db model class.
         :param template: template name.
         :param instance_name: template context name for the instance of model.
+        :param context_processors: list of functions that receive the context
+                                   dict before handing to template.
         """
         self.model = model
         self.template = template
         self.instance_name = instance_name
+        self.context_processors = context_processors
 
     def dispatch_request(self, **ident):
         instance_name = self.instance_name or 'instance'
         context = {
             instance_name: self.model.query.get_or_404(ident)
         }
+        if self.context_processors:
+            for context_processor in self.context_processors:
+                context_processor(context)
         return render_template(self.template, **context)
 
 

@@ -1,20 +1,19 @@
 from flask import Blueprint
-from flask import current_app
 from flask import url_for
 from markupsafe import Markup
 
-from ...authorization import edit_check
-from ...views.pluggable import ListView
-from ...views.pluggable import ModelView
+from performance.authorization import edit_check
+from performance.views.pluggable import ListView
+from performance.views.pluggable import ModelView
 
-from ..models import ScheduledReport
+from performance.dhl.models import ScheduledReport
 
-scheduled_report_bp = Blueprint('schedule', __name__)
+scheduled_report_bp = Blueprint('scheduled_report', __name__)
 
 def render_scheduled_report(scheduled_report):
-    return Markup(
-        '<a href="' + url_for('schedule.edit', id=scheduled_report.id) + '">'
-        + scheduled_report.name + '</a>')
+    href = url_for('scheduled_report.edit', id=scheduled_report.id)
+    text = scheduled_report.name
+    return Markup(f'<a href="{href}">{text}</a>')
 
 scheduled_report_bp.add_url_rule(
     '/',
