@@ -1,19 +1,13 @@
-import datetime as dt
-import calendar
-from calendar import Calendar
+import datetime
 
 from flask import Blueprint
 from flask import current_app
 from flask import redirect
 from flask import render_template
 from flask import url_for
-from flask_login import login_required
 
-from ..authorization import redirect_password_reset
 from ..authorization import basic_check
 from ..extensions import db
-from ..utils import nextmonth
-from ..utils import prevmonth
 from ..month import Month
 
 def select_date_blueprint(ReportClass, date_attr_name):
@@ -23,18 +17,10 @@ def select_date_blueprint(ReportClass, date_attr_name):
     """
     select_date_bp = Blueprint('select_date', __name__)
 
-    @select_date_bp.context_processor
-    def inject():
-        return {
-            'makedate': dt.date,
-            'month_names': calendar.month_name,
-            'weekday_abbr': calendar.day_abbr,
-        }
-
     @select_date_bp.route('/<int:year>/<int:month>')
     @basic_check
     def index(year, month):
-        today = dt.date.today()
+        today = datetime.date.today()
         firstweekday = current_app.config['FIRSTWEEKDAY']
         monthobj = Month(year, month, firstweekday)
         # add useful report info to month days attribute
@@ -56,7 +42,7 @@ def select_date_blueprint(ReportClass, date_attr_name):
     @select_date_bp.route('/today')
     @basic_check
     def goto_today():
-        today = dt.date.today()
+        today = datetime.date.today()
         return redirect(url_for('.index', year=today.year, month=today.month))
 
     return select_date_bp

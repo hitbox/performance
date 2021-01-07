@@ -8,6 +8,7 @@ flask-sqlalchemy
 flask-wtf
 humanize
 jsmin
+openpyxl
 passlib
 psycopg2
 pywin32; sys_platform == 'win32'
