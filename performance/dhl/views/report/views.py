@@ -70,28 +70,6 @@ def edit_report(id):
     )
     return render_template('report/edit.html', **context)
 
-def trash():
-    report_bp.add_url_rule(
-        '/edit/<int:id>',
-        view_func = edit_check(
-            UpdateDeleteView.as_view(
-                'edit_report',
-                ReportForm,
-                model = Report,
-                template = 'report/edit.html',
-                instance_name = 'report',
-            )))
-
-    report_bp.add_url_rule(
-        '/view/<int:id>',
-        view_func = basic_check(
-            ModelView.as_view(
-                'view_report',
-                Report,
-                'report/print.html',
-                instance_name = 'report',
-            )))
-
 @report_bp.route('/create_blank_report/<date:report_date>')
 @edit_check
 def create_report_blank(report_date):
@@ -114,7 +92,7 @@ def create_report(report_date):
     db.session.commit()
     return redirect(url_for('.view_report', id=report.id))
 
-@report_bp.route('/new/<date:report_date>')
+@report_bp.route('/prompt_new/<date:report_date>')
 @edit_check
 def prompt_new(report_date):
     # keep endpoint name the same as Amazon so that select_date will enter here.
@@ -164,3 +142,26 @@ def create_report_from_schedule(report_date, schedule_id, operation_id):
     db.session.add(report)
     db.session.commit()
     return redirect(url_for('.edit_report', id=report.id))
+
+
+def trash():
+    report_bp.add_url_rule(
+        '/edit/<int:id>',
+        view_func = edit_check(
+            UpdateDeleteView.as_view(
+                'edit_report',
+                ReportForm,
+                model = Report,
+                template = 'report/edit.html',
+                instance_name = 'report',
+            )))
+
+    report_bp.add_url_rule(
+        '/view/<int:id>',
+        view_func = basic_check(
+            ModelView.as_view(
+                'view_report',
+                Report,
+                'report/print.html',
+                instance_name = 'report',
+            )))

@@ -57,14 +57,20 @@ a:active {
     color: var(--a-active-color);
 }
 
-/* select date link */
-a.date {
-    font-size: 1.25rem;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    padding: 1rem;
-    box-sizing: border-box;
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+}
+
+.wd {
+    /* weekday formatting */
+    padding: .5rem 1rem;
+}
+
+.day {
+    /* cell in a calendar */
+    padding: 1.5rem;
+    border: 1px solid var(--font-color);
 }
 
 .legend {
@@ -72,13 +78,8 @@ a.date {
 }
 
 /* today's date link */
-.date.today {
+.today {
     background: var(--a-date-today-background-color);
-}
-
-/* link to existing report */
-.date.has-report:after {
-    content: "*";
 }
 
 /* top navigation links */
@@ -87,6 +88,7 @@ a.nav {
 }
 
 nav {
+    /* horizontal navigation elements */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -122,15 +124,12 @@ td {
 }
 
 /* field names that appear in rows of tables */
+/* ??? just use <th> ??? */
 td.head {
     font-family: arial;
 }
 
-td.date {
-    padding: 0;
-}
-
-tbody tr {
+tbody {
     font-family: monospace;
 }
 

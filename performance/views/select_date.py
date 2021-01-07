@@ -14,8 +14,13 @@ from ..authorization import basic_check
 from ..extensions import db
 from ..utils import nextmonth
 from ..utils import prevmonth
+from ..month import Month
 
 def select_date_blueprint(ReportClass, date_attr_name):
+    """
+    Return routes using configured ReportClass to compensate for differences
+    between `performance.amazon` and `performance.dhl`.
+    """
     select_date_bp = Blueprint('select_date', __name__)
 
     @select_date_bp.context_processor
@@ -31,20 +36,21 @@ def select_date_blueprint(ReportClass, date_attr_name):
     def index(year, month):
         today = dt.date.today()
         firstweekday = current_app.config['FIRSTWEEKDAY']
-        context = {
-            'year': year,
-            'month': month,
-            'today': today,
-            'calendar': Calendar(firstweekday),
-        }
-        context['prevyear'], context['prevmonth'] = prevmonth(year, month)
-        context['nextyear'], context['nextmonth'] = nextmonth(year, month)
+        monthobj = Month(year, month, firstweekday)
+        # add useful report info to month days attribute
         date_attr = getattr(ReportClass, date_attr_name)
         reports = ReportClass.query.filter(
             db.func.extract('year', date_attr) == year,
             db.func.extract('month', date_attr) == month,
         ).all()
-        context['reports'] = {getattr(report, date_attr_name):report for report in reports}
+        report_dates = {report.date:report for report in reports}
+        for day in monthobj.days:
+            if day.date in report_dates:
+                day.report = report_dates[day.date]
+        context = dict(
+            today = today,
+            month = monthobj,
+        )
         return render_template('select_date.html', **context)
 
     @select_date_bp.route('/today')
