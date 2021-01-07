@@ -5,6 +5,8 @@ REQUIRED_TRUTHY = [
     'SESSION_COOKIE_PATH',
     'REMEMBER_COOKIE_PATH',
     'PERFORMANCE_CONTROLLABLE',
+    'JAVASCRIPT_INJECTION',
+    'TITLE',
 ]
 
 # just required to exist in config

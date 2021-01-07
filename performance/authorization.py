@@ -28,7 +28,7 @@ def redirect_password_reset(func):
         if (hasattr(current_user, 'reset_password')
                 and current_user.reset_password):
             flash('Password reset required', 'info')
-            return redirect(url_for('user.password'))
+            return redirect(url_for('user.reset_password'))
         return func(*args, **kwargs)
     return decorated_view
 

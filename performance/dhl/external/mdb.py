@@ -1,25 +1,22 @@
-import datetime as dt
-import re
-
 from collections import defaultdict
 from operator import itemgetter
 from pathlib import Path
 
-from ..extensions import db
-from ..mdbreader import mdbreader
-from ..models import FlightType
-from ..utils import datefromiso
-from ..utils import float_or_none
-from ..utils import int_or_none
-from ..utils import str_or_none
-from ..utils import timefromiso
+from performance.extensions import db
+from performance.mdbreader import mdbreader
+from performance.models import FlightType
+from performance.utils import datefromiso
+from performance.utils import float_or_none
+from performance.utils import int_or_none
+from performance.utils import str_or_none
+from performance.utils import timefromiso
 
-from .models import Bound
-from .models import Flight
-from .models import Operation
-from .models import Report
-from .models import ScheduledFlight
-from .models import ScheduledReport
+from ..models import Bound
+from ..models import Flight
+from ..models import Operation
+from ..models import Report
+from ..models import ScheduledFlight
+from ..models import ScheduledReport
 
 class Migrator:
     """
@@ -106,9 +103,7 @@ class Migrator:
         for detaildict in legacy['details']:
             pk = operation_id, date = getpk(detaildict)
 
-            report = Report(
-                date = date,
-            )
+            report = Report(date=date)
 
             # operation
             # XXX: dirty data, some operations are referenced that do not exist

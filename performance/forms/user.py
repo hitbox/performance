@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField
 from wtforms import StringField
 from wtforms import SubmitField
+from wtforms.validators import EqualTo
 
 from ..models import User
 
@@ -14,7 +15,7 @@ class LoginForm(BaseFlaskForm):
     """
     username = StringField('username')
     password = PasswordField('password')
-    submit = SubmitField('login')
+    submit = SubmitField('Login')
 
 
 class UserForm(ModelForm):
@@ -23,3 +24,12 @@ class UserForm(ModelForm):
     """
     class Meta:
         model = User
+
+
+class ResetPasswordForm(BaseFlaskForm):
+    """
+    Reset password form
+    """
+    password = PasswordField('password')
+    confirm = PasswordField('reset', validators=[EqualTo('password')])
+    submit = SubmitField('Reset')

@@ -11,6 +11,5 @@ class User(UserMixin, db.Model):
     password = db.Column(PasswordType(schemes=['pbkdf2_sha512']))
     is_admin = db.Column(db.Boolean, default=False)
     is_editor = db.Column(db.Boolean, default=False)
-
     is_active = db.Column(db.Boolean, default=True)
     reset_password = db.Column(db.Boolean, default=True)

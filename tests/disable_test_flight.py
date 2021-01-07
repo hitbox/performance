@@ -4,7 +4,12 @@ import unittest
 from performance import parse
 from performance.app import create_app
 from performance.extensions import db
-from performance.models import Delay, DelayCode, Flight, FlightType, Leg, Report
+from performance.models import Delay
+from performance.models import DelayCode
+from performance.models import Flight
+from performance.models import FlightType
+from performance.models import Leg
+from performance.models import Report
 
 from tests.base import BaseTest
 
