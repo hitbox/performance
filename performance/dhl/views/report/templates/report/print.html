@@ -1,15 +1,7 @@
 {% extends "report/base.html" %}
 
-{%- from "macros.html" import blank_if_falsy -%}
-{%- from "macros.html" import blank_if_none -%}
-{%- from "macros.html" import string -%}
-{%- from "macros.html" import diff_class -%}
 {%- from "macros.html" import integer -%}
 {%- from "macros.html" import percent -%}
-{%- from "macros.html" import render_delaycodes -%}
-{%- from "macros.html" import time -%}
-{%- from "macros.html" import yes -%}
-{%- from "report/macros.html" import render_flights_table %}
 
 
 {% block main_head %}
@@ -149,17 +141,16 @@
     {% set subs = ['1200', '2000', '0300'] %}
     <div>
         <h3>Crew Info</h3>
-        <table class="expand">
-            <tbody>{% for s in subs %}
-                <tr>
-                    <td>{{ s }}</td>
-                    <td>{{ report['crew_info_' + s ] }}</td>
-                </tr>{% endfor %}
-            </tbody>
-        </table>
+        <div id=crew-info>{% for sub in subs %}
+            <div>{{ sub }}</div><div>{{ report['crew_info_' + sub ] }}</div>
+        {% endfor %}</div>
     </div>
     <div>
         <h3>Aircraft Spares</h3>
+        <div id=aircraft-spares>{% for sub in subs %}
+            <div>{{ sub }}</div><div>{{ report['aircraft_spares_' + sub ] }}</div>
+        {% endfor %}</div>
+        {#
         <table class="expand">
             <tbody>{% for s in subs %}
                 <tr>
@@ -168,6 +159,7 @@
                 </tr>{% endfor %}
             </tbody>
         </table>
+        #}
     </div>
 </div>
 {% endblock %}

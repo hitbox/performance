@@ -1,3 +1,12 @@
+import click
+import openpyxl
+
+TYPEMAP = {
+    # Calendar module days of week: 0 is Monday, 6 is Sunday.
+    # The worksheet seems to have 1 is Mon., 7 is Sunday.
+    'UTC\nDOW': lambda v: list(int(c) for c in str(v-1)),
+}
+
 
 def import_flights(path):
     wb = openpyxl.load_workbook(path)
@@ -21,4 +30,3 @@ def import_flights(path):
 
         pprint(rowdict)
         break
-

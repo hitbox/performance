@@ -1,3 +1,5 @@
+import click
+
 from operator import attrgetter
 
 from flask import Blueprint
@@ -13,6 +15,7 @@ from performance.models import FlightType
 from performance.views.pluggable import ModelView
 from performance.views.pluggable import UpdateDeleteView
 
+from performance.dhl import randomdata
 from performance.dhl.forms import ReportForm
 from performance.dhl.models import Bound
 from performance.dhl.models import Flight
@@ -70,7 +73,7 @@ def edit_report(id):
     )
     return render_template('report/edit.html', **context)
 
-@report_bp.route('/create_blank_report/<date:report_date>')
+@report_bp.route('/create-blank-report/<date:report_date>')
 @edit_check
 def create_report_blank(report_date):
     """
@@ -143,6 +146,26 @@ def create_report_from_schedule(report_date, schedule_id, operation_id):
     db.session.commit()
     return redirect(url_for('.edit_report', id=report.id))
 
+@report_bp.route('/create-random-report/<date:report_date>')
+@edit_check
+def create_random_report(report_date):
+    report = randomdata.random_report(report_date)
+    db.session.add(report)
+    db.session.commit()
+    return redirect(url_for('.view_report', id=report.id))
+
+@report_bp.cli.command('mkrandom')
+@click.argument('date', type=click.DateTime(formats=['%Y-%m-%d']))
+@click.option('--commit/--no-commit')
+def mkrandom(date, commit):
+    """
+    CLI create random report.
+    """
+    date = date.date()
+    report = randomdata.random_report(date)
+    db.session.add(report)
+    if commit:
+        db.session.commit()
 
 def trash():
     report_bp.add_url_rule(

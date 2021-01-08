@@ -1,19 +1,38 @@
 {%- extends "base.html" -%}
 
+{% macro render_month_link(month) %}
+<h4>{# abbreviated month name showing year if different than this page #}
+    <a href="{{ url_for('.index', year=month.year, month=month.month) }}">{{ month.abbr }}.{% if month.year != request.view_args.year %}&nbsp;{{ month.year }}{% endif %}</a>
+</h4>
+{% endmacro %}
+
+{% macro render_url_for(day) %}
+{% if day.report %}{{ url_for('report.view_report', id=day.report.id) }}{% else %}{{ url_for('report.prompt_new', report_date=day.date) }}{% endif %}
+{% endmacro %}
+
+{% macro render_day(day) %}
+    {% if day.number %}
+        {% if not current_user.is_editor %}
+            <div class="day">{{ day.number }}</div>
+        {% else %}
+            <a class="day{% if day.date == today %} today{% endif %}" href="{{ render_url_for(day) }}">{% if day.report %}&starf; {% endif %}{{ day.number }}</a>
+        {% endif %}
+    {% else %}
+        <div class="day"></div>
+    {% endif %}
+{% endmacro %}
+
 {% block content %}
 <div>
     <nav>
-        <h4>
-            <a href="{{ url_for('select_date.index', year=month.previous.year, month=month.previous.month) }}">{{ month.previous.abbr }}.{% if month.previous.year != year %}&nbsp;{{ month.previous.year }}{% endif %}</a>
-        </h4>
+        {{ render_month_link(month.previous) }}
         <h3>{{ month.name }}&nbsp;{{ month.year }}</h3>
-        <h4>
-            <a href="{{ url_for('select_date.index', year=month.next.year, month=month.next.month) }}">{{ month.next.abbr }}.{% if month.next.year != year %}&nbsp;{{ month.next.year }}{% endif %}</a>
-        </h4>
+        {{ render_month_link(month.next) }}
     </nav>
     <div class=calendar>
-        {% for wd in month.weekdays %}<div class="wd">{{ wd.abbr }}</div>{% endfor %}{# loop days #}{% for day in month.days %}{% if day.number %}<a class="day{% if day.date == today %} today{% endif %}" href="{% if day.report %}{{ url_for('report.view_report', id=day.report.id) }}{% else %}{{ url_for('report.prompt_new', report_date=day.date) }}{% endif %}">{% if day.report %}&starf; {% endif %}{{ day.number }}</a>{% else %}<div class="day">{# day outside this month #}</div>{% endif %}{% endfor %}
+        {# XXX non-editor users get 403 error message #}
+        {# weekdays #}{% for wd in month.weekdays %}<div class="wd">{{ wd.abbr }}</div>{% endfor %}{% for day in month.days %}{{ render_day(day) }}{% endfor %}
     </div>
     <h4>&starf; Report exists</h4>
-    {% if (month.year, month.month) != (today.year, today.month) %}<h4><a href="{{ url_for('select_date.goto_today') }}">Go to current calendar</a></h4>{% endif %}
+    {% if (month.year, month.month) != (today.year, today.month) %}<h4><a href="{{ url_for('.goto_today') }}">Go to current calendar</a></h4>{% endif %}
 </div>{% endblock content %}

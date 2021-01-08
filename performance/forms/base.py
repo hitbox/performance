@@ -1,5 +1,5 @@
-from math import inf
 from collections import OrderedDict
+from math import inf
 
 from flask_wtf import FlaskForm
 from wtforms import Form

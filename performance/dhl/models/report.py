@@ -19,11 +19,11 @@ class Report(
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
+    date = db.Column(db.Date, unique=True)
     flights = db.relationship(
         'performance.dhl.models.flight.Flight',
         backref = 'report',
-        cascade = 'all,delete-orphan',
+        cascade = 'all, delete-orphan',
     )
 
     # comments/details
@@ -86,7 +86,9 @@ class Report(
     dhl_arrival_performance_mtd_lanes = db.Column(db.Integer)
     dhl_arrival_performance_mtd_late = db.Column(db.Integer)
     dhl_assumed_best_arrival_performance_for_month_percent = db.Column(db.Float)
+
     # XXX: lanes and late unused?
+    #      It does not look like these are used.
     dhl_assumed_best_arrival_performance_for_month_lanes = db.Column(db.Integer)
     dhl_assumed_best_arrival_performance_for_month_late = db.Column(db.Integer)
     dhl_arrival_performance_wtd = db.Column(db.Float)
