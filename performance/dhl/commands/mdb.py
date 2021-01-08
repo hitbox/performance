@@ -4,7 +4,7 @@ from flask.cli import AppGroup
 
 from ...extensions import db
 
-from ..external.mdb import Migrator
+from ..external_data.mdb import Migrator
 
 mdb_cli = AppGroup('mdb', help='Data commands')
 

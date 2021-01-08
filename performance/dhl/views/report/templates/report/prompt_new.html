@@ -3,20 +3,26 @@
 {% block main %}<article>
     <h1>New Report</h1>
     <h3>{{ report_date.strftime(config.DATEFMT) }}</h3>
+    {#
+    2021-01-08: disabling links to "new report from schedule"
     <h3>From Schedule</h3>
     {% for scheduled_report in scheduled_reports %}
     <h4>
         <a href="{{ url_for('report.prompt_operation', report_date=report_date, schedule_id=scheduled_report.id) }}">{{ scheduled_report.name }}</a>
     </h4>
     {% endfor %}
+    #}
+    <h4>
+        <a href="{{ url_for('report.create_report_blank', report_date=report_date) }}">Create blank report</a>
+    </h4>
+    <h4>
+        <a href="{{ url_for('report.import_excel_schedule', report_date=report_date) }}">Import Excel schedule file</a>
+    </h4>
     {% if config.ENV == 'development' %}
+    <h2>Development-Only</h2>
     <h3>Random</h3>
     <h4>
         <a href="{{ url_for('report.create_random_report', report_date=request.view_args.report_date) }}">Create random report</a>
     </h4>
-    {% endif %}
-    <h3>Blank</h3>
-    <h4>
-        <a href="{{ url_for('report.create_report_blank', report_date=report_date) }}">Create blank report</a>
-    </h4>
+    {% endif %}{# env == development #}
 </article>{% endblock main %}

@@ -1,0 +1,68 @@
+/* styling for the main point of interacting with the site--the printable
+ * performance stats and flights page. */
+
+/* a group of performance statistics */
+.performance-statistics {
+    width: fit-content;
+}
+
+/* weird crosstab-like performance stats */
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    grid-gap: 1px;
+}
+
+.performance-grid > * {
+    box-shadow: 0 0 0 1px var(--font-color);
+    padding: 0.25rem;
+}
+
+.performance-grid > .head {
+    font-weight: bold;
+    font-size: 0.85rem
+}
+
+.performance-grid > .empty {
+    grid-column: 3 / span 2;
+}
+
+
+/* info-* Crew and Aircraft info after flights */
+
+.info-row {
+    display: flex;
+    margin: 1.5rem 0 0 0;
+}
+
+.info-card > .head {
+    /* Make look like the other <h*> tags used to separate sections (h3).
+     * Using a class so that there is not as much "bottom" space (separation)
+     * between the header and the data.
+     */
+    font-size: 1.17rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.info-row > * {
+    margin: 0 1rem 0 0;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-gap: 1px;
+}
+
+.info-grid > * {
+    padding: 0.25rem;
+    box-shadow: 0 0 0 1px var(--font-color);
+}
+
+/* free-form, pre-formatted details */
+pre.detail {
+    border: 1px solid var(--font-color);
+    margin: 0;
+    padding: 0.5rem;
+}

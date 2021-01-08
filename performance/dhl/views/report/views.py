@@ -1,5 +1,3 @@
-import click
-
 from operator import attrgetter
 
 from flask import Blueprint
@@ -8,6 +6,7 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
+# amazon/dhl shared
 from performance.authorization import basic_check
 from performance.authorization import edit_check
 from performance.extensions import db
@@ -15,7 +14,9 @@ from performance.models import FlightType
 from performance.views.pluggable import ModelView
 from performance.views.pluggable import UpdateDeleteView
 
-from performance.dhl import randomdata
+# dhl specific
+from performance.dhl.external_data.excel_schedule import import_flights
+from performance.dhl.forms import ImportExcelScheduleForm
 from performance.dhl.forms import ReportForm
 from performance.dhl.models import Bound
 from performance.dhl.models import Flight
@@ -38,7 +39,7 @@ def grouped_flights(report):
     ]
     return grouped
 
-@report_bp.route('/view/<int:id>')
+@report_bp.route('/<int:id>')
 @basic_check
 def view_report(id):
     """
@@ -49,7 +50,20 @@ def view_report(id):
         report = report,
         grouped = grouped_flights(report),
     )
-    return render_template('report/print.html', **context)
+    return render_template('report/print_grid.html', **context)
+
+@report_bp.route('/grid/<int:id>')
+@basic_check
+def view_report_grid(id):
+    """
+    View DHL Report object.
+    """
+    report = Report.query.get_or_404(id)
+    context = dict(
+        report = report,
+        grouped = grouped_flights(report),
+    )
+    return render_template('report/print_grid.html', **context)
 
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @edit_check
@@ -95,15 +109,37 @@ def create_report(report_date):
     db.session.commit()
     return redirect(url_for('.view_report', id=report.id))
 
-@report_bp.route('/prompt_new/<date:report_date>')
+@report_bp.route('/prompt-new/<date:report_date>')
 @edit_check
 def prompt_new(report_date):
+    """
+    Prompt for new report
+    """
     # keep endpoint name the same as Amazon so that select_date will enter here.
     context = {
         'report_date': report_date,
         'scheduled_reports': ScheduledReport.query.all(),
     }
-    return render_template('report/prompt_schedule.html', **context)
+    return render_template('report/prompt_new.html', **context)
+
+@report_bp.route('/import-excel-schedule/<date:report_date>', methods=['GET', 'POST'])
+@edit_check
+def import_excel_schedule(report_date):
+    """
+    Import Excel Schedule File
+    """
+    form = ImportExcelScheduleForm()
+    preview = None
+    if form.validate_on_submit():
+        file = request.files[form.excel_path.name]
+        preview = import_flights(form.excel_path.data, report_date)
+        if form.save.data:
+            return 'SAVED\n\n' + str(preview)
+    context = dict(
+        form = form,
+        preview = preview,
+    )
+    return render_template('report/import_excel_schedule.html', **context)
 
 @report_bp.route('/new/<int:schedule_id>/<date:report_date>')
 @edit_check
@@ -149,42 +185,10 @@ def create_report_from_schedule(report_date, schedule_id, operation_id):
 @report_bp.route('/create-random-report/<date:report_date>')
 @edit_check
 def create_random_report(report_date):
+    """
+    Create random report.
+    """
     report = randomdata.random_report(report_date)
     db.session.add(report)
     db.session.commit()
     return redirect(url_for('.view_report', id=report.id))
-
-@report_bp.cli.command('mkrandom')
-@click.argument('date', type=click.DateTime(formats=['%Y-%m-%d']))
-@click.option('--commit/--no-commit')
-def mkrandom(date, commit):
-    """
-    CLI create random report.
-    """
-    date = date.date()
-    report = randomdata.random_report(date)
-    db.session.add(report)
-    if commit:
-        db.session.commit()
-
-def trash():
-    report_bp.add_url_rule(
-        '/edit/<int:id>',
-        view_func = edit_check(
-            UpdateDeleteView.as_view(
-                'edit_report',
-                ReportForm,
-                model = Report,
-                template = 'report/edit.html',
-                instance_name = 'report',
-            )))
-
-    report_bp.add_url_rule(
-        '/view/<int:id>',
-        view_func = basic_check(
-            ModelView.as_view(
-                'view_report',
-                Report,
-                'report/print.html',
-                instance_name = 'report',
-            )))

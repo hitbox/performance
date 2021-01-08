@@ -2,7 +2,9 @@
 
 {% block main %}
 
-{% block main_head %}<h3>{{ config.TITLE }}: {{ report.operation.name }}, {{ report.date.strftime(config.DATEFMT) }}</h3>{% endblock main_head %}
+{% block main_head %}
+<h3>{{ config.TITLE }}: {{ report.operation.name }}, {{ report.date.strftime(config.DATEFMT) }}</h3>
+{% endblock main_head %}
 
 
 {% block dhl_performance_table %}

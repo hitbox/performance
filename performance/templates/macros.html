@@ -35,6 +35,12 @@
 {%- endmacro -%}
 
 
+{% macro render_date(value) %}{% if value %}{{ value.strftime(config.DATEFMT) }}{% endif %}{% endmacro %}
+
+{% macro render_datetime(value) %}{% if value %}{{ value.strftime(config.DATETIMEFMT) }}{% endif %}{% endmacro %}
+
+{% macro render_time(value) %}{% if value %}{{ value.strftime(config.TIMEFMT) }}{% endif %}{% endmacro %}
+
 {%- macro render_field_group(field) -%}
 {%- if field.type not in ('HiddenField', 'CSRFTokenField') -%}
 <div class="form-group{% if field.errors %} has-error{% endif %} {{ kwargs.pop('class_', '') }}">

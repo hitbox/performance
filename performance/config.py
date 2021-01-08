@@ -31,8 +31,9 @@ def configure_defaults(app):
     app.config.setdefault('PREFIX', '/')
     app.config.setdefault('TITLE', 'TITLE')
     # Used in templates for date formats.
-    app.config.setdefault('DATEFMT', '%d-%b-%y')
-    app.config.setdefault('DATETIMEFMT', '%d-%b-%y %H:%S')
+    datefmt = app.config.setdefault('DATEFMT', '%d-%b-%y')
+    timefmt = app.config.setdefault('TIMEFMT', '%H:%S')
+    app.config.setdefault('DATETIMEFMT', datefmt + ' ' + timefmt)
     # Used in templates to specify how many dates around the current should be
     # shown in navigation.
     app.config.setdefault('DATESPREAD', 4)

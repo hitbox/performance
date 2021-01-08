@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}<main>
+{% block content %}<main style="width: 500px;">
     <h1><span class="error code">{{ e.code }}</span>{{ e.name }}</h1>
     <p>{{ e.description }}</p>
     <a href="{{ url_for('index') }}">Back to index</a>

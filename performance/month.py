@@ -13,6 +13,8 @@ class Weekday:
         self.number = number
         self.name = calendar.day_name[self.number]
         self.abbr = calendar.day_abbr[self.number]
+        self.shortabbr = self.abbr[:3]
+        self.shortestabbr = self.abbr[:2]
 
 
 class Day:

@@ -1,0 +1,55 @@
+#monthnav {
+    display: grid;
+    grid-template-columns: repeat(3, calc(100% / 3));
+    text-align: center;
+}
+
+#monthnav a {
+    /* top/bottom spacing like the h tag in the middle */
+    padding: var(--header-separation) 0;
+}
+
+#monthnav a:first-child {
+    /* previous month link */
+    text-align: left;
+}
+
+#monthnav a:last-child {
+    /* next month link */
+    text-align: right;
+}
+
+/* use id instead? */
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+}
+
+.wd {
+    /* weekday formatting */
+    padding: .5rem 1rem;
+    font-size: .75rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.day {
+    /* cell in a calendar */
+    padding: 1.5rem;
+    border: 1px solid var(--font-color);
+}
+
+.legend {
+    margin-top: 2rem;
+}
+
+/* today's date link */
+.today {
+    background: var(--a-date-today-background-color);
+}
+
+/* this-weekday used on the import screen to highlight why this flight is included */
+.this-weekday {
+    background-color: ForestGreen;
+    color: white;
+}

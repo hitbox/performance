@@ -1,4 +1,5 @@
 from flask import Blueprint
+from flask import abort
 from flask import flash
 from flask import render_template
 
@@ -16,3 +17,7 @@ def index():
     flash('Multiline flash message\nLine 1\nLine 2', 'info')
     flash('TODO message only for development', 'todo')
     return render_template('debug.html')
+
+@debug_bp.route('/return-abort/<int:error>')
+def return_abort(error):
+    abort(error)

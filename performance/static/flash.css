@@ -1,0 +1,40 @@
+/* all flashes container */
+/* ???: make an id instead of class? */
+.flashes {
+    color: White;
+}
+
+/* single flash item */
+.flash {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 15px;
+}
+
+/* flash close button */
+.close {
+    font-size: 25px;
+}
+
+.flash.info {
+    background-color: CornflowerBlue;
+}
+
+.flash.success {
+    background-color: ForestGreen;
+}
+
+.flash.warning {
+    background-color: DarkOrange;
+}
+
+.flash.error {
+    background-color: Crimson;
+}
+
+/* error page */
+.error.code {
+    margin-right: 1rem;
+}
+
+

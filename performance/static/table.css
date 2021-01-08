@@ -1,0 +1,25 @@
+table {
+    border-collapse: collapse;
+}
+
+table.expand {
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid var(--font-color);
+}
+
+th {
+    padding: 4px 6px;
+    font-size: .8rem;
+    vertical-align: bottom;
+}
+
+td {
+    padding: 2px 4px;
+}
+
+tbody {
+    font-family: monospace;
+}

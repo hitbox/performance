@@ -19,7 +19,7 @@ class Report(
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, unique=True)
+    date = db.Column(db.Date)
     flights = db.relationship(
         'performance.dhl.models.flight.Flight',
         backref = 'report',
@@ -52,15 +52,47 @@ class Report(
         ),
     )
 
+    @property
+    def iter_details(self):
+        attrnames = ['system_detail', 'charter_detail', 'extra_section_detail',
+                     'ferry_flight_detail']
+        for attrname in attrnames:
+            yield {
+                'field': getattr(self.__class__, attrname),
+                'value': getattr(self, attrname),
+            }
+
     aircraft_spares_1200 = db.Column(db.Integer, info=dict(label='1200'))
     aircraft_spares_1800 = db.Column(db.Integer)
     aircraft_spares_2000 = db.Column(db.Integer, info=dict(label='2000'))
     aircraft_spares_0300 = db.Column(db.Integer, info=dict(label='0300'))
 
+    @property
+    def list_aircraft_spares(self):
+        l = []
+        subs = ['1200', '2000', '0300']
+        for sub in subs:
+            attrname = 'aircraft_spares_' + sub
+            attr = getattr(self.__class__, attrname)
+            value = getattr(self, attrname)
+            l.append((attr, value))
+        return l
+
     crew_info_1200 = make_crew_info_column('1200')
     crew_info_1800 = make_crew_info_column('1800')
     crew_info_2000 = make_crew_info_column('2000')
     crew_info_0300 = make_crew_info_column('0300')
+
+    @property
+    def list_crew_info(self):
+        l = []
+        subs = ['1200', '2000', '0300']
+        for sub in subs:
+            attrname = 'crew_info_' + sub
+            attr = getattr(self.__class__, attrname)
+            value = getattr(self, attrname)
+            l.append((attr, value))
+        return l
 
     # ABX/Amazon performance numbers
     # NOTE: previous is actual today (legacy problem).

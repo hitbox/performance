@@ -1,12 +1,9 @@
 from sqlalchemy.ext.declarative import declared_attr
 
-from ...extensions import db
-from ...models.mixin import MetaMixin
+from performance.extensions import db
+from performance.models.mixin import MetaMixin
 
-class Bound(
-    db.Model,
-    MetaMixin,
-):
+class Bound(db.Model, MetaMixin):
     """
     Created to allow an additional relationship to flights for in/out bound.
     """

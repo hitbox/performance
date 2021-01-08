@@ -13,6 +13,8 @@
     --a-date-today-background-color: Bisque;
 
     --data-href-background-color: #111;
+
+    --header-separation: 1.5rem;
 }
 
 [data-theme="dark"] {
@@ -32,13 +34,21 @@
 }
 
 body {
-    align-items: center;
-    background-color: var(--background-color);
-    color: var(--font-color);
     display: flex;
     flex-direction: column;
+    color: var(--font-color);
+    background-color: var(--background-color);
     font-family: arial;
     padding-bottom: 100%;
+}
+
+main {
+    width: fit-content;
+    margin: 0 auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: var(--header-separation) 0;
 }
 
 a:link {
@@ -57,66 +67,25 @@ a:active {
     color: var(--a-active-color);
 }
 
-.calendar {
-    display: grid;
-    grid-template-columns: repeat(7, auto);
-}
-
-.wd {
-    /* weekday formatting */
-    padding: .5rem 1rem;
-}
-
-.day {
-    /* cell in a calendar */
-    padding: 1.5rem;
-    border: 1px solid var(--font-color);
-}
-
-.legend {
-    margin-top: 2rem;
-}
-
-/* today's date link */
-.today {
-    background: var(--a-date-today-background-color);
-}
-
-/* top navigation links */
-a.nav {
-    padding: 0 2rem;
-}
-
 nav {
     /* horizontal navigation elements */
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: fit-content;
+    margin: 0 auto;
 }
 
-table {
-    border-collapse: collapse;
-}
-
-table.expand {
-    width: 100%;
-}
-
-table, th, td {
-    border: 1px solid var(--font-color);
-}
-
-#crew-info, #aircraft-spares {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-}
-
-#crew-info > *, #aircraft-spares > * {
-    padding: .25rem .5rem;
-    font-family: monospace;
+nav > * {
+    padding: 0 2rem;
 }
 
 .data {
+    font-family: monospace;
+}
+
+.data.number {
+    text-align: right;
 }
 
 .data.numeric {
@@ -125,25 +94,6 @@ table, th, td {
 
 .data.late {
     color: red;
-}
-
-th {
-    padding: 4px 6px;
-    font-size: .8rem;
-}
-
-td {
-    padding: 2px 4px;
-}
-
-/* field names that appear in rows of tables */
-/* ??? just use <th> ??? */
-td.head {
-    font-family: arial;
-}
-
-tbody {
-    font-family: monospace;
 }
 
 ul.flat {
@@ -171,182 +121,6 @@ ul.buttons > li {
     width: 50%;
 }
 
-#crew_info_1200, #crew_info_2000, #crew_info_0300 {
-    width: 12rem;
-}
-
-input, select, textarea {
-    font-family: monospace;
-    color: var(--input-font-color);
-    background-color: var(--input-background-color);
-}
-
-input[type="submit"] {
-    margin: 4px 2px;
-}
-
-input[type="submit"]:first-child {
-    margin-left: 0;
-}
-
-button, fieldset, input, label, select, textarea {
-    box-sizing: border-box;
-}
-
-input[type=date],
-input[type=datetime],
-input[type=number],
-input[type=text],
-select,
-textarea:not([cols]) {
-    width: 15rem;
-}
-
-input[type=date].narrower,
-input[type=datetime].narrower,
-input[type=number].narrower,
-input[type=text].narrower,
-select.narrower,
-textarea:not([cols]).narrower {
-    width: 10rem;
-}
-
-input[type=date].narrowest,
-input[type=datetime].narrowest,
-input[type=number].narrowest,
-input[type=text].narrowest,
-select.narrowest,
-textarea:not([cols]).narrowest {
-    width: 6rem;
-}
-
-button, input[type=submit] {
-    width: 10rem;
-}
-
-/* rename "sm" to "narrowest" */
-button.sm, input[type=submit].sm {
-    width: 5rem;
-}
-
-button.narrow, input[type=submit].narrow {
-    width: 7.5rem;
-}
-
-button.narrower, input[type=submit].narrower {
-    width: 7rem;
-}
-
-button, input, select, textarea {
-    padding: .5rem;
-}
-
-input[type=file] {
-    padding: 0;
-}
-
-form {
-    display: inline-block;
-    margin: 0 auto;
-}
-
-form.expand {
-    display: block;
-}
-
-/* actual label text is inside a span */
-label > span {
-    display: inline-block;
-    text-align: right;
-    vertical-align: middle;
-}
-
-label > span.normal {
-    width: 150px;
-}
-
-label > span.narrow {
-    width: 100px;
-}
-
-label > span.narrower {
-    width: 50px;
-}
-
-label {
-    position: relative;
-}
-
-fieldset {
-    margin: .5rem 0;
-}
-
-.label-for-textarea {
-    vertical-align: top;
-}
-
-.date-entry {
-    width: 6rem !important;
-}
-
-.time-entry {
-    width: 6rem !important;
-}
-
-li.input-group {
-    margin-left: .5rem !important;
-}
-
-.single-line {
-    margin-left: 2rem;
-}
-
-input[data-autocomplete-varname=airports] {
-    width: 6rem;
-}
-
-/* flight form */
-
-input.flight, textarea.flight, select.flight {
-    margin: .5rem;
-}
-.click:hover {
-    cursor: pointer;
-}
-
-/* all flashes container */
-.flashes {
-    color: White;
-}
-
-/* single flash item */
-.flash {
-    padding: 10px;
-    display: grid;
-    grid-template-columns: 1fr 15px;
-}
-
-/* flash close button */
-.close {
-    font-size: 25px;
-}
-
-.flash.info {
-    background-color: CornflowerBlue;
-}
-
-.flash.success {
-    background-color: ForestGreen;
-}
-
-.flash.warning {
-    background-color: DarkOrange;
-}
-
-.flash.error {
-    background-color: Crimson;
-}
-
 @media print {
     * {
         color: black;
@@ -368,4 +142,7 @@ input.flight, textarea.flight, select.flight {
         padding-bottom: 0 !important;
     }
 
+    .performance-section {
+        page-break-inside: avoid;
+    }
 }

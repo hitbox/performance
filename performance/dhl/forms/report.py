@@ -1,8 +1,12 @@
-from wtforms.widgets.html5 import NumberInput
+from flask_wtf.file import FileField
+from wtforms import BooleanField
+from wtforms import SubmitField
+from wtforms.validators import DataRequired
 
-from ...forms.base import ModelForm
-from ...forms.mixins import BackLinkMixin
-from ...forms.mixins import SubmitUpdateDeleteMixin
+from performance.forms.base import BaseFlaskForm
+from performance.forms.base import ModelForm
+from performance.forms.mixins import BackLinkMixin
+from performance.forms.mixins import SubmitUpdateDeleteMixin
 
 from ..models import Report
 
@@ -57,6 +61,8 @@ class ReportForm(
             'ferry_flight_detail',
             'system_detail',
         ]
+
+        # add class to all fields
         field_args = {
             key: {
                 'render_kw': {
@@ -66,10 +72,18 @@ class ReportForm(
             for key in only
         }
 
-        for field in ['charter_detail', 'extra_section_detail', 'ferry_flight_detail', 'system_detail']:
+        # add render_kw cols/rows to textarea fields
+        fields = [
+            'charter_detail',
+            'extra_section_detail',
+            'ferry_flight_detail',
+            'system_detail',
+        ]
+        for field in fields:
             field_args[field]['render_kw']['cols'] = 120
             field_args[field]['render_kw']['rows'] = 15
 
+        # add render_kw class to percent fields
         _percent_fields = [
             'dhl_arrival_performance_mtd',
             'dhl_arrival_performance_mtd_30_percent',
@@ -85,3 +99,11 @@ class ReportForm(
         for key, options in field_args.items():
             if key in _percent_fields:
                 options['render_kw']['class'] += ' percent'
+
+
+class ImportExcelScheduleForm(BaseFlaskForm):
+
+    excel_path = FileField('Excel schedule file', validators=[DataRequired()])
+
+    save = SubmitField('Import...')
+    preview = SubmitField('Preview')

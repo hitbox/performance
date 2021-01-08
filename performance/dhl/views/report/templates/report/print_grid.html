@@ -1,0 +1,58 @@
+{% extends "report/base_grid.html" %}
+
+{% from "macros.html" import integer %}
+{% from "macros.html" import percent %}
+
+
+{% block main_head %}
+{{ super() }}
+<div class="noprint">
+    <h4>
+        <a href="javascript:;" onclick="window.print(); return false">Print</a>
+    </h4>
+    {% if current_user.is_editor %}<h4>
+        <a href="{{ url_for('report.edit_report', id=report.id) }}">Edit</a>
+    </h4>{% endif %}
+</div>
+{% endblock main_head %}
+
+
+{% block flights %}
+{% for (flight_type, bound), flights in grouped %}
+    {% if flights %}
+        {% include "report/flight_table.html" with context %}
+    {% else %}
+        {# edit link to add new? #}
+    {% endif %}
+{% endfor %}
+{% endblock flights %}
+
+
+{% block after_flights %}
+
+{% for detail in report.iter_details|selectattr('value') %}
+<div class="performance-section">
+    <h3>{{ detail.field.info.label }}</h3>
+    <pre class=detail>{{ detail.value }}</pre>
+</div>
+{% endfor %}
+
+{% if false %}{# disabled crew-info and aircraft-spares (delete me at some point) #}
+<div class="info-row performance-section">
+    <div class=info-card>
+        <div class=head>Crew Info</div>
+        <div class=info-grid>{% for attr, value in report.list_crew_info %}
+            <div class=data>{{ attr.info.label }}</div>
+            <div>{{ value }}</div>
+        {% endfor %}</div>
+    </div>
+    <div class=info-card>
+        <div class=head>Aircraft Spares</div>
+        <div class=info-grid>{% for attr, value in report.list_aircraft_spares %}
+            <div class=data>{{ attr.info.label }}</div>
+            <div class="data number">{{ value }}</div>
+        {% endfor %}</div>
+    </div>
+</div>
+{% endif %}{# disabled crew-info and aircraft-spares #}
+{% endblock after_flights %}
