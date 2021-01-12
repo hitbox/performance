@@ -5,9 +5,12 @@
 {% block inside_form %}
     {{ form.hidden_tag() }}
     <fieldset>
-        <legend>Flight</legend>
+        <legend>Type</legend>
         {{ render_input_group(form.bound) }}
         {{ render_input_group(form.flight_type) }}
+    </fieldset>
+    <fieldset>
+        <legend>Flight</legend>
         {{ render_input_group(form.leg) }}
         {{ render_input_group(form.flight_number) }}
         {{ render_input_group(form.tail_number) }}

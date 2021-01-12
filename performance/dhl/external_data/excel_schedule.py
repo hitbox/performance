@@ -81,18 +81,7 @@ def import_flights(path, date):
             data.append(rowdict)
 
     # filter for weekday
-    weekday = date.weekday()
-    data = [row for row in data if weekday in row['utc_dow'] ]
-
-    _sortkey = itemgetter('flight', 'utc_dep')
-    def sortkey(row):
-        flight, utc_dep = _sortkey(row)
-        try:
-            flight = int(flight)
-        except ValueError:
-            pass
-        return flight, utc_dep
-
-    data = sorted(data, key=sortkey)
+    wanted_weekday = date.weekday()
+    data = [row for row in data if wanted_weekday in row['utc_dow'] ]
 
     return data

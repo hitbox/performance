@@ -12,5 +12,9 @@ def init_app(app):
         """
         Add convenient things to the flask shell.
         """
+        from .forms import ReportForm
+
         context = root_context()
+
+        context.update(**locals())
         return context

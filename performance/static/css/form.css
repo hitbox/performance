@@ -1,0 +1,97 @@
+:root {
+    --input-margin-topbottom: 0.5rem;
+}
+
+fieldset {
+    margin: 1rem 0;
+    padding: 1rem;
+}
+
+input, select {
+    margin: var(--input-margin-topbottom) 0;
+    padding: 0.5rem;
+}
+
+input[type=submit] {
+    min-width: 8rem;
+}
+
+label {
+    margin: 0 1rem;
+}
+
+label:hover {
+    cursor: pointer;
+}
+
+h3 > label {
+    margin-left: 0;
+}
+
+form > .buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+form > .buttons > * {
+    margin: 0 1rem 0 0;
+}
+
+/* report form styling */
+
+/* form ids inside a performance grid */
+form #dhl_previous_overall_performance,
+form #dhl_previous_overall_performance_lanes,
+form #dhl_previous_overall_performance_late,
+form #dhl_todays_arrival_performance_front_half,
+form #dhl_todays_arrival_performance_front_half_lanes,
+form #dhl_todays_arrival_performance_front_half_late,
+form #dhl_arrival_performance_wtd,
+form #dhl_arrival_performance_wtd_lanes,
+form #dhl_arrival_performance_wtd_late,
+form #dhl_arrival_performance_mtd,
+form #dhl_arrival_performance_mtd_lanes,
+form #dhl_arrival_performance_mtd_late,
+form #dhl_arrival_performance_mtd_30_percent,
+form #dhl_arrival_performance_mtd_30_lanes,
+form #dhl_arrival_performance_mtd_30_late,
+form #dhl_days_at_100_percent,
+form #dhl_assumed_best_arrival_performance_for_month_percent,
+form #dhl_qtd_performance {
+    width: 3rem;
+    /* inputs push the cells out too much, bring them back in */
+    padding: .25rem;
+    margin: .1rem;
+}
+
+/* flight form styling below */
+
+form #leg {
+    width: 2rem;
+}
+
+form #flight_number, form #tail_number, form #weight {
+    width: 4rem;
+}
+
+form #origin_station, form #destination_station {
+    width: 3rem;
+}
+
+form #origin_departure_estimated_date,
+form #origin_departure_actual_date,
+form #destination_arrival_estimated_date,
+form #destination_arrival_actual_date {
+    width: 5rem;
+}
+
+form #origin_departure_estimated_time,
+form #origin_departure_actual_time,
+form #destination_arrival_estimated_time,
+form #destination_arrival_actual_time {
+    width: 3rem;
+}
+
+form #origin_delays, form #destination_delays {
+    width: 40rem;
+}

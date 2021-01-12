@@ -1,181 +1,24 @@
-{% extends "report/base.html" -%}
+{% extends "report/edit-base.html" %}
 
-{%- from "report/macros.html" import render_flights_table %}
-
-
-{% block head %}
-{{ super() }}
-{% assets filters='jsmin', output='gen/packed.js', 'report-edit.js' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
-{% endblock head %}
-
-
-{% block main_head %}
-{{ super() }}
-<h4>
-    <a href="{{ url_for('report.view_report', id=report.id) }}">Printable</a>
-</h4>
-{% endblock main_head %}
-
-
-{% block dhl_previous_overall_performance %}
-<td>{{ form.dhl_previous_overall_performance }}</td>
-{% endblock %}
-
-{% block dhl_previous_overall_performance_lanes %}
-<td>{{ form.dhl_previous_overall_performance_lanes }}</td>
-{% endblock %}
-
-{% block dhl_previous_overall_performance_late %}
-<td>{{ form.dhl_previous_overall_performance_late }}</td>
-{% endblock %}
-
-{% block dhl_todays_arrival_performance_front_half %}
-<td>{{ form.dhl_todays_arrival_performance_front_half }}</td>
-{% endblock %}
-
-{% block dhl_todays_arrival_performance_front_half_lanes %}
-<td>{{ form.dhl_todays_arrival_performance_front_half_lanes }}</td>
-{% endblock %}
-
-{% block dhl_todays_arrival_performance_front_half_late %}
-<td>{{ form.dhl_todays_arrival_performance_front_half_late }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_wtd %}
-<td>{{ form.dhl_arrival_performance_wtd }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_wtd_lanes %}
-<td>{{ form.dhl_arrival_performance_wtd_lanes }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_wtd_late %}
-<td>{{ form.dhl_arrival_performance_wtd_late }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_mtd %}
-<td>{{ form.dhl_arrival_performance_mtd }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_mtd_lanes %}
-<td>{{ form.dhl_arrival_performance_mtd_lanes }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_mtd_late %}
-<td>{{ form.dhl_arrival_performance_mtd_late }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_mtd_30_percent %}
-<td>{{ form.dhl_arrival_performance_mtd_30_percent }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_mtd_30_lanes %}
-<td>{{ form.dhl_arrival_performance_mtd_30_lanes }}</td>
-{% endblock %}
-
-{% block dhl_arrival_performance_mtd_30_late %}
-<td>{{ form.dhl_arrival_performance_mtd_30_late }}</td>
-{% endblock %}
-
-{% block dhl_days_at_100_percent %}
-<td>{{ form.dhl_days_at_100_percent }}</td>
-{% endblock %}
-
-{% block dhl_assumed_best_arrival_performance_for_month_percent %}
-<td>{{ form.dhl_assumed_best_arrival_performance_for_month_percent }}</td>
-{% endblock %}
-
-{% block dhl_qtd_performance %}
-<td>{{ form.dhl_qtd_performance }}</td>
-{% endblock %}
-
-
-{# ABX Amazon Performance #}
-
-{% block abx_amazon_previous_days_performance_percent %}
-<td>{{ form.abx_amazon_previous_days_performance_percent }}</td>
-{% endblock %}
-
-{% block abx_amazon_previous_days_performance_lanes %}
-<td>{{ form.abx_amazon_previous_days_performance_lanes }}</td>
-{% endblock %}
-
-{% block abx_amazon_previous_days_performance_late %}
-<td>{{ form.abx_amazon_previous_days_performance_late }}</td>
-{% endblock %}
-
-{% block abx_amazon_arrival_performance_mtd_percent %}
-<td>{{ form.abx_amazon_arrival_performance_mtd_percent }}</td>
-{% endblock %}
-
-{% block abx_amazon_arrival_performance_mtd_lanes %}
-<td>{{ form.abx_amazon_arrival_performance_mtd_lanes }}</td>
-{% endblock %}
-
-{% block abx_amazon_arrival_performance_mtd_late %}
-<td>{{ form.abx_amazon_arrival_performance_mtd_late }}</td>
-{% endblock %}
-
-{% block abx_amazon_days_at_100_percent %}
-<td>{{ form.abx_amazon_days_at_100_percent }}</td>
-{% endblock %}
-
-{% block abx_amazon_qtd_performance_percent %}
-<td>{{ form.abx_amazon_qtd_performance_percent }}</td>
-{% endblock %}
+{% set formid = 'reportform' %}
 
 
 {% block flights %}
-{% set with_edit = true %}
 {% for (flight_type, bound), flights in grouped %}
-{% include "report/flight_table.html" with context %}
+    {% include "report/flight_table_edit.html" %}
 {% endfor %}
 {% endblock flights %}
 
-{% block dhl_performance_table %}
-<form action="{{ url_for(request.endpoint, **request.view_args) }}" id="reportform" method="POST">
-    {{ form.hidden_tag() }}
-    {{ super() }}
-    <div class="flex width50">
-        <div>
-            <h3>Crew Info</h3>
-            <p>
-                {{ form.crew_info_1200.label }}
-                {{ form.crew_info_1200 }}
-            </p>
-            <p>
-                {{ form.crew_info_2000.label }}
-                {{ form.crew_info_2000 }}
-            </p>
-            <p>
-                {{ form.crew_info_0300.label }}
-                {{ form.crew_info_0300 }}
-            </p>
-        </div>
-        <div>
-            <h3>Aircraft Spares</h3>
-            <p>
-                {{ form.aircraft_spares_1200.label }}
-                {{ form.aircraft_spares_1200 }}
-            </p>
-            <p>
-                {{ form.aircraft_spares_2000.label }}
-                {{ form.aircraft_spares_2000 }}
-            </p>
-            <p>
-                {{ form.aircraft_spares_0300.label }}
-                {{ form.aircraft_spares_0300 }}
-            </p>
-        </div>
-    </div>
 
-    {% for name in ['system_detail'] %}
-        <h3>{{ form[name].label }}</h3>
-        <p>{{ form[name] }}</p>
-    {% endfor %}
-
-</form>
-{% endblock dhl_performance_table %}
+{% block comments_details %}
+{% set names = ['system_detail', 'charter_detail', 'extra_section_detail', 'ferry_flight_detail'] %}
+{% for name in names %}
+<div id="{{name}}-container">
+    <h3>{{ form[name].label }}</h3>
+    <p>{{ form[name] }}</p>
+</div>
+{% endfor %}
+{% endblock comments_details %}
 
 {% block before_flights %}
 <p>

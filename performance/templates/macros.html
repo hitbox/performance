@@ -98,7 +98,7 @@
 
 {%- macro diff_class(diff) %}{% if diff is not none %}{% if diff < 0 %} early{% elif diff > 0 %} late{% else %} ontime{% endif %}{% endif %}{% endmacro -%}
 
-{%- macro percent(v) %}{% if v %}{{ '%.2f%%' | format(v * 100) }}{% endif %}{% endmacro -%}
+{%- macro percent(v) %}{% if v %}{% if v == 1 %}100%{% else %}{{ '%.2f%%'|format(v*100) }}{% endif %}{% endif %}{% endmacro -%}
 
 {%- macro render_delaycodes(delays) %}{% for delay in delays %}{% if not loop.first %} {% endif %}{% if delay.code.controllable %}<span class="controllable">{% endif %}{{delay.code.name}}{% if delay.minutes %}({{delay.minutes}}){% endif %}{% if delay.code.controllable %}</span>{% endif %}{% endfor %}{% endmacro -%}
 

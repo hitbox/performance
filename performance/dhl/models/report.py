@@ -52,14 +52,16 @@ class Report(
         ),
     )
 
+    details_attrs = ['system_detail', 'charter_detail', 'extra_section_detail',
+                     'ferry_flight_detail']
+
     @property
     def iter_details(self):
-        attrnames = ['system_detail', 'charter_detail', 'extra_section_detail',
-                     'ferry_flight_detail']
-        for attrname in attrnames:
+        for attrname in self.details_attrs:
             yield {
                 'field': getattr(self.__class__, attrname),
                 'value': getattr(self, attrname),
+                'name': attrname,
             }
 
     aircraft_spares_1200 = db.Column(db.Integer, info=dict(label='1200'))

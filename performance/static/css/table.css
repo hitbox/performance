@@ -11,13 +11,13 @@ table, th, td {
 }
 
 th {
-    padding: 4px 6px;
+    padding: var(--head-padding);
     font-size: .8rem;
     vertical-align: bottom;
 }
 
 td {
-    padding: 2px 4px;
+    padding: var(--cell-padding);
 }
 
 tbody {

@@ -1,8 +1,8 @@
-from ...extensions import db
-from ...models import FlightBaseMixin
-from ...models import FlightTypeRelationshipMixin
-from ...models import MetaMixin
-from ...models import ReportFlightBaseMixin
+from performance.extensions import db
+from performance.models import FlightBaseMixin
+from performance.models import FlightTypeRelationshipMixin
+from performance.models import MetaMixin
+from performance.models import ReportFlightBaseMixin
 
 from .bound import BoundRelationshipMixin
 from .operation import OperationRelationshipMixin
@@ -17,4 +17,4 @@ class Flight(
 ):
 
     id = db.Column(db.Integer, primary_key=True)
-    report_id = db.Column(db.Integer, db.ForeignKey('report.id'))
+    report_id = db.Column(db.Integer, db.ForeignKey('report.id', ondelete='CASCADE'))

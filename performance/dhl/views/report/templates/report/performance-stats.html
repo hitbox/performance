@@ -1,0 +1,62 @@
+{% from "macros.html" import integer %}
+{% from "macros.html" import percent %}
+
+{# one-page editor for performance statistics #}
+{% set edit_endpoint = 'report.edit_performance_stats' %}
+
+{% macro render_cell(attrname, value) %}
+{% set url = url_for(edit_endpoint, id=report.id, _anchor=attrname) %}
+{# data-href: javascript click like <a> to remain printable #}
+<div class="data number" data-href="{{ url }}" title="click to edit">{{ value }}</div>
+{% endmacro %}
+
+
+{% macro render_cell_percent(attrname) %}
+{{ render_cell(attrname, percent(report[attrname])) }}
+{% endmacro %}
+
+
+{% macro render_cell_integer(attrname) %}
+{{ render_cell(attrname, integer(report[attrname])) }}
+{% endmacro %}
+
+
+<div class=performance-statistics>
+    <h3>{{ config.PERFORMANCE_REPORT_TITLE }}<span class="edit-link noprint"><a href="{{ url_for('report.edit_performance_stats', id=report.id) }}">edit</a></span></h3>
+    <div class=performance-grid>
+        <div>{# empty #}</div>
+        <div class="head top">Percent</div>
+        <div class="head top">Lanes</div>
+        <div class="head top">Late</div>
+        <div class="head">Previous Operation Overall Performance</div>
+        {# NOTE: data-href hooked up by javascript. This leaves this printable and clickable. #}
+        {{ render_cell_percent('dhl_previous_overall_performance') }}
+        {{ render_cell_integer('dhl_previous_overall_performance_lanes') }}
+        {{ render_cell_integer('dhl_previous_overall_performance_late') }}
+        <div class="head">Today's Arrival Performance Front Half</div>
+        {{ render_cell_percent('dhl_todays_arrival_performance_front_half') }}
+        {{ render_cell_integer('dhl_todays_arrival_performance_front_half_lanes') }}
+        {{ render_cell_integer('dhl_todays_arrival_performance_front_half_late') }}
+        <div class="head">Arrival Performance WTD</div>
+        {{ render_cell_percent('dhl_arrival_performance_wtd') }}
+        {{ render_cell_integer('dhl_arrival_performance_wtd_lanes') }}
+        {{ render_cell_integer('dhl_arrival_performance_wtd_late') }}
+        <div class="head">Arrival Performance MTD &gt; 15</div>
+        {{ render_cell_percent('dhl_arrival_performance_mtd') }}
+        {{ render_cell_integer('dhl_arrival_performance_mtd_lanes') }}
+        {{ render_cell_integer('dhl_arrival_performance_mtd_late') }}
+        <div class="head">Arrival Performance MTD &gt; 30</div>
+        {{ render_cell_percent('dhl_arrival_performance_mtd_30_percent') }}
+        {{ render_cell_integer('dhl_arrival_performance_mtd_30_lanes') }}
+        {{ render_cell_integer('dhl_arrival_performance_mtd_30_late') }}
+        <div class="head"># days at 100%</div>
+        {{ render_cell_integer('dhl_days_at_100_percent') }}
+        <div class="empty"></div>
+        <div class="head">Assumed Best Arrival Performance for Month</div>
+        {{ render_cell_percent('dhl_assumed_best_arrival_performance_for_month_percent') }}
+        <div class="empty"></div>
+        <div class="head">QTD Performance</div>
+        {{ render_cell_percent('dhl_qtd_performance') }}
+        <div class="empty"></div>
+    </div>
+</div>

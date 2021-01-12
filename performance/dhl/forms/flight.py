@@ -135,7 +135,7 @@ class FlightForm(
                 'render_kw': {
                     'autocomplete': 'off',
                     'class': 'flight',
-                    'style': 'width: 45rem',
+                    #'style': 'width: 45rem',
                 },
             },
             'destination_station': {
@@ -179,7 +179,7 @@ class FlightForm(
                 'render_kw': {
                     'autocomplete': 'off',
                     'class': 'flight',
-                    'style': 'width: 45rem',
+                    #'style': 'width: 45rem',
                 },
             },
             'comment': {

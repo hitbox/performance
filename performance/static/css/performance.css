@@ -13,17 +13,36 @@
     grid-gap: 1px;
 }
 
+/* cells in performance grid */
 .performance-grid > * {
+    /* match css/table.css:td */
     box-shadow: 0 0 0 1px var(--font-color);
-    padding: 0.25rem;
+    padding: var(--cell-padding);
 }
 
+/* header cells, like a field name */
 .performance-grid > .head {
+    /* match css/table.css:th */
     font-weight: bold;
-    font-size: 0.85rem
+    font-size: .8rem;
+    display: flex;
+    align-items: center; /* align vertically */
+    padding: var(--head-padding);
+}
+
+/* header cells at the top */
+.performance-grid > .head.top {
+    display: flex;
+    justify-content: center; /* align horizontal */
+}
+
+/* header cells need some special attention */
+.performance-grid > .head-edit {
+    font-size: 1rem;
 }
 
 .performance-grid > .empty {
+    /* double-purposing the first column, so combine the last two */
     grid-column: 3 / span 2;
 }
 

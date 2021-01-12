@@ -15,6 +15,9 @@
     --data-href-background-color: #111;
 
     --header-separation: 1.5rem;
+
+    --head-padding: 4px 6px;
+    --cell-padding: 3px 6px;
 }
 
 [data-theme="dark"] {
@@ -59,11 +62,11 @@ a:visited {
     color: var(--a-visited-color);
 }
 
-a:hover {
+a:hover, [data-href]:hover {
     color: var(--a-hover-color);
 }
 
-a:active {
+a:active, [data-href]:active {
     color: var(--a-active-color);
 }
 
@@ -78,6 +81,24 @@ nav {
 
 nav > * {
     padding: 0 2rem;
+}
+
+/* links from data-href attribute */
+[data-href] {
+    text-decoration: underline;
+}
+
+[data-href]:hover {
+    cursor: pointer;
+}
+
+.edit-link {
+    /*
+     * edit links in-line with text, meant to be the final element.
+     * often inside a header element so the font-size is put back.
+     */
+    margin-left: 1rem;
+    font-size: 1rem;
 }
 
 .data {
@@ -119,30 +140,4 @@ ul.buttons > li {
 
 .width50 {
     width: 50%;
-}
-
-@media print {
-    * {
-        color: black;
-    }
-
-    *:hover {
-        background-color: white !important;
-    }
-
-    body {
-        background-color: white;
-    }
-
-    .noprint {
-        display: none !important;
-    }
-
-    body {
-        padding-bottom: 0 !important;
-    }
-
-    .performance-section {
-        page-break-inside: avoid;
-    }
 }

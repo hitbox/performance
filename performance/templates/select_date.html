@@ -2,17 +2,13 @@
 
 
 {% macro render_month_link(month) %}
-{#
-<h4>
-</h4>
-#}
     {# abbreviated month name showing year if different than this page #}
     <a href="{{ url_for('.index', year=month.year, month=month.month) }}">{{ month.abbr }}.{% if month.year != request.view_args.year %}&nbsp;{{ month.year }}{% endif %}</a>
 {% endmacro %}
 
 
 {% macro render_url_for(day) %}
-{% if day.report %}{{ url_for('report.view_report', id=day.report.id) }}{% else %}{{ url_for('report.prompt_new', report_date=day.date) }}{% endif %}
+{% if day.report %}{{ url_for('report.view', id=day.report.id) }}{% else %}{{ url_for('report.prompt_new', report_date=day.date) }}{% endif %}
 {% endmacro %}
 
 

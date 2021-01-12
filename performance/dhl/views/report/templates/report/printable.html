@@ -1,0 +1,37 @@
+{% extends "report/base.html" %}
+
+{# links at top #}
+{% block main_head %}
+{{ super() }}
+<h2>{{ config.PERFORMANCE_REPORT_TITLE }} {{ report.date.strftime(config.PERFORMANCE_REPORT_DATEFMT) }}</h2>
+<nav class="noprint">
+    <h4>
+        <a href="javascript:;" onclick="window.print(); return false">Print</a>
+    </h4>
+</nav>
+{% endblock main_head %}
+
+
+{% block performance_stats %}
+{% include "report/performance-stats.html" %}
+{% endblock performance_stats %}
+
+
+{% block flights %}
+{% for (flight_type, bound), flights in grouped_flights %}
+    {% include "report/flight-table-printable.html" with context %}
+{% endfor %}
+{% endblock flights %}
+
+
+{% block comments_details %}
+{% for detail in report.iter_details %}
+<div class="performance-section{% if not detail.value %} noprint{% endif %}">
+    <h3>
+        {{ detail.field.info.label }}
+        <span class=edit-link><a class="noprint" href="{{ url_for('report.edit_details', id=request.view_args.id, attrname=detail.name) }}">edit</a></span>
+    </h3>
+    {% if detail.value %}<pre class=detail>{{ detail.value }}</pre>{% endif %}
+</div>
+{% endfor %}
+{% endblock comments_details %}

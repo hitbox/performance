@@ -1,0 +1,30 @@
+@media print {
+    *:hover {
+        background-color: white !important;
+    }
+
+    body {
+        background-color: white;
+        color: black;
+    }
+
+    [data-href] {
+        text-decoration: none;
+    }
+
+    .noprint {
+        display: none !important;
+    }
+
+    body {
+        padding-bottom: 0 !important;
+    }
+
+    .performance-section {
+        page-break-inside: avoid;
+    }
+
+    pre {
+        font-size: 0.95rem;
+    }
+}

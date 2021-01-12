@@ -25,18 +25,23 @@
     grid-template-columns: repeat(7, auto);
 }
 
+.wd, .day {
+    text-align: center;
+}
+
 .wd {
     /* weekday formatting */
     padding: .5rem 1rem;
     font-size: .75rem;
     font-weight: bold;
-    text-align: center;
 }
 
 .day {
     /* cell in a calendar */
-    padding: 1.5rem;
+    display: block;
     border: 1px solid var(--font-color);
+    font-size: 1.25rem;
+    padding: 2rem;
 }
 
 .legend {

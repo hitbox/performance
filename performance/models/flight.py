@@ -27,7 +27,7 @@ class FlightBaseMixin:
 
     leg = db.Column(
         db.Integer,
-        server_default=db.text('1'),
+        server_default = db.text('1'),
         info = dict(
             label = 'Leg',
         ),

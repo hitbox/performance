@@ -1,0 +1,6 @@
+{% extends "report/edit-base.html" %}
+
+{% block main_inner %}
+<h3>{{ flight_type.name }} {{ bound.altname }}</h3>
+{% include "report/flights-table.html" with context %}
+{% endblock main_inner %}
