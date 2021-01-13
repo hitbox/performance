@@ -1,16 +1,37 @@
 from flask import current_app
 from flask import flash
 from flask import redirect
+from flask import render_template
 from flask import url_for
+from werkzeug.exceptions import HTTPException
+
+from ..month import Weekday
 
 from .user import user_bp
 
 def init_app(app):
+    """
+    Initialize generic shared app views.
+    """
     app.register_blueprint(user_bp)
+
+    @app.context_processor
+    def inject():
+        return dict(
+            weekday = {n:Weekday(n) for n in range(7)},
+        )
+
 
     @app.route('/')
     def index():
         return redirect(url_for('select_date.goto_today'))
+
+    @app.errorhandler(HTTPException)
+    def error(e):
+        """
+        HTTP Error Code page to make everything styled consistently.
+        """
+        return (render_template('error.html', e=e), e.code)
 
     if app.env == 'development':
         init_app_development(app)

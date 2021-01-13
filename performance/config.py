@@ -1,9 +1,52 @@
 from .exceptions import AppError
+from .utils import exists_and_truthy
+
+class RaiseConfig:
+    """
+    Ensure sane configuration as soon as possible.
+    """
+
+    def __init__(
+            self,
+            required_truthy,
+            required_truthy_if_development,
+            required_exists,
+        ):
+        """
+        :param required_truthy: keys required to exist and have a truthy value.
+        :param required_truthy_if_development: keys required truthy if
+                app.env == 'development'.
+        :param required_exists: keys required to exist.
+        """
+        self.required_truthy = required_truthy
+        self.required_truthy_if_development = required_truthy_if_development
+        self.required_exists = required_exists
+
+    def raise_for_config(self, app):
+        """
+        Ensure necessary configuration
+        """
+        for key in self.required_truthy:
+            if not exists_and_truthy(app.config, key):
+                raise AppError(f'{key} must be configured and truthy true.')
+        if app.env == 'development':
+            for key in self.required_truthy_if_development:
+                if not exists_and_truthy(app.config, key):
+                    raise AppError(f'in development, {key} must be configured and'
+                                    ' truthy true.')
+        for key in self.required_exists:
+            if key not in app.config:
+                raise AppError(f'{key} must be configured.')
+
 
 # required to be set to something truthy
 REQUIRED_TRUTHY = [
     'SESSION_COOKIE_PATH',
     'REMEMBER_COOKIE_PATH',
+    # used in templates and will blow up without these:
+    'DATEFMT',
+    'TIMEFMT',
+    'DATETIMEFMT',
     # list of stations to consider for calculating what delays were controllable:
     'PERFORMANCE_CONTROLLABLE',
     # <head><title>...
@@ -14,52 +57,13 @@ REQUIRED_TRUTHY = [
     'PERFORMANCE_REPORT_TITLE',
 ]
 
-REQUIRED_TRUTHY_IF_DEVELOPMENT = [
-    'PREFIX',
-]
+REQUIRED_TRUTHY_IF_DEVELOPMENT = ['PREFIX']
 
 # just required to exist in config
-REQUIRED_EXISTS = [
-]
+REQUIRED_EXISTS = []
 
-def exists_and_truthy(config, key):
-    return key in config and config[key]
-
-def raise_for_config(app):
-    """
-    Ensure necessary configuration
-    """
-    for key in REQUIRED_TRUTHY:
-        if not exists_and_truthy(app.config, key):
-            raise AppError(f'{key} must be configured and truthy true.')
-    if app.env == 'development':
-        for key in REQUIRED_TRUTHY_IF_DEVELOPMENT:
-            if not exists_and_truthy(app.config, key):
-                raise AppError(f'in development, {key} must be configured and'
-                                ' truthy true.')
-    for key in REQUIRED_EXISTS:
-        if key not in app.config:
-            raise AppError(f'{key} must be configured.')
-
-def configure_defaults(app):
-    app.config.setdefault('PREFIX', '/')
-    # Used in templates for date formats.
-    datefmt = app.config.setdefault('DATEFMT', '%d-%b-%y')
-    timefmt = app.config.setdefault('TIMEFMT', '%H:%S')
-    app.config.setdefault('DATETIMEFMT', datefmt + ' ' + timefmt)
-    # Used in templates to specify how many dates around the current should be
-    # shown in navigation.
-    app.config.setdefault('DATESPREAD', 4)
-    # calendar 0 is Monday and default, 6 is Sunday
-    app.config.setdefault('FIRSTWEEKDAY', 0)
-    # top navigation (endpoint, text)
-    app.config.setdefault('TOPNAV', [])
-    app.config.setdefault('TOPNAVDEV', [])
-
-def init_app(app):
-    """
-    Validate configuration and set defaults.
-    """
-    app.config.from_envvar('PERFORMANCE_CONFIG')
-    raise_for_config(app)
-    configure_defaults(app)
+raise_config = RaiseConfig(
+    REQUIRED_TRUTHY,
+    REQUIRED_TRUTHY_IF_DEVELOPMENT,
+    REQUIRED_EXISTS
+)

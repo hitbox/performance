@@ -1,9 +1,10 @@
-from flask import Flask
-
 import performance.app
 
-from . import commands
+# ensure models are defined
 from . import models
+
+from . import commands
+from . import config
 from . import shell
 from . import views
 
@@ -12,6 +13,7 @@ def create_app():
     DHL Flask Web App
     """
     app = performance.app.create_app()
+    config.raise_config.raise_for_config(app)
 
     commands.init_app(app)
     shell.init_app(app)

@@ -158,6 +158,20 @@ def create_report_blank(report_date):
     db.session.commit()
     return redirect(url_for('.view', id=report.id))
 
+def convert_excel_schedule_flights(preview):
+    # Need to set bound and flight_type at least. After import no flights are shown.
+    flights = [
+        Flight(
+            flight_number = data['flight'],
+            origin_station = data['org'],
+            destination_station = data['dest'],
+            origin_departure_estimated_time = data['utc_dep'],
+            destination_arrival_estimated_time = data['utc_arr'],
+        )
+        for data in preview
+    ]
+    return flights
+
 @report_bp.route('/import-excel-schedule/<date:report_date>', methods=['GET', 'POST'])
 @edit_check
 def import_excel_schedule(report_date):
@@ -172,19 +186,7 @@ def import_excel_schedule(report_date):
         if form.save.data:
             # User click "Import..." otherwise assume they clicked "Preview"
             # and let the value of `preview` fall through.
-            # XXX
-            # TODO
-            # Need to set bound and flight_type at least. After import no flights are shown.
-            flights = [
-                Flight(
-                    flight_number = data['flight'],
-                    origin_station = data['org'],
-                    destination_station = data['dest'],
-                    origin_departure_estimated_time = data['utc_dep'],
-                    destination_arrival_estimated_time = data['utc_arr'],
-                )
-                for data in preview
-            ]
+            flights = convert_excel_schedule_flights(preview)
             report = Report(date=report_date, flights=flights)
             db.session.add(report)
             db.session.commit()

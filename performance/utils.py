@@ -21,6 +21,12 @@ def snakecase(s):
     result = re.sub(pattern, repl, s).lower().replace('._', '.')
     return result
 
+def exists_and_truthy(config, key):
+    """
+    key exists in config and evals to true
+    """
+    return key in config and config[key]
+
 def ppattr(obj):
     """
     Pretty-print an objects attributes and values ignoring underscored and
