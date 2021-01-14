@@ -8,7 +8,7 @@
 {% set ncols = 16 %}
 
 <div class="performance-section{% if not flights %} noprint{% endif %}">
-    <h3 id="flightype{{ flight_type.id }}-bound{{ bound.id }}">{{ flight_type.name }}&nbsp;{{ bound.altname }}<span class="noprint edit-link"><a href="{{ url_for('report.edit_flights_by_category', report_id=request.view_args.id, flight_type=flight_type.id, bound=bound.id) }}">edit</a></span></h3>
+    <h3 id="flightype{{ flight_type.id }}-bound{{ bound.id }}">{{ flight_type.name }}&nbsp;{{ bound.altname }}<span class="noprint edit-link"><a href="{{ url_for('report.edit_flights_by_category', id=request.view_args.id, flight_type=flight_type.id, bound=bound.id) }}">edit</a></span></h3>
     {% if flights %}<table class="expand">
         <thead>
             <tr>

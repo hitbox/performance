@@ -1,7 +1,9 @@
 /* all flashes container */
 /* ???: make an id instead of class? */
-.flashes {
+#flashes {
     color: White;
+    width: 720px;
+    margin: 0 auto;
 }
 
 /* single flash item */

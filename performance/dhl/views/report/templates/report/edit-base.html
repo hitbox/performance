@@ -6,6 +6,9 @@
 {% endblock head %}
 
 
+{% set formid = 'reportform' %}
+
+
 {% block main_head %}
 <h4>
     <a href="{{ url_for('report.view', id=request.view_args.id) }}">Printable</a>

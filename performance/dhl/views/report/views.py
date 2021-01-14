@@ -8,6 +8,7 @@ from flask import url_for
 
 # amazon/dhl shared
 from performance.authorization import basic_check
+from performance.authorization import development_only
 from performance.authorization import edit_check
 from performance.extensions import db
 from performance.models import FlightType
@@ -15,6 +16,7 @@ from performance.views.pluggable import ModelView
 from performance.views.pluggable import UpdateDeleteView
 
 # dhl specific
+from performance.dhl import randomdata
 from performance.dhl.external_data.excel_schedule import import_flights
 from performance.dhl.forms import ImportExcelScheduleForm
 from performance.dhl.forms import ReportForm
@@ -34,6 +36,8 @@ report_bp = Blueprint('report', __name__, template_folder='templates')
 def view(id):
     """
     View DHL Report object with links to edit if current_user is an editor.
+
+    :param id: Report.id
     """
     report = Report.query.get_or_404(id)
     context = dict(
@@ -42,31 +46,15 @@ def view(id):
     )
     return render_template('report/printable.html', **context)
 
-@report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
-@edit_check
-def edit(id):
-    report = Report.query.get_or_404(id)
-    form = ReportForm(obj=report)
-    if form.validate_on_submit():
-        if form.delete.data:
-            db.session.delete(report)
-        elif form.submit.data:
-            form.populate_obj(report)
-        db.session.commit()
-        if hasattr(form, 'backurl') and form.backurl.data:
-            return redirect(form.backurl.data)
-    elif request.method == 'GET':
-        form.submit.label.text = 'Update'
-    context = dict(
-        form = form,
-        grouped = grouped_flights(report),
-        report = report,
-    )
-    return render_template('report/edit.html', **context)
-
 @report_bp.route('/edit/<int:id>/details/<attrname>', methods=['GET', 'POST'])
 @edit_check
 def edit_details(id, attrname):
+    """
+    Edit free form comments/details.
+
+    :param id: Report.id
+    :param attrname: name of one of the Report.details_attrs comment fields.
+    """
     if attrname not in Report.details_attrs:
         abort(404)
     report = Report.query.get_or_404(id)
@@ -85,7 +73,9 @@ def edit_details(id, attrname):
 @edit_check
 def edit_performance_stats(id):
     """
-    One page, performance stats editor.
+    Crosstab performance stats one-page editor.
+
+    :param id: Report.id
     """
     report = Report.query.get_or_404(id)
     form = ReportForm(obj=report)
@@ -106,11 +96,15 @@ def edit_performance_stats(id):
     )
     return render_template('report/edit-performance-stats.html', **context)
 
-@report_bp.route('/edit/<int:report_id>/flights-by-category/<int:flight_type>/<int:bound>')
+@report_bp.route('/edit/<int:id>/flights-by-category/<int:flight_type>/<int:bound>')
 @edit_check
-def edit_flights_by_category(report_id, flight_type, bound):
+def edit_flights_by_category(id, flight_type, bound):
     """
     One page of edit links for one category of flights.
+
+    :param id: Report.id
+    :param flight_type: Flight.flight_type_id
+    :param bound: Flight.bound_id
     """
     query = (
         Flight.query
@@ -118,7 +112,7 @@ def edit_flights_by_category(report_id, flight_type, bound):
         .join(FlightType, FlightType.id == Flight.flight_type_id)
         .join(Bound, Bound.id == Flight.bound_id)
         .filter(
-            Report.id == report_id,
+            Report.id == id,
             Flight.flight_type_id == flight_type,
             Flight.bound_id == bound,
         ).order_by(
@@ -127,8 +121,8 @@ def edit_flights_by_category(report_id, flight_type, bound):
         )
     )
     context = dict(
-        # other objects' queries delayed until here to avoid overwriting namespace.
-        report = Report.query.get_or_404(report_id),
+        # queries executed here to avoid overwriting this namespace.
+        report = Report.query.get_or_404(id),
         flight_type = FlightType.query.get_or_404(flight_type),
         bound = Bound.query.get_or_404(bound),
         flights = query.all(),
@@ -139,20 +133,25 @@ def edit_flights_by_category(report_id, flight_type, bound):
 @edit_check
 def prompt_new(report_date):
     """
-    Prompt for new report with options to create.
+    Prompt for new report with options to create or import.
+
+    :param report_date: wanted date for new report.
     """
-    # keep endpoint name the same as Amazon so that select_date will enter here.
+    # keep endpoint name the same as Amazon so that select_date will enter
+    # here.
     context = {
         'report_date': report_date,
         'scheduled_reports': ScheduledReport.query.all(),
     }
-    return render_template('report/prompt_new.html', **context)
+    return render_template('report/prompt-new.html', **context)
 
 @report_bp.route('/create-blank-report/<date:report_date>')
 @edit_check
 def create_report_blank(report_date):
     """
     Create a new blank report.
+
+    :param report_date: wanted date for new, blank report.
     """
     report = Report(date=report_date)
     db.session.add(report)
@@ -160,6 +159,7 @@ def create_report_blank(report_date):
     return redirect(url_for('.view', id=report.id))
 
 def convert_excel_schedule_flights(preview):
+    # TODO
     # Need to set bound and flight_type at least. After import no flights are shown.
     hub_name = current_app.config['PERFORMANCE_HUB_STATION_NAME']
     inbound_name = current_app.config['PERFORMANCE_INBOUND_NAME']
@@ -186,6 +186,8 @@ def convert_excel_schedule_flights(preview):
 def import_excel_schedule(report_date):
     """
     Import Excel Schedule File
+
+    :param report_date: wanted report date to import to.
     """
     form = ImportExcelScheduleForm()
     preview = None
@@ -209,10 +211,11 @@ def import_excel_schedule(report_date):
         form = form,
         preview = preview,
     )
-    return render_template('report/import_excel_schedule.html', **context)
+    return render_template('report/import-excel-schedule.html', **context)
 
 @report_bp.route('/create-random-report/<date:report_date>')
 @edit_check
+@development_only
 def create_random_report(report_date):
     """
     Create random report.
@@ -221,3 +224,27 @@ def create_random_report(report_date):
     db.session.add(report)
     db.session.commit()
     return redirect(url_for('.view', id=report.id))
+
+def trash():
+    @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
+    @edit_check
+    def edit(id):
+        report = Report.query.get_or_404(id)
+        form = ReportForm(obj=report)
+        if form.validate_on_submit():
+            if form.delete.data:
+                db.session.delete(report)
+            elif form.submit.data:
+                form.populate_obj(report)
+            db.session.commit()
+            if hasattr(form, 'backurl') and form.backurl.data:
+                return redirect(form.backurl.data)
+        elif request.method == 'GET':
+            form.submit.label.text = 'Update'
+        context = dict(
+            form = form,
+            grouped = grouped_flights(report),
+            report = report,
+        )
+        return render_template('report/edit.html', **context)
+
