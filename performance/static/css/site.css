@@ -70,6 +70,10 @@ a:active, [data-href]:active {
     color: var(--a-active-color);
 }
 
+.click:hover {
+    cursor: pointer;
+}
+
 nav {
     /* horizontal navigation elements */
     display: flex;

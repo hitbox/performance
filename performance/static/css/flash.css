@@ -1,5 +1,4 @@
 /* all flashes container */
-/* ???: make an id instead of class? */
 #flashes {
     color: White;
     width: 720px;
@@ -38,5 +37,3 @@
 .error.code {
     margin-right: 1rem;
 }
-
-
