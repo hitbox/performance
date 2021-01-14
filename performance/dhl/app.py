@@ -8,6 +8,10 @@ from . import config
 from . import shell
 from . import views
 
+def raise_for_values():
+    from .models import Bound
+    from .models import FlightType
+
 def create_app():
     """
     DHL Flask Web App

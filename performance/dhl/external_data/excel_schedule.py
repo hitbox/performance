@@ -10,6 +10,7 @@ from ..models import Report
 
 def dow(value):
     """
+    day of week
     Convert value to a list of integer days of the week.
 
     The Excel sheet DOW numbers are 1:Monday, 2:Tuesday, etc. This function
@@ -48,12 +49,15 @@ TYPEMAP = {
 }
 
 def fixfieldname(s):
+    """
+    Replace newlines with underscores.
+    """
     return s.replace('\n', '_').lower()
 
-def import_flights(path, date):
-    # ? front half is dest = HUB, back half is orig = HUB
-    # * NEED HUB config VAR
-
+def import_flights(path, weekday):
+    """
+    Return a list of data dicts from an Excel schedule of flights file.
+    """
     wb = openpyxl.load_workbook(path)
     ws = wb.active
     rows = iter(ws)
@@ -65,11 +69,6 @@ def import_flights(path, date):
     fields = [fixfieldname(cell.value) for cell in next(rows) if cell.value is not None]
     fields = getrow(fields)
 
-    # NOTE
-    # cells past the right of actual data come in as None
-    # will blow up if these are ever not strings
-    #fields = [fixfieldname(cell.value) for cell in row if cell.value is not None]
-
     data = []
     for row in rows:
         values = getrow([cell.value for cell in row])
@@ -79,9 +78,5 @@ def import_flights(path, date):
             for key, func in TYPEMAP.items():
                 rowdict[key] = func(rowdict[key])
             data.append(rowdict)
-
-    # filter for weekday
-    wanted_weekday = date.weekday()
-    data = [row for row in data if wanted_weekday in row['utc_dow'] ]
 
     return data

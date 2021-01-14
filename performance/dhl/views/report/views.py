@@ -1,5 +1,6 @@
 from flask import Blueprint
 from flask import abort
+from flask import current_app
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -160,9 +161,17 @@ def create_report_blank(report_date):
 
 def convert_excel_schedule_flights(preview):
     # Need to set bound and flight_type at least. After import no flights are shown.
+    hub_name = current_app.config['PERFORMANCE_HUB_STATION_NAME']
+    inbound_name = current_app.config['PERFORMANCE_INBOUND_NAME']
+    outbound_name = current_app.config['PERFORMANCE_OUTBOUND_NAME']
+
+    inbound = Bound.query.filter(Bound.name == inbound_name).one()
+    outbound = Bound.query.filter(Bound.name == outbound_name).one()
+
     flights = [
         Flight(
             flight_number = data['flight'],
+            bound = inbound if data['dest'] == hub_name else outbound,
             origin_station = data['org'],
             destination_station = data['dest'],
             origin_departure_estimated_time = data['utc_dep'],
@@ -183,6 +192,8 @@ def import_excel_schedule(report_date):
     if form.validate_on_submit():
         file = request.files[form.excel_path.name]
         preview = import_flights(form.excel_path.data, report_date)
+        # filter for weekday
+        preview = [row for row in preview if report_date.weekday() in row['utc_dow']]
         if form.save.data:
             # User click "Import..." otherwise assume they clicked "Preview"
             # and let the value of `preview` fall through.
