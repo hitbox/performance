@@ -116,7 +116,7 @@ def edit_flights_by_category(id, flight_type, bound):
             Flight.flight_type_id == flight_type,
             Report.id == id,
         ).order_by(
-            Bound.report_order
+            Bound.report_order,
             FlightType.report_order,
         )
     )
