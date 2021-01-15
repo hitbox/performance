@@ -1,9 +1,3 @@
-from flask_wtf.file import FileField
-from wtforms import BooleanField
-from wtforms import SubmitField
-from wtforms.validators import DataRequired
-
-from performance.forms.base import BaseFlaskForm
 from performance.forms.base import ModelForm
 from performance.forms.mixins import BackLinkMixin
 from performance.forms.mixins import SubmitUpdateDeleteMixin
@@ -99,11 +93,3 @@ class ReportForm(
         for key, options in field_args.items():
             if key in _percent_fields:
                 options['render_kw']['class'] += ' percent'
-
-
-class ImportExcelScheduleForm(BaseFlaskForm):
-
-    excel_path = FileField('Excel schedule file', validators=[DataRequired()])
-
-    save = SubmitField('Import...')
-    preview = SubmitField('Preview')

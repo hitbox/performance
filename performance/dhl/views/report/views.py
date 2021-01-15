@@ -1,6 +1,5 @@
 from flask import Blueprint
 from flask import abort
-from flask import current_app
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -26,6 +25,7 @@ from performance.dhl.models import Operation
 from performance.dhl.models import Report
 from performance.dhl.models import ScheduledReport
 
+from .utils import convert_excel_schedule_flights
 from .utils import grouped_flights
 from .utils import sort_scheduled_flights_from_excel
 
@@ -108,16 +108,16 @@ def edit_flights_by_category(id, flight_type, bound):
     """
     query = (
         Flight.query
-        .join(Report, Report.id == Flight.report_id)
-        .join(FlightType, FlightType.id == Flight.flight_type_id)
         .join(Bound, Bound.id == Flight.bound_id)
+        .join(FlightType, FlightType.id == Flight.flight_type_id)
+        .join(Report, Report.id == Flight.report_id)
         .filter(
-            Report.id == id,
-            Flight.flight_type_id == flight_type,
             Flight.bound_id == bound,
+            Flight.flight_type_id == flight_type,
+            Report.id == id,
         ).order_by(
-            FlightType.report_order,
             Bound.report_order
+            FlightType.report_order,
         )
     )
     context = dict(
@@ -157,32 +157,6 @@ def create_report_blank(report_date):
     db.session.add(report)
     db.session.commit()
     return redirect(url_for('.view', id=report.id))
-
-def convert_excel_schedule_flights(preview):
-    # TODO
-    # Need to set bound and flight_type at least. After import no flights are shown.
-    hub_name = current_app.config['PERFORMANCE_HUB_STATION_NAME']
-    flight_type = current_app.config['PERFORMANCE_SCHEDULED_FLIGHT_TYPE_NAME']
-    inbound_name = current_app.config['PERFORMANCE_INBOUND_NAME']
-    outbound_name = current_app.config['PERFORMANCE_OUTBOUND_NAME']
-
-    flight_type = FlightType.query.filter(FlightType.name == flight_type).one()
-    inbound = Bound.query.filter(Bound.name == inbound_name).one()
-    outbound = Bound.query.filter(Bound.name == outbound_name).one()
-
-    flights = [
-        Flight(
-            flight_number = data['flight'],
-            bound = inbound if data['dest'] == hub_name else outbound,
-            flight_type = flight_type,
-            origin_station = data['org'],
-            destination_station = data['dest'],
-            origin_departure_estimated_time = data['utc_dep'],
-            destination_arrival_estimated_time = data['utc_arr'],
-        )
-        for data in preview
-    ]
-    return flights
 
 @report_bp.route('/import-excel-schedule/<date:report_date>', methods=['GET', 'POST'])
 @edit_check

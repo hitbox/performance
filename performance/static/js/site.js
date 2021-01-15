@@ -27,6 +27,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
         });
     }
 
+    // close button that deletes itself and parent
+    elements = document.querySelectorAll(".click.close");
+    for (i = 0; i < elements.length; i++) {
+        elements[i].addEventListener("click", function() {
+            this.parentNode.parentNode.removeChild(this.parentNode);
+        });
+    }
+
     // flatpickr date entry
     // NOTE: flatpickr makes another element for altInput and that screws
     //       everything up!

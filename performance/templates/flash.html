@@ -5,7 +5,7 @@
         {% for category, message in messages %}
         <li class="flash {{ category or 'info'  }}">
             <div class="message">{{ message|safe }}</div>
-            <div class="close click" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&times</div>
+            <div class="click close">&times</div>
         </li>
         {% endfor %}
     </ul>
