@@ -18,8 +18,11 @@ th {
 
 td {
     padding: var(--cell-padding);
+    /* make non-.data tds a little smaller */
+    font-size: .925rem;
 }
 
-tbody {
+td.data {
     font-family: monospace;
+    font-size: 1rem;
 }

@@ -13,8 +13,8 @@ class LoginForm(BaseFlaskForm):
     """
     Login form.
     """
-    username = StringField('username')
-    password = PasswordField('password')
+    username = StringField('Username')
+    password = PasswordField('Password')
     submit = SubmitField('Login')
 
 

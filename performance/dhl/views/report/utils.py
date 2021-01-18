@@ -35,20 +35,35 @@ def convert_excel_schedule_flights(preview):
     ]
     return flights
 
-def grouped_flights(report):
+def get_grouped_flights(report):
     """
     Return a list of flights grouped by ALL `flight_type` and `bound` objects.
 
     [((flight_type, bound), flights), ...]
     """
+    def safe_int(s):
+        try:
+            return int(s)
+        except ValueError:
+            return s
+
+    def sortkey(flight):
+        return safe_int(flight.flight_number)
+
+    getfields = attrgetter('flight_type', 'bound')
+
+    def get_flights(flight_type, bound):
+        return (flight for flight in report.flights
+                if getfields(flight) == (flight_type, bound))
+
+    flight_types_query = FlightType.query.order_by(FlightType.report_order)
+    bound_query = Bound.query.order_by(Bound.report_order)
+
     grouped = [
         ((flight_type, bound),
-         sorted(
-             (flight for flight in report.flights
-              if flight.flight_type == flight_type and flight.bound == bound),
-             key = attrgetter('flight_number')))
-        for flight_type in FlightType.query.order_by(FlightType.report_order)
-        for bound in Bound.query.order_by(Bound.report_order)
+         sorted(get_flights(flight_type, bound), key=sortkey))
+        for flight_type in flight_types_query
+        for bound in bound_query
     ]
     return grouped
 

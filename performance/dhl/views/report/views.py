@@ -26,7 +26,7 @@ from performance.dhl.models import Report
 from performance.dhl.models import ScheduledReport
 
 from .utils import convert_excel_schedule_flights
-from .utils import grouped_flights
+from .utils import get_grouped_flights
 from .utils import sort_scheduled_flights_from_excel
 
 report_bp = Blueprint('report', __name__, template_folder='templates')
@@ -35,14 +35,15 @@ report_bp = Blueprint('report', __name__, template_folder='templates')
 @basic_check
 def view(id):
     """
-    View DHL Report object with links to edit if current_user is an editor.
+    Main report view. View DHL Report object with links to edit if current_user
+    is an editor.
 
     :param id: Report.id
     """
     report = Report.query.get_or_404(id)
     context = dict(
         report = report,
-        grouped_flights = grouped_flights(report),
+        grouped_flights = get_grouped_flights(report),
     )
     return render_template('report/printable.html', **context)
 
@@ -91,7 +92,7 @@ def edit_performance_stats(id):
         form.submit.label.text = 'Update'
     context = dict(
         form = form,
-        grouped = grouped_flights(report),
+        grouped = get_grouped_flights(report),
         report = report,
     )
     return render_template('report/edit-performance-stats.html', **context)
@@ -220,7 +221,7 @@ def trash():
             form.submit.label.text = 'Update'
         context = dict(
             form = form,
-            grouped = grouped_flights(report),
+            grouped = get_grouped_flights(report),
             report = report,
         )
         return render_template('report/edit.html', **context)

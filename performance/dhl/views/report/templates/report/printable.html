@@ -3,12 +3,7 @@
 {# links at top #}
 {% block main_head %}
 {{ super() }}
-<h2>{{ config.PERFORMANCE_REPORT_TITLE }} {{ report.date.strftime(config.PERFORMANCE_REPORT_DATEFMT) }}</h2>
-<nav class="noprint">
-    <h4>
-        <a href="javascript:;" onclick="window.print(); return false">Print</a>
-    </h4>
-</nav>
+<h2>{{ config.PERFORMANCE_REPORT_TITLE }} {{ report.date.strftime(config.PERFORMANCE_REPORT_DATEFMT) }}<span class="noprint edit-link"><a href="javascript:;" onclick="window.print(); return false">print</a></span></h2>
 {% endblock main_head %}
 
 

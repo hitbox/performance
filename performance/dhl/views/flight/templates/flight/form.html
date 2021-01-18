@@ -1,6 +1,6 @@
 {% extends 'pluggable/form.html' %}
 
-{% macro render_input_group(field) %}{{ field.label }}{{ field }}{% endmacro %}
+{% macro render_input_group(field) %}{% if field.label.text %}{{ field.label }}{% endif %}{{ field }}{% endmacro %}
 
 {% block inside_form %}
     {{ form.hidden_tag() }}

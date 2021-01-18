@@ -17,7 +17,22 @@ input[type=submit] {
 }
 
 label {
-    margin: 0 1rem 0 0;
+    margin: 1rem;
+}
+
+/* flight/form.html: makes things line up nicely */
+fieldset > label:nth-child(2) {
+    margin-left: 0;
+    min-width: 50px;
+    display: inline-block;
+}
+
+input ~ input {
+    margin-left: 0;
+}
+
+label:first-child {
+    margin-left: 0;
 }
 
 label:hover {
