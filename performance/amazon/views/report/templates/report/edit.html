@@ -13,7 +13,7 @@
 
 {% block head %}
 {{ super() }}
-{% assets filters='jsmin', output='gen/packed.js', 'report-edit.js' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+{% assets filters='jsmin', output='gen/packed.js', 'js/report-edit.js' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 {% endblock head %}
 
 
