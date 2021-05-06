@@ -75,28 +75,6 @@ def edit_report(id):
     )
     return render_template('report/edit.html', **context)
 
-def trash():
-    report_bp.add_url_rule(
-        '/edit/<int:id>',
-        view_func = edit_check(
-            UpdateDeleteView.as_view(
-                'edit_report',
-                ReportForm,
-                model = Report,
-                template = 'report/edit.html',
-                instance_name = 'report',
-            )))
-
-    report_bp.add_url_rule(
-        '/view/<int:id>',
-        view_func = basic_check(
-            ModelView.as_view(
-                'view_report',
-                Report,
-                'report/print.html',
-                instance_name = 'report',
-            )))
-
 @report_bp.route('/delete/<int:report_id>')
 @edit_check
 def delete_report(report_id):
