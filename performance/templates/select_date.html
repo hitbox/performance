@@ -8,7 +8,7 @@
 
 
 {% macro render_url_for(day) %}
-{% if day.report %}{{ url_for('report.view', id=day.report.id) }}{% else %}{{ url_for('report.prompt_new', report_date=day.date) }}{% endif %}
+{% if day.report %}{{ url_for('report.view_report', id=day.report.id) }}{% else %}{{ url_for('report.prompt_new', report_date=day.date) }}{% endif %}
 {% endmacro %}
 
 
