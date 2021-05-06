@@ -20,6 +20,8 @@ from performance.amazon.models import ScheduledReport
 
 report_bp = Blueprint('report', __name__, template_folder='templates')
 
+FLIGHT_SORTKEY = attrgetter('origin_departure_estimated_time')
+
 @report_bp.route('/view/<int:id>')
 @basic_check
 def view_report(id):
@@ -31,9 +33,8 @@ def view_report(id):
     grouped = [
         (flight_type,
          sorted(
-             (flight for flight in report.flights
-              if flight.flight_type == flight_type),
-             key = attrgetter('flight_number')))
+             (flight for flight in report.flights if flight.flight_type == flight_type),
+             key = FLIGHT_SORTKEY))
         for flight_type in FlightType.query.order_by(FlightType.report_order)
     ]
     context = dict(
@@ -63,9 +64,8 @@ def edit_report(id):
     grouped = [
         (flight_type,
          sorted(
-             (flight for flight in report.flights
-              if flight.flight_type == flight_type),
-             key = attrgetter('flight_number')))
+             (flight for flight in report.flights if flight.flight_type == flight_type),
+             key = FLIGHT_SORTKEY))
         for flight_type in FlightType.query.order_by(FlightType.report_order)
     ]
     context = dict(
