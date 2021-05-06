@@ -92,7 +92,7 @@ def edit_performance_stats(id):
         form.submit.label.text = 'Update'
     context = dict(
         form = form,
-        grouped = get_grouped_flights(report),
+        grouped = grouped_flights(report),
         report = report,
     )
     return render_template('report/edit-performance-stats.html', **context)
@@ -203,26 +203,12 @@ def create_random_report(report_date):
     db.session.commit()
     return redirect(url_for('.view', id=report.id))
 
-def trash():
-    @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
-    @edit_check
-    def edit(id):
-        report = Report.query.get_or_404(id)
-        form = ReportForm(obj=report)
-        if form.validate_on_submit():
-            if form.delete.data:
-                db.session.delete(report)
-            elif form.submit.data:
-                form.populate_obj(report)
-            db.session.commit()
-            if hasattr(form, 'backurl') and form.backurl.data:
-                return redirect(form.backurl.data)
-        elif request.method == 'GET':
-            form.submit.label.text = 'Update'
-        context = dict(
-            form = form,
-            grouped = get_grouped_flights(report),
-            report = report,
-        )
-        return render_template('report/edit.html', **context)
-
+@report_bp.route('/onepage/edit/<report_id>')
+@edit_check
+def onepage_edit(report_id):
+    context = dict(
+        javascript_injection = dict(
+            testurl = url_for('xhr.test', report_id=report_id),
+        ),
+    )
+    return render_template('report/xhr-editor.html', **context)

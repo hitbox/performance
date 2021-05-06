@@ -107,3 +107,7 @@
 {%- macro yesno(bool) %}{% if bool %}Yes{% else %}No{% endif %}{% endmacro -%}
 
 {%- macro yes(bool) %}{% if bool %}Yes{% endif %}{% endmacro -%}
+
+{% macro render_javascript_injection(d) %}<script>{% for key, value in d.items() %}
+    let {{ key }} = {{ value|tojson }};{% endfor %}
+</script>{% endmacro %}

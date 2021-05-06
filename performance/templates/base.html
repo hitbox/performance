@@ -1,36 +1,37 @@
-{%- extends "skeleton.html" -%}
+{% from "macros.html" import render_javascript_injection -%}
+{% from "macros.html" import render_nav_item -%}
 
-{%- from "macros.html" import render_nav_item -%}
+<!doctype html>
+<html lang="en">
+    <head>{% block head %}
+        <link rel="icon" href="data:,">{# empty favicon #}
+        <meta charset="utf-8">
+        <title>{% block title %}{{ config.PERFORMANCE_HEAD_TITLE }}{% endblock title %}</title>
+        {# data injection for javascript from config #}
+        {% if config.PERFORMANCE_JAVASCRIPT_INJECTION %}{{ render_javascript_injection(config.PERFORMANCE_JAVASCRIPT_INJECTION) }}{% endif %}
+        {# data injection for javascript from views #}
+        {% if javascript_injection %}{{ render_javascript_injection(javascript_injection) }}{% endif %}
+        {% assets filters='cssmin', output='gen/base.css', 'css/calendar.css', 'css/flash.css', 'css/form.css', 'css/performance.css', 'css/table.css', 'css/site.css', 'css/print.css', 'css/external/flatpickr.min.css' %}<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">{% endassets %}
+        {% assets filters='jsmin', output='gen/base.js', 'js/external/flatpickr.min.js', 'js/site.js' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+    {% endblock head %}</head>
+    <body>{% block body %}
+        {% block topnav %}<nav class="noprint">
+            {% for endpoint, text in config.TOPNAVDEV %}
+                {{ render_nav_item(endpoint, text) }}
+            {% endfor %}
+            {% for endpoint, text in config.TOPNAV %}
+                {{ render_nav_item(endpoint, text) }}
+            {% endfor %}
+            <div>
+                <label for=theme-1>Dark Theme</label>
+                <input class=theme-toggler id=theme-1 type=checkbox>
+            </div>
+        {% endblock topnav %}</nav>
+        {% include "flash.html" %}
+        <main>{% block main %}
+            {% block content %}{% endblock %}
+        {% endblock %}</main>
+        {% block body_last %}{% endblock body_last %}
+    {% endblock %}</body>
+</html>
 
-{%- block head %}<title>
-    {% block title %}{{ config.PERFORMANCE_HEAD_TITLE }}{% endblock title %}
-</title>
-{#- empty favicon -#}
-<link rel="icon" href="data:,">
-<meta charset="utf-8">
-{% block head_last %}
-{# data injection for javascript #}{% if config.PERFORMANCE_JAVASCRIPT_INJECTION %}<script>{% for key, value in config.PERFORMANCE_JAVASCRIPT_INJECTION.items() %}let {{ key }} = {{ value|tojson }};{% endfor %}</script>{% endif %}
-{% endblock head_last %}
-{% assets filters='cssmin', output='gen/base.css', 'css/calendar.css', 'css/flash.css', 'css/form.css', 'css/performance.css', 'css/table.css', 'css/site.css', 'css/print.css', 'css/external/flatpickr.min.css' %}<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">{% endassets %}
-{% assets filters='jsmin', output='gen/base.js', 'js/external/flatpickr.min.js', 'js/site.js' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
-{%- endblock head -%}
-
-{%- block body -%}
-    {% block topnav %}<nav class="noprint">
-        {% for endpoint, text in config.TOPNAVDEV %}
-            {{ render_nav_item(endpoint, text) }}
-        {% endfor %}
-        {% for endpoint, text in config.TOPNAV %}
-            {{ render_nav_item(endpoint, text) }}
-        {% endfor %}
-        <div>
-            <label for=theme-1>Dark Theme</label>
-            <input class=theme-toggler id=theme-1 type=checkbox>
-        </div>
-    {% endblock topnav %}</nav>
-    {% include "flash.html" %}
-    <main>{% block main %}
-        {% block content %}{% endblock %}
-    {% endblock %}</main>
-    {% block body_last %}{% endblock body_last %}
-{% endblock body %}

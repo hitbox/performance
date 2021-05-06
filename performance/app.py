@@ -16,6 +16,7 @@ def create_app():
     """
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_envvar('PERFORMANCE_CONFIG')
+    config.raise_for_config(app)
 
     commands.init_app(app)
     converters.init_app(app)

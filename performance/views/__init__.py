@@ -21,7 +21,6 @@ def init_app(app):
             weekday = {n:Weekday(n) for n in range(7)},
         )
 
-
     @app.route('/')
     def index():
         return redirect(url_for('select_date.goto_today'))

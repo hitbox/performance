@@ -6,9 +6,12 @@ from flask import redirect
 from flask import render_template
 from flask import url_for
 
+from .. import config
 from ..authorization import basic_check
 from ..extensions import db
 from ..month import Month
+
+config.require('FIRSTWEEKDAY', 'isint')
 
 def select_date_blueprint(ReportClass, date_attr_name):
     """

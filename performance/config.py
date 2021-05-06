@@ -1,7 +1,37 @@
 from .exceptions import AppError
 from .utils import exists_and_truthy
 
-class RaiseConfig:
+_registry = {}
+
+class ConfigError(Exception):
+    pass
+
+
+def isint(value):
+    "An integer"
+    return isinstance(value, int)
+
+def require(key, validate_func_name):
+    if key in _registry:
+        raise ConfigError('Key already exists, %r' % key)
+    if validate_func_name not in globals():
+        raise ConfigError('Invalid validator name, %r' % validate_func_name)
+    validate_func = globals()[validate_func_name]
+    _registry[key] = validate_func
+
+def raise_for_config(app):
+    for key, validator in _registry.items():
+        try:
+            value = app.config[key]
+        except KeyError:
+            raise ConfigError('Missing config key, %r' % key)
+        else:
+            if not validator(value):
+                raise ConfigError(
+                    'Invalid config value %r for %r. Expected %r'
+                    % (value, key, validator.__doc__))
+
+class ConfigValidator:
     """
     Ensure sane configuration as soon as possible.
     """
@@ -41,6 +71,7 @@ class RaiseConfig:
 
 # required to be set to something truthy
 REQUIRED_TRUTHY = [
+    'FIRSTWEEKDAY',
     'SESSION_COOKIE_PATH',
     'REMEMBER_COOKIE_PATH',
     # used in templates and will blow up without these:
@@ -62,7 +93,7 @@ REQUIRED_TRUTHY_IF_DEVELOPMENT = ['PREFIX']
 # just required to exist in config
 REQUIRED_EXISTS = []
 
-raise_config = RaiseConfig(
+validate = ConfigValidator(
     REQUIRED_TRUTHY,
     REQUIRED_TRUTHY_IF_DEVELOPMENT,
     REQUIRED_EXISTS
