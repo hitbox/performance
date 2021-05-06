@@ -2,11 +2,11 @@
 
 {% block main %}
 
-{% block main_head %}<h3>{{ config.TITLE }}: {{ report.date.strftime(config.DATEFMT) }}</h3>{% endblock main_head %}
+{% block main_head %}<h3>{{ config.PERFORMANCE_REPORT_TITLE }}: {{ report.date.strftime(config.DATEFMT) }}</h3>{% endblock main_head %}
 
 
 {% block performance_table %}
-<h3>{{ config.TITLE_PERFORMANCE }}</h3>
+<h3>{{ config.PERFORMANCE_REPORT_TITLE }}</h3>
 <table>
     <thead>
         <tr>
