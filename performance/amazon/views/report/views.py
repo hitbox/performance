@@ -22,13 +22,7 @@ report_bp = Blueprint('report', __name__, template_folder='templates')
 
 FLIGHT_SORTKEY = attrgetter('origin_departure_estimated_time')
 
-@report_bp.route('/view/<int:id>')
-@basic_check
-def view_report(id):
-    """
-    View Report object.
-    """
-    report = Report.query.get_or_404(id)
+def get_flights_by_type(report):
     # [(flight_type, flight of that type), ...]
     grouped = [
         (flight_type,
@@ -37,10 +31,24 @@ def view_report(id):
              key = FLIGHT_SORTKEY))
         for flight_type in FlightType.query.order_by(FlightType.report_order)
     ]
+    return grouped
+
+def get_context(report):
     context = dict(
         report = report,
-        grouped = grouped,
+        flights_by_type = get_flights_by_type(report),
     )
+    return context
+
+@report_bp.route('/view/<int:id>')
+@basic_check
+def view_report(id):
+    """
+    View Report object.
+    """
+    report = Report.query.get_or_404(id)
+    flights_by_type = get_flights_by_type(report)
+    context = get_context(report)
     return render_template('report/print.html', **context)
 
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -60,17 +68,10 @@ def edit_report(id):
     elif request.method == 'GET':
         form.submit.label.text = 'Update'
 
-    # [(flight_type, flight of that type), ...]
-    grouped = [
-        (flight_type,
-         sorted(
-             (flight for flight in report.flights if flight.flight_type == flight_type),
-             key = FLIGHT_SORTKEY))
-        for flight_type in FlightType.query.order_by(FlightType.report_order)
-    ]
+    flights_by_type = get_flights_by_type(report)
     context = dict(
         form = form,
-        grouped = grouped,
+        flights_by_type = flights_by_type,
         report = report,
     )
     return render_template('report/edit.html', **context)

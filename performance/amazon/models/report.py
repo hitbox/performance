@@ -26,7 +26,7 @@ class Report(
         ),
     )
 
-    # NOTE: previous is actual today (legacy problem).
+    # NOTE: previous is actually today (legacy problem).
     previous_days_performance_percent = db.Column(db.Float)
     previous_days_performance_lanes = db.Column(db.Integer)
     previous_days_performance_late = db.Column(db.Integer)

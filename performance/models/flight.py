@@ -135,6 +135,12 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         if isinstance(value, str):
             return parse.formatdelays(parse.delaystring(value))
 
+    def origin_delay_codes(self):
+        return parse.delaystring(self.origin_delays)
+
+    def destination_delay_codes(self):
+        return parse.delaystring(self.destination_delays)
+
     def controllable_over(self, minutes):
         """
         Controllable delays over some number of minutes.
@@ -142,9 +148,6 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         """
         controllable_codes = current_app.config['PERFORMANCE_CONTROLLABLE']
         items = []
-        # XXX: confirm it's only destination delays that count
-        #if self.origin_delays:
-        #    items.extend(parse.delaystring(self.origin_delays))
         if self.destination_delays:
             items.extend(parse.delaystring(self.destination_delays))
         items = [(code, delay_minutes)

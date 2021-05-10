@@ -45,9 +45,15 @@
         </tr>
         {% endif %}
     </tbody>
-    {% if with_edit %}<tfoot class="noprint">
+    <tfoot class="noprint">
         <tr>
-            <td colspan="{{ ncols }}"><h4><a href="{{ url_for('flight.create', report_id=report.id, flight_type_id=flight_type.id, backurl=thisurl) }}">Add {{ flight_type.name }} flight</a></h4></td>
+            <td>Total</td>
+            <td>{{ report.flights|length }}</td>
+            <td>{% for flight in flights %}{% for code, minutes in flight.origin_delay_codes() %}{{ code }}{% endfor %}{% endfor %}</td>
+            <td colspan="{{ ncols-1 }}"></td>
         </tr>
-    </tfoot>{% endif %}
+        {% if with_edit %}<tr>
+            <td colspan="{{ ncols }}"><h4><a href="{{ url_for('flight.create', report_id=report.id, flight_type_id=flight_type.id, backurl=thisurl) }}">Add {{ flight_type.name }} flight</a></h4></td>
+        </tr>{% endif %}
+    </tfoot>
 </table>
