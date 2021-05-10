@@ -91,15 +91,6 @@ class Report(
             if delay_code in controllable
         ]
 
-    def extra_info_delays(self):
-        extra_controllable = current_app.config['PERFORMANCE_EXTRA_INFO_CONTROLLABLE']
-        return [
-            (delay_code, minutes)
-            for flight in self.flights
-            for delay_code, minutes in flight.destination_delay_codes()
-            if delay_code in extra_controllable
-        ]
-
     def over30(self):
         controllable = current_app.config['PERFORMANCE_CONTROLLABLE']
         extra_controllable = current_app.config['PERFORMANCE_EXTRA_INFO_CONTROLLABLE']

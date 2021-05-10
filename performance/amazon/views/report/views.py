@@ -31,7 +31,6 @@ def get_context(report):
     extrainfo_month = dict(
         lanes = sum(report.lanes() for report in reports_for_month),
         chargeable_delays = sum(len(report.chargeable_delays()) for report in reports_for_month),
-        extra_info_delays = sum(len(report.extra_info_delays()) for report in reports_for_month),
         over30 = sum(len(report.over30()) for report in reports_for_month),
     )
     context = dict(
