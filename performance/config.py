@@ -95,6 +95,7 @@ require('PERFORMANCE_JAVASCRIPT_INJECTION', Dictionary())
 
 require_all(List(is_populated=True), [
     'PERFORMANCE_CONTROLLABLE',
+    'PERFORMANCE_EXTRA_INFO_CONTROLLABLE',
 ])
 
 require('PREFIX', String(min=1), is_development=True)

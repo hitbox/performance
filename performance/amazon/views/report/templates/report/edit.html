@@ -11,12 +11,6 @@
 {%- from "report/macros.html" import render_flights_table -%}
 
 
-{% block head %}
-{{ super() }}
-{% assets filters='jsmin', output='gen/packed.js', 'js/report-edit.js' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
-{% endblock head %}
-
-
 {% block main_head %}
 {{ super() }}
 {{ thisurl }}
@@ -82,6 +76,10 @@
 <td>{{ form.qtd_performance_late() }}</td>
 {% endblock %}
 
+{% block performance_assumed_best_lanes %}
+<td>{{ form.assumed_best_lanes() }}</td>
+{% endblock %}
+
 
 {% block performance_table %}
 <form action="{{ url_for(request.endpoint, **request.view_args) }}" id="reportform" method="POST">
@@ -100,8 +98,8 @@
 
 
 {% block flights %}
-{% set with_edit=true %}
-{% for flight_type, flights in grouped %}
-{% include "report/flight_table.html" with context %}
-{% endfor %}
+    {% set with_edit = true %}
+    {% for flight_type, flights in report.flights_by_type() %}
+        {% include "report/flight_table.html" with context %}
+    {% endfor %}
 {% endblock flights %}

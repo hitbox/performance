@@ -51,6 +51,11 @@
             {% block performance_qtd_performance_lanes %}{% endblock %}
             {% block performance_qtd_performance_late %}{% endblock %}
         </tr>
+        <tr>
+            <td class="head">Assumed Best Lanes</td>
+            {% block performance_assumed_best_lanes %}{% endblock %}
+            <td colspan=2></td>
+        </tr>
     </tbody>
     {% block performance_table_tfoot %}{% endblock %}
 </table>{% endblock performance_table %}

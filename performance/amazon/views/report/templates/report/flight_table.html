@@ -37,7 +37,7 @@
     </thead>
     <tbody>{% if flights %}
         {% for flight in flights %}<tr tabindex="0">
-            {% include "flight_table_data.html" %}
+            {% include "flight_table_data.html" with context %}
         </tr>{% endfor %}
         {%- else -%}
         <tr>

@@ -1,5 +1,3 @@
-from wtforms.widgets.html5 import NumberInput
-
 from ...forms.base import ModelForm
 from ...forms.mixins import BackLinkMixin
 from ...forms.mixins import SubmitUpdateDeleteMixin
@@ -29,11 +27,13 @@ class ReportForm(
             'qtd_performance_lanes',
             'qtd_performance_late',
             'system_detail',
+            'assumed_best_lanes',
         ]
         field_args = {
             key: {
                 'render_kw': {
-                    'class': 'narrowest'
+                    'class': 'narrowest',
+                    'type': 'number',
                 }
             }
             for key in only
@@ -50,3 +50,7 @@ class ReportForm(
         for key, options in field_args.items():
             if key in _percent_fields:
                 options['render_kw']['class'] += ' percent'
+                options['render_kw']['type'] = 'number'
+                options['render_kw']['step'] = '0.01'
+                options['render_kw']['min'] = '0'
+                options['render_kw']['max'] = '100'

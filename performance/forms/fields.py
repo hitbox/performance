@@ -1,3 +1,4 @@
+from wtforms import Field
 from wtforms.widgets import TextInput
 from wtforms_components import TimeField
 
@@ -17,3 +18,21 @@ class StringTimeField(TimeField):
             s = valuelist[0]
             valuelist[0] = f'{s[:2]}:{s[2:]}'
         super().process_formdata(valuelist)
+
+
+class PercentField(Field):
+    widget = TextInput()
+
+    def _value(self):
+        if self.data:
+            return f'{self.data*100:.2f}'
+        else:
+            return ''
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = float(valuelist[0])/100
+        else:
+            self.data = float()
+
+

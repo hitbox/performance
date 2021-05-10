@@ -1,11 +1,14 @@
-from operator import attrgetter
+
+import sqlalchemy as sa
 
 from flask import Blueprint
+from flask import current_app
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
 
+from performance import parse
 from performance.authorization import basic_check
 from performance.authorization import edit_check
 from performance.extensions import db
@@ -20,23 +23,20 @@ from performance.amazon.models import ScheduledReport
 
 report_bp = Blueprint('report', __name__, template_folder='templates')
 
-FLIGHT_SORTKEY = attrgetter('origin_departure_estimated_time')
-
-def get_flights_by_type(report):
-    # [(flight_type, flight of that type), ...]
-    grouped = [
-        (flight_type,
-         sorted(
-             (flight for flight in report.flights if flight.flight_type == flight_type),
-             key = FLIGHT_SORTKEY))
-        for flight_type in FlightType.query.order_by(FlightType.report_order)
-    ]
-    return grouped
-
 def get_context(report):
+    reports_for_month = Report.query.filter(
+        sa.func.date_part('month', Report.date) == report.date.month,
+        sa.func.date_part('year', Report.date) == report.date.year,
+    ).all()
+    extrainfo_month = dict(
+        lanes = sum(report.lanes() for report in reports_for_month),
+        chargeable_delays = sum(len(report.chargeable_delays()) for report in reports_for_month),
+        extra_info_delays = sum(len(report.extra_info_delays()) for report in reports_for_month),
+        over30 = sum(len(report.over30()) for report in reports_for_month),
+    )
     context = dict(
         report = report,
-        flights_by_type = get_flights_by_type(report),
+        extrainfo_month = extrainfo_month,
     )
     return context
 
@@ -47,7 +47,6 @@ def view_report(id):
     View Report object.
     """
     report = Report.query.get_or_404(id)
-    flights_by_type = get_flights_by_type(report)
     context = get_context(report)
     return render_template('report/print.html', **context)
 
@@ -68,10 +67,8 @@ def edit_report(id):
     elif request.method == 'GET':
         form.submit.label.text = 'Update'
 
-    flights_by_type = get_flights_by_type(report)
     context = dict(
         form = form,
-        flights_by_type = flights_by_type,
         report = report,
     )
     return render_template('report/edit.html', **context)

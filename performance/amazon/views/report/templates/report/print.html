@@ -19,8 +19,39 @@
         <a href="javascript:;" onclick="window.print(); return false">Print</a>
     </h4>
     {% if current_user.is_editor %}<h4>
-        <a href="{{ url_for('report.edit_report', id=report.id) }}">Edit</a>
+        <a href="{{ url_for('report.edit_report', id=report.id, backurl=url_for(request.endpoint, id=report.id)) }}">Edit</a>
     </h4>{% endif %}
+</div>
+<div id="extra-performance-info">
+    <h3>Performance</h3>
+    <div id="extra-performance-info-table">
+        {# header #}
+        <div></div>
+        <div>Daily</div>
+        <div>Monthly</div>
+        <div></div>
+        {# data #}
+        <div>Lanes</div>
+        <div class=data>{{ report.lanes() }}</div>
+        <div class=data>{{ extrainfo_month.lanes }}</div>
+        <div></div>
+        <div>Chargeable Delays</div>
+        <div class=data>{{ report.chargeable_delays()|length }}</div>
+        <div class=data>{{ extrainfo_month.chargeable_delays }}</div>
+        <div></div>
+        <div>WTH/AFL Delays</div>
+        <div class=data>{{ report.extra_info_delays()|length }}</div>
+        <div class=data>{{ extrainfo_month.extra_info_delays }}</div>
+        <div class=data>{{ percent((extrainfo_month.lanes - extrainfo_month.chargeable_delays) / extrainfo_month.lanes) }}</div>
+        <div>&gt;30 Count</div>
+        <div class=data>{{ report.over30()|length }}</div>
+        <div class=data>{{ extrainfo_month.over30 }}</div>
+        <div class=data>{{ percent((extrainfo_month.lanes - extrainfo_month.over30) / extrainfo_month.lanes) }}</div>
+        <div>Assumed Best</div>
+        <div></div>
+        <div></div>
+        <div class=data>{% if report.assumed_best_lanes %}{{ percent((report.assumed_best_lanes - extrainfo_month.chargeable_delays) / report.assumed_best_lanes) }}{% endif %}</div>
+    </div>
 </div>
 {% endblock %}
 
@@ -81,8 +112,13 @@
 <td class="rightalign">{{ integer(report.qtd_performance_late) }}</td>
 {% endblock %}
 
+{% block performance_assumed_best_lanes %}
+<td class="rightalign">{{ integer(report.assumed_best_lanes) }}</td>
+{% endblock %}
+
+
 {% block flights %}
-{% for flight_type, flights in flights_by_type %}
+{% for flight_type, flights in report.flights_by_type() %}
     {% if flights %}
         {% include "report/flight_table.html" %}
     {% endif %}

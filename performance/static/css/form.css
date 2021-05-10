@@ -79,6 +79,10 @@ form #dhl_qtd_performance {
     margin: .1rem;
 }
 
+input.narrowest {
+    width: 4rem;
+}
+
 /* flight form styling below */
 
 form #leg {
