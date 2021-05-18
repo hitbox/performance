@@ -4,6 +4,8 @@ TODO LIST
 
 From Chris:
 
+    Work on Amazon version first.
+
     [X] Display Sort and Entry Sort showing by Z Departure time.
     [ ] Daily total and % on time (Lane count number of chargeable delays)
     [ ] Month to date totals and % on time >15 minutes
