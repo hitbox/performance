@@ -85,12 +85,3 @@ pre.detail {
     margin: 0;
     padding: 0.5rem;
 }
-
-#extra-performance-info {
-    width: 50%;
-}
-
-#extra-performance-info-table {
-    display: grid;
-    grid-template-columns: repeat(4, auto);
-}

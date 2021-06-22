@@ -94,10 +94,12 @@ class Report(
     def over30(self):
         controllable = current_app.config['PERFORMANCE_CONTROLLABLE']
         extra_controllable = current_app.config['PERFORMANCE_EXTRA_INFO_CONTROLLABLE']
+        all_controllable = controllable + extra_controllable
         return [
             (delay_code, minutes)
             for flight in self.flights
-            for delay_code, minutes in flight.destination_delay_codes()
-            if delay_code in controllable + extra_controllable
-            and minutes is not None and minutes > 30
+            for delay_code, minutes in flight.origin_delay_codes()
+            if delay_code in all_controllable
+            and minutes is not None
+            and minutes > 30
         ]

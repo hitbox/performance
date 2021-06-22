@@ -18,41 +18,41 @@
     </thead>
     <tbody>
         <tr>
-            <td class="head">Today's Performance</td>
+            <th>Today's Performance</td>
             {% block performance_previous_days_performance_percent %}{% endblock %}
             {% block performance_previous_days_performance_lanes %}{% endblock %}
             {% block performance_previous_days_performance_late %}{% endblock %}
         </tr>
         <tr>
-            <td class="head">Arrival Performance MTD &gt; 15</td>
+            <th>Arrival Performance MTD &gt; 15</td>
             {% block performance_arrival_performance_mtd_percent %}{% endblock %}
             {% block performance_arrival_performance_mtd_lanes %}{% endblock %}
             {% block performance_arrival_performance_mtd_late %}{% endblock %}
         </tr>
         <tr>
-            <td class="head">Arrival Performance MTD &gt; 30</td>
+            <th>Arrival Performance MTD &gt; 30</td>
             {% block performance_arrival_performance_mtd_30_percent %}{% endblock %}
             {% block performance_arrival_performance_mtd_30_lanes %}{% endblock %}
             {% block performance_arrival_performance_mtd_30_late %}{% endblock %}
         </tr>
         <tr>
-            <td class="head"># days at 100%</td>
+            <th># days at 100%</td>
             {% block performance_days_at_100_percent %}{% endblock %}
             <td colspan=2></td>
         </tr>
         <tr>
-            <td class="head">Assumed Best Arrival Performance for Month</td>
+            <th>Assumed Best Arrival Performance for Month</td>
             {% block performance_assumed_best_arrival_performance_for_month_percent %}{% endblock %}
             <td colspan=2></td>
         </tr>
         <tr>
-            <td class="head">QTD Performance</td>
+            <th>QTD Performance</td>
             {% block performance_qtd_performance_percent %}{% endblock %}
             {% block performance_qtd_performance_lanes %}{% endblock %}
             {% block performance_qtd_performance_late %}{% endblock %}
         </tr>
         <tr>
-            <td class="head">Assumed Best Lanes</td>
+            <th>Assumed Best Lanes</td>
             {% block performance_assumed_best_lanes %}{% endblock %}
             <td colspan=2></td>
         </tr>

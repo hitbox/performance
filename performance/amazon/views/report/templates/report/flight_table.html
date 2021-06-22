@@ -48,8 +48,8 @@
     <tfoot class="noprint">
         <tr>
             <td>Total</td>
-            <td>{{ report.flights|length }}</td>
-            <td>{% for flight in flights %}{% for code, minutes in flight.origin_delay_codes() %}{{ code }}{% endfor %}{% endfor %}</td>
+            <td class=data>{{ report.flights|length }}</td>
+            <td>{# WTF IS THIS? {% for flight in flights %}{% for code, minutes in flight.origin_delay_codes() %}{{ code }}{% endfor %}{% endfor %}#}</td>
             <td colspan="{{ ncols-1 }}"></td>
         </tr>
         {% if with_edit %}<tr>

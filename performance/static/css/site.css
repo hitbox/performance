@@ -107,6 +107,7 @@ nav > * {
 
 .data {
     font-family: monospace;
+    font-size: 1rem;
 }
 
 .data.number {

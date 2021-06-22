@@ -26,3 +26,8 @@ td.data {
     font-family: monospace;
     font-size: 1rem;
 }
+
+tbody > tr > th {
+    text-align: left;
+    font-size: .9rem;
+}
