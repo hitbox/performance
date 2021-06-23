@@ -19,7 +19,8 @@ def root_context():
 
     context = locals()
     # add all the database models
-    context.update(db.Model._decl_class_registry)
+    for mapper in db.Model.registry.mappers:
+        context[mapper.class_.__name__] = mapper.class_
     return context
 
 def init_app(app):

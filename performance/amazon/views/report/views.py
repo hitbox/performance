@@ -22,16 +22,53 @@ from performance.amazon.models import ScheduledReport
 
 report_bp = Blueprint('report', __name__, template_folder='templates')
 
+def get_performance_from(reports):
+    """
+    Return performance numbers (lanes, chargeable delays, and over-30 count).
+    :param reports: list of reports.
+    """
+    result = dict(
+        lanes = sum(report.lanes() for report in reports),
+        chargeable_delays = sum(len(report.chargeable_delays()) for report in reports),
+        over30 = sum(len(report.over30()) for report in reports),
+    )
+    return result
+
+def get_quarter_to_date(report):
+    """
+    Return dictionary of quarter to date (of report's date).
+    """
+    query = Report.query.join(
+        Flight,
+    ).with_entities(
+        sa.func.count(Report.flights).label('lanes'),
+    ).filter(
+        sa.func.date_part('year', Report.date) == report.date.year,
+        # quarter of date calculation
+        # (month - 1) // 3 + 1
+        # sa.func.div postgres specific
+        sa.func.div(
+            sa.cast(
+                sa.func.date_part('month', Report.date) - 1,
+                sa.Integer),
+            3) + 1 == (report.date.month - 1) // 3 + 1,
+        Report.date <= report.date,
+    )
+    result = db.session.execute(query)
+    mappings = result.mappings()
+    return mappings.one()
+
 def get_context(report):
-    reports_month_to_date = Report.query.filter(
+    month_to_date = Report.query.filter(
         sa.func.date_part('year', Report.date) == report.date.year,
         sa.func.date_part('month', Report.date) == report.date.month,
         Report.date <= report.date,
     ).all()
+    month_to_date = get_performance_from(month_to_date)
 
-    reports_quarter_to_date = Report.query.filter(
+    quarter_to_date = Report.query.filter(
         sa.func.date_part('year', Report.date) == report.date.year,
-        # quarter
+        # quarter of date calculation
         # (month - 1) // 3 + 1
         # sa.func.div postgres specific
         sa.func.div(
@@ -41,16 +78,16 @@ def get_context(report):
             3) + 1 == (report.date.month - 1) // 3 + 1,
         Report.date <= report.date,
     ).all()
+    quarter_to_date = get_performance_from(quarter_to_date)
+    # TODO: assumed best
+    #       need field on report
+    #       form
+    #       migrations
 
-    month_to_date = dict(
-        lanes = sum(report.lanes() for report in reports_month_to_date),
-        chargeable_delays = sum(len(report.chargeable_delays()) for report in reports_month_to_date),
-        over30 = sum(len(report.over30()) for report in reports_month_to_date),
-    )
     context = dict(
         report = report,
         month_to_date = month_to_date,
-        reports_quarter_to_date = reports_quarter_to_date,
+        quarter_to_date = quarter_to_date,
     )
     return context
 

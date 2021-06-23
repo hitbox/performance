@@ -44,12 +44,7 @@
     </h4>{% endif %}
 </div>
 <div>
-    <div>
-        <h1>TEST</h1>
-        <ul>{% for report in reports_quarter_to_date %}
-            <li>{{ report.date }} Q{{ (report.date.month - 1) // 3 + 1 }}</li>{% endfor %}
-        </ul>
-    </div>
+    <pre>{{ quarter_to_date }}</pre>
     <h3>Performance</h3>
     <table>
         <tbody>
@@ -63,19 +58,21 @@
                 <th>Lanes</th>
                 <td class="data number">{{ report.lanes() }}</td>
                 <td class="data number">{{ month_to_date.lanes }}</td>
-                <td></td>
+                <td class="data number">{{ quarter_to_date.lanes }}</td>
             </tr>
             <tr>
                 <th>Chargeable Delays</th>
                 <td class="data number">{{ report.chargeable_delays()|length }}</td>
                 <td class="data number">{{ month_to_date.chargeable_delays }}</td>
-                <td></td>
+                <td class="data number">{{ quarter_to_date.chargeable_delays }}</td>
             </tr>
             <tr>
                 <th>&gt;30 Count</th>
                 <td class="data number">{{ report.over30()|length }}</td>
                 <td class="data number">{{ month_to_date.over30 }}</td>
-                <td class="data number">{{ percent((month_to_date.lanes - month_to_date.over30) / month_to_date.lanes) }}</td>
+                {# what is this? #}
+                {#<td class="data number">{{ percent((month_to_date.lanes - month_to_date.over30) / month_to_date.lanes) }}</td>#}
+                <td class="data number">{{ quarter_to_date.over30 }}</td>
             </tr>
             <tr>
                 <th>Assumed Best</th>
