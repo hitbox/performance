@@ -95,7 +95,7 @@ class Report(
         controllable = current_app.config['PERFORMANCE_CONTROLLABLE']
         extra_controllable = current_app.config['PERFORMANCE_EXTRA_INFO_CONTROLLABLE']
         all_controllable = controllable + extra_controllable
-        return [
+        delay_codes = [
             (delay_code, minutes)
             for flight in self.flights
             for delay_code, minutes in flight.origin_delay_codes()
@@ -103,3 +103,4 @@ class Report(
             and minutes is not None
             and minutes > 30
         ]
+        return delay_codes

@@ -23,18 +23,34 @@ from performance.amazon.models import ScheduledReport
 report_bp = Blueprint('report', __name__, template_folder='templates')
 
 def get_context(report):
-    reports_for_month = Report.query.filter(
-        sa.func.date_part('month', Report.date) == report.date.month,
+    reports_month_to_date = Report.query.filter(
         sa.func.date_part('year', Report.date) == report.date.year,
+        sa.func.date_part('month', Report.date) == report.date.month,
+        Report.date <= report.date,
     ).all()
-    extrainfo_month = dict(
-        lanes = sum(report.lanes() for report in reports_for_month),
-        chargeable_delays = sum(len(report.chargeable_delays()) for report in reports_for_month),
-        over30 = sum(len(report.over30()) for report in reports_for_month),
+
+    reports_quarter_to_date = Report.query.filter(
+        sa.func.date_part('year', Report.date) == report.date.year,
+        # quarter
+        # (month - 1) // 3 + 1
+        # sa.func.div postgres specific
+        sa.func.div(
+            sa.cast(
+                sa.func.date_part('month', Report.date) - 1,
+                sa.Integer),
+            3) + 1 == (report.date.month - 1) // 3 + 1,
+        Report.date <= report.date,
+    ).all()
+
+    month_to_date = dict(
+        lanes = sum(report.lanes() for report in reports_month_to_date),
+        chargeable_delays = sum(len(report.chargeable_delays()) for report in reports_month_to_date),
+        over30 = sum(len(report.over30()) for report in reports_month_to_date),
     )
     context = dict(
         report = report,
-        extrainfo_month = extrainfo_month,
+        month_to_date = month_to_date,
+        reports_quarter_to_date = reports_quarter_to_date,
     )
     return context
 

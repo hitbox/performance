@@ -27,6 +27,11 @@ td.data {
     font-size: 1rem;
 }
 
+th.top {
+    text-align: center;
+    font-size: .9rem;
+}
+
 tbody > tr > th {
     text-align: left;
     font-size: .9rem;
