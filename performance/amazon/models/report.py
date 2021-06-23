@@ -35,6 +35,9 @@ class Report(
         ),
     )
 
+    performance_meta_id = db.Column(db.Integer, db.ForeignKey('performance_meta.id'))
+    performance_meta = db.relationship('performance.amazon.models.performance_meta.PerformanceMeta')
+
     # NOTE: previous is actually today (legacy problem).
     previous_days_performance_percent = db.Column(
         db.Float, info=dict(form_field_class=PercentField))
@@ -57,8 +60,6 @@ class Report(
         db.Float, info=dict(form_field_class=PercentField))
     assumed_best_arrival_performance_for_month_lanes = db.Column(db.Integer)
     assumed_best_arrival_performance_for_month_late = db.Column(db.Integer)
-
-    assumed_best_lanes = db.Column(db.Integer)
 
     arrival_performance_mtd_30_percent = db.Column(
         db.Float, info=dict(form_field_class=PercentField))

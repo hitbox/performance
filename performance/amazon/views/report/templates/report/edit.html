@@ -1,5 +1,6 @@
 {% extends "report/base.html" %}
 
+{% set with_edit = true %}
 
 {% block main_head %}
 {{ super() }}
@@ -88,7 +89,6 @@
 
 
 {% block flights %}
-    {% set with_edit = true %}
     {% for flight_type, flights in report.flights_by_type() %}
         {% include "report/flight_table.html" with context %}
     {% endfor %}

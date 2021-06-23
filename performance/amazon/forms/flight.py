@@ -6,12 +6,12 @@ from wtforms import SelectField
 from wtforms_alchemy import ClassMap
 from wtforms_alchemy import QuerySelectField
 
-from ...forms import defaults
-from ...forms.base import ModelForm
-from ...forms.fields import StringTimeField
-from ...forms.mixins import BackLinkMixin
-from ...forms.mixins import SubmitUpdateDeleteMixin
-from ...models import FlightType
+from performance.forms import defaults
+from performance.forms.base import ModelForm
+from performance.forms.fields import StringTimeField
+from performance.forms.mixins import BackLinkMixin
+from performance.forms.mixins import SubmitUpdateDeleteMixin
+from performance.models import FlightType
 
 from ..models import Flight
 

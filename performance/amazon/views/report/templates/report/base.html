@@ -50,12 +50,11 @@
             {% block performance_qtd_performance_percent %}{% endblock %}
             {% block performance_qtd_performance_lanes %}{% endblock %}
             {% block performance_qtd_performance_late %}{% endblock %}
-        </tr>
+        </tr>{% if with_edit %}
         <tr>
-            <th>Assumed Best Lanes</td>
-            {% block performance_assumed_best_lanes %}{% endblock %}
-            <td colspan=2></td>
-        </tr>
+            <th>Assumed Best Lanes for Quarter</th>
+            <td colspan=3>{{ form.performance_meta.assumed_best_lanes_quarter }}{{ form.performance_meta.hidden_tag() }}</td>
+        </tr>{% endif %}
     </tbody>
     {% block performance_table_tfoot %}{% endblock %}
 </table>{% endblock performance_table %}

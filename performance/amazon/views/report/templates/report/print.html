@@ -4,35 +4,6 @@
 {%- from "macros.html" import percent -%}
 
 
-{% block trash %}
-    {# this was up there, in extra-performance-info #}
-    <div id="extra-performance-info-table">
-        {# header #}
-        <div></div>
-        <div>Daily</div>
-        <div>Monthly</div>
-        <div></div>
-        {# data #}
-        <div>Lanes</div>
-        <div class=data>{{ report.lanes() }}</div>
-        <div class=data>{{ month_to_date.lanes }}</div>
-        <div></div>
-        <div>Chargeable Delays</div>
-        <div class=data>{{ report.chargeable_delays()|length }}</div>
-        <div class=data>{{ month_to_date.chargeable_delays }}</div>
-        <div></div>
-        <div>&gt;30 Count</div>
-        <div class=data>{{ report.over30()|length }}</div>
-        <div class=data>{{ month_to_date.over30 }}</div>
-        <div class=data>{{ percent((month_to_date.lanes - month_to_date.over30) / month_to_date.lanes) }}</div>
-        <div>Assumed Best</div>
-        <div></div>
-        <div></div>
-        <div class=data>{% if report.assumed_best_lanes %}{{ percent((report.assumed_best_lanes - month_to_date.chargeable_delays) / report.assumed_best_lanes) }}{% endif %}</div>
-    </div>
-{% endblock trash %}
-
-
 {% block main_head %}
 {{ super() }}
 <div class="noprint">
@@ -77,7 +48,7 @@
                 <th>Assumed Best</th>
                 <td></td>
                 <td></td>
-                <td class="data number">{% if report.assumed_best_lanes %}{{ percent((report.assumed_best_lanes - month_to_date.chargeable_delays) / report.assumed_best_lanes) }}{% endif %}</td>
+                <td class="data number" title="Calculation: ({{ report.performance_meta.assumed_best_lanes_quarter }} - {{ quarter_to_date.chargeable_delays }}) / {{ report.performance_meta.assumed_best_lanes_quarter }}">{{ percent(assumed_best_lanes_quarter_percent) }}</td>
             </tr>
         </tbody>
     </table>

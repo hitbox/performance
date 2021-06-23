@@ -1,3 +1,4 @@
+alembic
 cssmin
 flask
 flask-assets
@@ -12,7 +13,7 @@ openpyxl
 passlib
 psycopg2
 pywin32; sys_platform == 'win32'
+sqlalchemy
 sqlalchemy-utils
 wtforms
 wtforms-alchemy
-sqlalchemy

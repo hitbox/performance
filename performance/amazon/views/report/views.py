@@ -27,36 +27,15 @@ def get_performance_from(reports):
     Return performance numbers (lanes, chargeable delays, and over-30 count).
     :param reports: list of reports.
     """
+    lanes = sum(report.lanes() for report in reports)
+    chargeable_delays = sum(len(report.chargeable_delays()) for report in reports)
+    over30 = sum(len(report.over30()) for report in reports)
     result = dict(
-        lanes = sum(report.lanes() for report in reports),
-        chargeable_delays = sum(len(report.chargeable_delays()) for report in reports),
-        over30 = sum(len(report.over30()) for report in reports),
+        lanes = lanes,
+        chargeable_delays = chargeable_delays,
+        over30 = over30,
     )
     return result
-
-def get_quarter_to_date(report):
-    """
-    Return dictionary of quarter to date (of report's date).
-    """
-    query = Report.query.join(
-        Flight,
-    ).with_entities(
-        sa.func.count(Report.flights).label('lanes'),
-    ).filter(
-        sa.func.date_part('year', Report.date) == report.date.year,
-        # quarter of date calculation
-        # (month - 1) // 3 + 1
-        # sa.func.div postgres specific
-        sa.func.div(
-            sa.cast(
-                sa.func.date_part('month', Report.date) - 1,
-                sa.Integer),
-            3) + 1 == (report.date.month - 1) // 3 + 1,
-        Report.date <= report.date,
-    )
-    result = db.session.execute(query)
-    mappings = result.mappings()
-    return mappings.one()
 
 def get_context(report):
     month_to_date = Report.query.filter(
@@ -78,16 +57,21 @@ def get_context(report):
             3) + 1 == (report.date.month - 1) // 3 + 1,
         Report.date <= report.date,
     ).all()
+    #
     quarter_to_date = get_performance_from(quarter_to_date)
-    # TODO: assumed best
-    #       need field on report
-    #       form
-    #       migrations
-
+    # assumed best lanes for quarter is effectively quarter-to-date
+    assumed_best_lanes_quarter_percent = None
+    if report.performance_meta:
+        best_lanes = report.performance_meta.assumed_best_lanes_quarter
+        if best_lanes:
+            assumed_best_lanes_quarter_percent = (best_lanes - quarter_to_date['chargeable_delays']) / best_lanes
+            assumed_best_lanes_quarter_percent = assumed_best_lanes_quarter_percent
+    #
     context = dict(
         report = report,
         month_to_date = month_to_date,
         quarter_to_date = quarter_to_date,
+        assumed_best_lanes_quarter_percent = assumed_best_lanes_quarter_percent,
     )
     return context
 

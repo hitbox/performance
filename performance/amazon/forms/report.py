@@ -1,8 +1,12 @@
-from ...forms.base import ModelForm
-from ...forms.mixins import BackLinkMixin
-from ...forms.mixins import SubmitUpdateDeleteMixin
+from wtforms import FormField
+
+from performance.forms.base import ModelForm
+from performance.forms.mixins import BackLinkMixin
+from performance.forms.mixins import SubmitUpdateDeleteMixin
 
 from ..models import Report
+
+from .performance_meta import PerformanceMetaForm
 
 class ReportForm(
     BackLinkMixin,
@@ -27,7 +31,6 @@ class ReportForm(
             'qtd_performance_lanes',
             'qtd_performance_late',
             'system_detail',
-            'assumed_best_lanes',
         ]
         field_args = {
             key: {
@@ -54,3 +57,5 @@ class ReportForm(
                 options['render_kw']['step'] = '0.01'
                 options['render_kw']['min'] = '0'
                 options['render_kw']['max'] = '100'
+
+    performance_meta = FormField(PerformanceMetaForm)
