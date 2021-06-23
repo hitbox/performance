@@ -65,7 +65,7 @@
 {% endblock %}
 
 {% block performance_previous_days_performance_late %}
-<td class="data number">{{ integer(report.previous_days_performance_late) }}</td>
+<td class="data number">{{ integer(report.previous_days_performance_late, or_zero=True) }}</td>
 {% endblock %}
 
 {% block performance_arrival_performance_mtd_percent %}
