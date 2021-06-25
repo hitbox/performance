@@ -89,7 +89,7 @@
 
 {%- macro integer(v) %}{% if v is number %}{{ '{:,d}'.format(v) }}{% elif kwargs.or_zero %}0{% endif %}{% endmacro -%}
 
-{%- macro string(v) %}{% if v is number %}{{ v }}{% endif %}{% endmacro -%}
+{%- macro string(v) %}{% if v %}{{ v }}{% endif %}{% endmacro -%}
 
 
 {%- macro blank_if_none(s) %}{% if s is not none %}{{ s }}{% endif %}{% endmacro -%}
