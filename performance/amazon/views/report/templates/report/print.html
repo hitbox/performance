@@ -26,23 +26,23 @@
             </tr>
             <tr>
                 <th>Lanes</th>
-                <td class="data number">{{ report.lanes() }}</td>
-                <td class="data number">{{ month_to_date.lanes }}</td>
-                <td class="data number">{{ quarter_to_date.lanes }}</td>
+                <td class="data number">{{ integer(report.lanes()) }}</td>
+                <td class="data number">{{ integer(month_to_date.lanes) }}</td>
+                <td class="data number">{{ integer(quarter_to_date.lanes) }}</td>
             </tr>
             <tr>
                 <th>Chargeable Delays</th>
-                <td class="data number">{{ report.chargeable_delays()|length }}</td>
-                <td class="data number">{{ month_to_date.chargeable_delays }}</td>
-                <td class="data number">{{ quarter_to_date.chargeable_delays }}</td>
+                <td class="data number">{{ integer(report.chargeable_delays()|length) }}</td>
+                <td class="data number">{{ integer(month_to_date.chargeable_delays) }}</td>
+                <td class="data number">{{ integer(quarter_to_date.chargeable_delays) }}</td>
             </tr>
             <tr>
                 <th>&gt;30 Count</th>
-                <td class="data number">{{ report.over30()|length }}</td>
-                <td class="data number">{{ month_to_date.over30 }}</td>
+                <td class="data number">{{ integer(report.over30()|length) }}</td>
+                <td class="data number">{{ integer(month_to_date.over30) }}</td>
                 {# what is this? #}
                 {#<td class="data number">{{ percent((month_to_date.lanes - month_to_date.over30) / month_to_date.lanes) }}</td>#}
-                <td class="data number">{{ quarter_to_date.over30 }}</td>
+                <td class="data number">{{ integer(quarter_to_date.over30) }}</td>
             </tr>
             <tr>
                 <th>Assumed Best</th>
@@ -119,9 +119,7 @@
 
 {% block flights %}
 {% for flight_type, flights in report.flights_by_type() %}
-    {% if flights %}
-        {% include "report/flight_table.html" %}
-    {% endif %}
+    {% if flights %}{% include "report/flight_table.html" %}{% endif %}
 {% endfor %}
 {% endblock flights %}
 
