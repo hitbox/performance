@@ -1,3 +1,4 @@
+from datetime import time
 from operator import attrgetter
 
 from flask import current_app
@@ -8,9 +9,15 @@ from performance.models.mixin import MetaMixin
 
 from .util import grouped_flights
 
+from performance.forms.fields import PercentField
+
 FLIGHTS_BY_TYPE_SORT = attrgetter('origin_departure_estimated_time')
 
-from performance.forms.fields import PercentField
+def by_estimated_departure(flight):
+    if isinstance(flight.origin_departure_estimated_time, time):
+        return flight.origin_departure_estimated_time
+    else:
+        return time(0,0)
 
 class Report(
     MetaMixin,
@@ -75,7 +82,7 @@ class Report(
             (flight_type,
              sorted(
                  (flight for flight in self.flights if flight.flight_type == flight_type),
-                 key = FLIGHTS_BY_TYPE_SORT))
+                 key = by_estimated_departure))
             for flight_type in FlightType.query.order_by(FlightType.report_order)
         ]
         return grouped
