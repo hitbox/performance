@@ -1,4 +1,5 @@
 from wtforms import FormField
+from wtforms_alchemy import ModelFormField
 
 from performance.forms.base import ModelForm
 from performance.forms.mixins import BackLinkMixin
@@ -58,4 +59,4 @@ class ReportForm(
                 options['render_kw']['min'] = '0'
                 options['render_kw']['max'] = '100'
 
-    performance_meta = FormField(PerformanceMetaForm)
+    performance_meta = ModelFormField(PerformanceMetaForm)
