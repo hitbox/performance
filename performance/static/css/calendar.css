@@ -39,6 +39,10 @@
 .day {
     /* cell in a calendar */
     display: block;
+    /* observed size when date has a report */
+    /* setting the size so that the calendar doesn't jump around */
+    width: 50px;
+    height: 50px;
     border: 1px solid var(--font-color);
     font-size: 1.25rem;
     padding: 2rem;
