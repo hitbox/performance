@@ -43,8 +43,12 @@ class Report(
     )
 
     performance_meta_id = db.Column(db.Integer, db.ForeignKey('performance_meta.id'))
+    # XXX: was this performance_meta field a mistake? think what we need is
+    #      objects linked to these reports by month/year and quarter/year.
+    # TODO: need month/year object that stores "assumed best lanes" and possibly other things.
     performance_meta = db.relationship('performance.amazon.models.performance_meta.PerformanceMeta')
 
+    # TODO: all these can be removed with the "automatic calculation" changes?
     # NOTE: previous is actually today (legacy problem).
     previous_days_performance_percent = db.Column(
         db.Float, info=dict(form_field_class=PercentField))
@@ -88,9 +92,31 @@ class Report(
         return grouped
 
     def lanes(self):
+        # TODO
+        # * should only be included in the count if they are a
+        #   "scheduled flight", or an "extra-CMI AMZ Flight".
+        # * Do not include "extra non-cmi amz flights" in the LANE count. These
+        #   apply for DAILY, MONTHLY and QTD.
+        # * One exception: if Origin and Dest are the same, it will NOT count
+        #   in the LANE count (this would be like ILN-ILN for a ground
+        #   turnback/example).
+        # * Right now, it is including the "non-cmi" flights in the counts. On
+        #   the 13Jul21 report, I manually filled in the performance numbers
+        #   for a comparison to the first calculation section.
         return len(self.flights)
 
     def chargeable_delays(self):
+        # TODO:
+        # should only be counted as Chargeable if the Delay Codes (2nd delay
+        # code column) in the Arrival are equal to:
+        #
+        # MXA with minutes greater than >15 and >30 respectively
+        # DSP with minutes greater than >15 and >30 respectively
+        # CRW with minutes greater than >15 and >30 respectively
+        #
+        # XLD MXA  (no minutes will be listed if XLD) Will count in both the >15 column and >30 column
+        # XLD CRW (no minutes will be listed if XLD) Will count in both the >15 column and >30 column
+        # XLD DSP (no minutes will be listed if XLD) Will count in both the >15 column and >30 column
         controllable = current_app.config['PERFORMANCE_CONTROLLABLE']
         return [
             (delay_code, minutes)
@@ -100,6 +126,7 @@ class Report(
         ]
 
     def over30(self):
+        # TODO: see chargeable_delays above
         controllable = current_app.config['PERFORMANCE_CONTROLLABLE']
         extra_controllable = current_app.config['PERFORMANCE_EXTRA_INFO_CONTROLLABLE']
         all_controllable = controllable + extra_controllable
