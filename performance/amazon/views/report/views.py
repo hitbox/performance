@@ -1,19 +1,14 @@
 import sqlalchemy as sa
 
 from flask import Blueprint
-from flask import current_app
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
 
-from performance import parse
 from performance.authorization import basic_check
 from performance.authorization import edit_check
 from performance.extensions import db
-from performance.models import FlightType
-from performance.views.pluggable import ModelView
-from performance.views.pluggable import UpdateDeleteView
 
 from performance.amazon.forms import ReportForm
 from performance.amazon.models import Flight
@@ -47,7 +42,7 @@ def get_context(report):
 
     quarter_to_date = Report.query.filter(
         sa.func.date_part('year', Report.date) == report.date.year,
-        # quarter of date calculation
+        # quarter of a date calculation
         # (month - 1) // 3 + 1
         # sa.func.div postgres specific
         sa.func.div(

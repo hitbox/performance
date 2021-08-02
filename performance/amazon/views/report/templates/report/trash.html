@@ -1,0 +1,58 @@
+{#
+this came from ./base.html
+it should not be necessary if the automatic calculations work.
+#}
+{% block performance_table %}
+<h3>{{ config.PERFORMANCE_REPORT_TITLE }}</h3>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th class="top">Percent</th>
+            <th class="top">Lanes</th>
+            <th class="top">Late</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>Today's Performance</td>
+            {% block performance_previous_days_performance_percent %}{% endblock %}
+            {% block performance_previous_days_performance_lanes %}{% endblock %}
+            {% block performance_previous_days_performance_late %}{% endblock %}
+        </tr>
+        <tr>
+            <th>Arrival Performance MTD &gt; 15</td>
+            {% block performance_arrival_performance_mtd_percent %}{% endblock %}
+            {% block performance_arrival_performance_mtd_lanes %}{% endblock %}
+            {% block performance_arrival_performance_mtd_late %}{% endblock %}
+        </tr>
+        <tr>
+            <th>Arrival Performance MTD &gt; 30</td>
+            {% block performance_arrival_performance_mtd_30_percent %}{% endblock %}
+            {% block performance_arrival_performance_mtd_30_lanes %}{% endblock %}
+            {% block performance_arrival_performance_mtd_30_late %}{% endblock %}
+        </tr>
+        <tr>
+            <th># days at 100%</td>
+            {% block performance_days_at_100_percent %}{% endblock %}
+            <td colspan=2></td>
+        </tr>
+        <tr>
+            <th>Assumed Best Arrival Performance for Month</td>
+            {% block performance_assumed_best_arrival_performance_for_month_percent %}{% endblock %}
+            <td colspan=2></td>
+        </tr>
+        <tr>
+            <th>QTD Performance</td>
+            {% block performance_qtd_performance_percent %}{% endblock %}
+            {% block performance_qtd_performance_lanes %}{% endblock %}
+            {% block performance_qtd_performance_late %}{% endblock %}
+        </tr>{% if with_edit %}
+        <tr>
+            <th>Assumed Best Lanes for Quarter</th>
+            <td colspan=3>{{ form.performance_meta.assumed_best_lanes_quarter }}{{ form.performance_meta.hidden_tag() }}</td>
+        </tr>{% endif %}
+    </tbody>
+    {% block performance_table_tfoot %}{% endblock %}
+</table>{% endblock performance_table %}
+

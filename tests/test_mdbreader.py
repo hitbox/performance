@@ -23,6 +23,7 @@ class TestMDBReader(unittest.TestCase):
         #  pyodbc.connect(constr)
         #  #reader = mdbreader(coj)
         #  #print(reader.read_table('table1'))
+        pass
 
 
 if __name__ == '__main__':

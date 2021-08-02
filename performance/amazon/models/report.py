@@ -13,6 +13,11 @@ from performance.forms.fields import PercentField
 
 FLIGHTS_BY_TYPE_SORT = attrgetter('origin_departure_estimated_time')
 
+def configured_performance_lanes_flighttypes():
+    flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
+    flight_types = FlightType.query.filter(FlightType.name.in_(flight_types_names)).all()
+    return flight_types
+
 def by_estimated_departure(flight):
     if isinstance(flight.origin_departure_estimated_time, time):
         return flight.origin_departure_estimated_time
@@ -91,6 +96,13 @@ class Report(
         ]
         return grouped
 
+    def lanes_flights(self):
+        flight_types = configured_performance_lanes_flighttypes()
+        flights = [flight for flight in self.flights
+                   if flight.origin_station != flight.destination_station
+                   and flight.flight_type in flight_types]
+        return flights
+
     def lanes(self):
         # TODO
         # * should only be included in the count if they are a
@@ -103,7 +115,7 @@ class Report(
         # * Right now, it is including the "non-cmi" flights in the counts. On
         #   the 13Jul21 report, I manually filled in the performance numbers
         #   for a comparison to the first calculation section.
-        return len(self.flights)
+        return len(self.lanes_flights())
 
     def chargeable_delays(self):
         # TODO:
