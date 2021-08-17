@@ -6,6 +6,7 @@
 
 {% set thisurl = url_for(request.endpoint, **request.view_args) %}
 {% set ncols = 16 if with_edit else 15 %}
+{% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
 
 {# different grouping than DHL #}
 <h3>{{ flight_type.name }}</h3>
@@ -24,12 +25,12 @@
             <th>ETD</th>
             <th>ATD</th>
             <th>(+/-)</th>
-            <th>Delay Codes</th>
+            <th title="{{ controllable_delays_note }}">Delay Codes</th>
             <th>Dest</th>
             <th>ETA</th>
             <th>ATA</th>
             <th>(+/-)</th>
-            <th>Delay Codes</th>
+            <th title="{{ controllable_delays_note }}">Delay Codes</th>
             <th>&gt;&nbsp;15</th>
             <th>&gt;&nbsp;30</th>
             <th>Weight</th>
@@ -48,9 +49,8 @@
     <tfoot class="noprint">
         <tr>
             <td>Total</td>
-            <td class=data>{{ report.flights|length }}</td>
-            <td>{# WTF IS THIS? {% for flight in flights %}{% for code, minutes in flight.origin_delay_codes() %}{{ code }}{% endfor %}{% endfor %}#}</td>
-            <td colspan="{{ ncols-1 }}"></td>
+            <td class=data>{{ flights|length }}</td>
+            <td colspan="{{ ncols }}"></td>
         </tr>
         {% if with_edit %}<tr>
             <td colspan="{{ ncols }}"><h4><a href="{{ url_for('flight.create', report_id=report.id, flight_type_id=flight_type.id, backurl=thisurl) }}">Add {{ flight_type.name }} flight</a></h4></td>

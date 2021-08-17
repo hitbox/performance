@@ -1,11 +1,19 @@
 {% extends "report/base.html" -%}
 
+{%- from "macros.html" import diff_class -%}
+{%- from "macros.html" import integer -%}
 {%- from "macros.html" import integer -%}
 {%- from "macros.html" import percent -%}
+{%- from "macros.html" import string -%}
+{%- from "macros.html" import time -%}
+{%- from "macros.html" import yes -%}
 
+
+{% set thisurl = url_for(request.endpoint, **request.view_args) %}
 
 {% block main_head %}
 {{ super() }}
+{% if config.ENV == 'development' and request.args.debug %}<h1><a href="#debug">Debugging</a></h1>{% endif %}
 <div class="noprint">
     <h4>
         <a href="javascript:;" onclick="window.print(); return false">Print</a>
@@ -14,6 +22,7 @@
         <a href="{{ url_for('report.edit_report', id=report.id, backurl=url_for(request.endpoint, id=report.id)) }}">Edit</a>
     </h4>{% endif %}
 </div>
+
 <div>
     <h3>Performance</h3>
     <table>
@@ -21,28 +30,26 @@
             <tr>
                 <th></th>
                 <th class="top">Daily</th>
-                <th class="top">Monthly</th>
+                <th class="top" title="Month To Date">Monthly</th>
                 <th class="top" title="Quarter To Date">QTD</th>
             </tr>
             <tr>
                 <th>Lanes</th>
-                <td class="data number">{{ integer(report.lanes()) }}</td>
-                <td class="data number">{{ integer(month_to_date.lanes) }}</td>
-                <td class="data number">{{ integer(quarter_to_date.lanes) }}</td>
+                <td class="data number">{{ integer(daily.lanes|length) }}</td>
+                <td class="data number">{{ integer(month_to_date.lanes|length) }}</td>
+                <td class="data number">{{ integer(quarter_to_date.lanes|length) }}</td>
+            </tr>
+            <tr>{% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
+                <th title="{{ controllable_delays_note }}">Chargeable Delays</th>
+                <td class="data number" title="">{{ integer(daily.controllable_destination_delays_over15|length) }}</td>
+                <td class="data number" title="">{{ integer(month_to_date.controllable_destination_delays_over15|length) }}</td>
+                <td class="data number" title="">{{ integer(quarter_to_date.controllable_destination_delays_over15|length) }}</td>
             </tr>
             <tr>
-                <th>Chargeable Delays</th>
-                <td class="data number">{{ integer(report.chargeable_delays()|length) }}</td>
-                <td class="data number">{{ integer(month_to_date.chargeable_delays) }}</td>
-                <td class="data number">{{ integer(quarter_to_date.chargeable_delays) }}</td>
-            </tr>
-            <tr>
-                <th>&gt;30 Count</th>
-                <td class="data number">{{ integer(report.over30()|length) }}</td>
-                <td class="data number">{{ integer(month_to_date.over30) }}</td>
-                {# what is this? #}
-                {#<td class="data number">{{ percent((month_to_date.lanes - month_to_date.over30) / month_to_date.lanes) }}</td>#}
-                <td class="data number">{{ integer(quarter_to_date.over30) }}</td>
+                <th title="{{ controllable_delays_note }}">&gt;30 Count</th>
+                <td class="data number">{{ integer(daily.controllable_destination_delays_over30|length) }}</td>
+                <td class="data number">{{ integer(month_to_date.controllable_destination_delays_over30|length) }}</td>
+                <td class="data number">{{ integer(quarter_to_date.controllable_destination_delays_over30|length) }}</td>
             </tr>
             <tr>
                 <th>Assumed Best</th>
@@ -53,67 +60,6 @@
         </tbody>
     </table>
 </div>
-{% endblock %}
-
-
-{% block performance_previous_days_performance_percent %}
-<td class="data number">{{ percent(report.previous_days_performance_percent) }}</td>
-{% endblock %}
-
-{% block performance_previous_days_performance_lanes %}
-<td class="data number">{{ integer(report.previous_days_performance_lanes) }}</td>
-{% endblock %}
-
-{% block performance_previous_days_performance_late %}
-<td class="data number">{{ integer(report.previous_days_performance_late, or_zero=True) }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_percent %}
-<td class="data number">{{ percent(report.arrival_performance_mtd_percent) }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_lanes %}
-<td class="data number">{{ integer(report.arrival_performance_mtd_lanes) }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_late %}
-<td class="data number">{{ integer(report.arrival_performance_mtd_late) }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_30_percent %}
-<td class="data number">{{ percent(report.arrival_performance_mtd_30_percent) }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_30_lanes %}
-<td class="data number">{{ integer(report.arrival_performance_mtd_30_lanes) }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_30_late %}
-<td class="data number">{{ integer(report.arrival_performance_mtd_30_late) }}</td>
-{% endblock %}
-
-{% block performance_days_at_100_percent %}
-<td class="data number">{{ integer(report.days_at_100_percent) }}</td>
-{% endblock %}
-
-{% block performance_assumed_best_arrival_performance_for_month_percent %}
-<td class="data number">{{ percent(report.assumed_best_arrival_performance_for_month_percent) }}</td>
-{% endblock %}
-
-{% block performance_qtd_performance_percent %}
-<td class="data number">{{ percent(report.qtd_performance_percent) }}</td>
-{% endblock %}
-
-{% block performance_qtd_performance_lanes %}
-<td class="data number">{{ integer(report.qtd_performance_lanes) }}</td>
-{% endblock %}
-
-{% block performance_qtd_performance_late %}
-<td class="data number">{{ integer(report.qtd_performance_late) }}</td>
-{% endblock %}
-
-{% block performance_assumed_best_lanes %}
-<td class="data number">{{ integer(report.assumed_best_lanes) }}</td>
 {% endblock %}
 
 
@@ -145,3 +91,8 @@
     </tfoot>{% endif %}
 </table>
 {% endblock comments %}
+
+
+{% block debug %}
+{% if request.args.debug %}{% include "report/debug_print.html" %}{% endif %}
+{% endblock debug %}

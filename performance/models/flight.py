@@ -6,6 +6,12 @@ from flask import current_app
 from .. import parse
 from ..extensions import db
 
+def configured_performance_lanes_flighttypes():
+    from .flight_type import FlightType
+    flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
+    flight_types = FlightType.query.filter(FlightType.name.in_(flight_types_names)).all()
+    return flight_types
+
 class FlightBaseMixin:
     """
     Columns shared by flights and scheduled flights.
@@ -135,27 +141,27 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         if isinstance(value, str):
             return parse.formatdelays(parse.delaystring(value))
 
-    def origin_delay_codes(self):
+    def origin_delays_objects(self):
         return parse.delaystring(self.origin_delays)
 
-    def destination_delay_codes(self):
+    def destination_delays_objects(self):
         return parse.delaystring(self.destination_delays)
 
-    def controllable_over(self, minutes):
+    def controllable_destination_delays(self, over_minutes):
         """
         Controllable delays over some number of minutes.
         Return 2-tuple list of controllable delay codes > `minutes`.
+        XXX: comment is wrong.
         """
-        controllable_codes = current_app.config['PERFORMANCE_CONTROLLABLE']
-        items = []
-        if self.destination_delays:
-            items.extend(parse.delaystring(self.destination_delays))
-        items = [(code, delay_minutes)
-                 for code, delay_minutes in items
-                 if code in controllable_codes
-                 and delay_minutes
-                 and delay_minutes > minutes]
-        return items
+        return [delay
+                for delay in self.destination_delays_objects()
+                if delay.is_controllable(over_minutes)]
+
+    def is_lane(self):
+        flight_types = configured_performance_lanes_flighttypes()
+        return (
+            self.origin_station != self.destination_station
+            and self.flight_type in flight_types)
 
     def origin_diff_minutes(self):
         est_date = self.origin_departure_estimated_date or self.report.date

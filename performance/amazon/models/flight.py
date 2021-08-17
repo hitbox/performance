@@ -1,5 +1,4 @@
 from performance.extensions import db
-from performance.models import FlightBaseMixin
 from performance.models import FlightTypeRelationshipMixin
 from performance.models import MetaMixin
 from performance.models import ReportFlightBaseMixin

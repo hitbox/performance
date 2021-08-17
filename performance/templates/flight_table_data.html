@@ -22,6 +22,9 @@
 {% set diff = flight.destination_diff_minutes() or 0 %}<td class="data numeric{{ diff_class(diff) }}">{{ diff }}</td>
 <td class="data">{{ string(flight.destination_delays) }}</td>
 {#- controllable delays -#}
-{% for minutes in [15, 30] %}{% set has_over = flight.controllable_over(minutes) %}<td{% if has_over %} class="data late"{% endif %}>{{ yes(has_over) }}</td>{% endfor %}
+{% for over_minutes in [15, 30] %}
+    {% set delays = flight.controllable_destination_delays(over_minutes) %}
+    <td{% if delays %} class="data late"{% endif %}>{{ yes(delays) }}</td>
+{% endfor %}
 {#- weight -#}
 <td class="data numeric">{{ integer(flight.weight) }}</td>

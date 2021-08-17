@@ -22,17 +22,27 @@ def get_performance_from(reports):
     Return performance numbers (lanes, chargeable delays, and over-30 count).
     :param reports: list of reports.
     """
-    lanes = sum(report.lanes() for report in reports)
-    chargeable_delays = sum(len(report.chargeable_delays()) for report in reports)
-    over30 = sum(len(report.over30()) for report in reports)
+    lanes = [flight for report in reports for flight in report.lane_flights()]
+    controllable_destination_delays_over15 = [
+        delay
+        for report in reports
+        for delay in report.controllable_destination_delays(over_minutes=15)
+    ]
+    controllable_destination_delays_over30 = [
+        delay
+        for report in reports
+        for delay in report.controllable_destination_delays(over_minutes=30)
+    ]
     result = dict(
         lanes = lanes,
-        chargeable_delays = chargeable_delays,
-        over30 = over30,
+        controllable_destination_delays_over15 = controllable_destination_delays_over15,
+        controllable_destination_delays_over30 = controllable_destination_delays_over30,
     )
     return result
 
 def get_context(report):
+    """
+    """
     month_to_date = Report.query.filter(
         sa.func.date_part('year', Report.date) == report.date.year,
         sa.func.date_part('month', Report.date) == report.date.month,
@@ -41,16 +51,9 @@ def get_context(report):
     month_to_date = get_performance_from(month_to_date)
 
     quarter_to_date = Report.query.filter(
-        sa.func.date_part('year', Report.date) == report.date.year,
-        # quarter of a date calculation
-        # (month - 1) // 3 + 1
-        # sa.func.div postgres specific
-        sa.func.div(
-            sa.cast(
-                sa.func.date_part('month', Report.date) - 1,
-                sa.Integer),
-            3) + 1 == (report.date.month - 1) // 3 + 1,
         Report.date <= report.date,
+        sa.func.date_part('year', Report.date) == report.date.year,
+        Report.date_quarter == report.date_quarter,
     ).all()
     #
     quarter_to_date = get_performance_from(quarter_to_date)
@@ -64,6 +67,11 @@ def get_context(report):
     #
     context = dict(
         report = report,
+        daily = dict(
+            lanes = report.lane_flights(),
+            controllable_destination_delays_over15 = report.controllable_destination_delays(15),
+            controllable_destination_delays_over30 = report.controllable_destination_delays(30),
+        ),
         month_to_date = month_to_date,
         quarter_to_date = quarter_to_date,
         assumed_best_lanes_quarter_percent = assumed_best_lanes_quarter_percent,

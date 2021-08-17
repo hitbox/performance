@@ -1,7 +1,10 @@
 from datetime import time
 from operator import attrgetter
 
+import sqlalchemy as sa
+
 from flask import current_app
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from performance.extensions import db
 from performance.models import FlightType
@@ -13,21 +16,13 @@ from performance.forms.fields import PercentField
 
 FLIGHTS_BY_TYPE_SORT = attrgetter('origin_departure_estimated_time')
 
-def configured_performance_lanes_flighttypes():
-    flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
-    flight_types = FlightType.query.filter(FlightType.name.in_(flight_types_names)).all()
-    return flight_types
-
 def by_estimated_departure(flight):
     if isinstance(flight.origin_departure_estimated_time, time):
         return flight.origin_departure_estimated_time
     else:
         return time(0,0)
 
-class Report(
-    MetaMixin,
-    db.Model,
-):
+class Report(MetaMixin, db.Model):
     """
     Amazon Performance Report.
     """
@@ -82,6 +77,28 @@ class Report(
     arrival_performance_mtd_30_lanes = db.Column(db.Integer)
     arrival_performance_mtd_30_late = db.Column(db.Integer)
 
+    @hybrid_property
+    def date_quarter(self):
+        """
+        The quarter part of the date.
+        """
+        return (self.date.month - 1) // 3 + 1
+
+    @date_quarter.expression
+    def date_quarter(cls):
+        """
+        The quarter part of the date.
+        """
+        # quarter of a date calculation
+        # (month - 1) // 3 + 1
+        # XXX: sa.func.div postgres specific
+        quarter = sa.func.div(
+            sa.cast(
+                sa.func.date_part('month', Report.date) - 1,
+                sa.Integer),
+            3) + 1
+        return quarter
+
     def grouped_flights(self):
         return grouped_flights(self.flights)
 
@@ -96,58 +113,13 @@ class Report(
         ]
         return grouped
 
-    def lanes_flights(self):
-        flight_types = configured_performance_lanes_flighttypes()
-        flights = [flight for flight in self.flights
-                   if flight.origin_station != flight.destination_station
-                   and flight.flight_type in flight_types]
-        return flights
+    def lane_flights(self):
+        return [flight for flight in self.flights if flight.is_lane()]
 
-    def lanes(self):
-        # TODO
-        # * should only be included in the count if they are a
-        #   "scheduled flight", or an "extra-CMI AMZ Flight".
-        # * Do not include "extra non-cmi amz flights" in the LANE count. These
-        #   apply for DAILY, MONTHLY and QTD.
-        # * One exception: if Origin and Dest are the same, it will NOT count
-        #   in the LANE count (this would be like ILN-ILN for a ground
-        #   turnback/example).
-        # * Right now, it is including the "non-cmi" flights in the counts. On
-        #   the 13Jul21 report, I manually filled in the performance numbers
-        #   for a comparison to the first calculation section.
-        return len(self.lanes_flights())
-
-    def chargeable_delays(self):
-        # TODO:
-        # should only be counted as Chargeable if the Delay Codes (2nd delay
-        # code column) in the Arrival are equal to:
-        #
-        # MXA with minutes greater than >15 and >30 respectively
-        # DSP with minutes greater than >15 and >30 respectively
-        # CRW with minutes greater than >15 and >30 respectively
-        #
-        # XLD MXA  (no minutes will be listed if XLD) Will count in both the >15 column and >30 column
-        # XLD CRW (no minutes will be listed if XLD) Will count in both the >15 column and >30 column
-        # XLD DSP (no minutes will be listed if XLD) Will count in both the >15 column and >30 column
-        controllable = current_app.config['PERFORMANCE_CONTROLLABLE']
+    def controllable_destination_delays(self, over_minutes):
+        """
+        All report's flights controllable destination delay codes.
+        """
         return [
-            (delay_code, minutes)
-            for flight in self.flights
-            for delay_code, minutes in flight.destination_delay_codes()
-            if delay_code in controllable
-        ]
-
-    def over30(self):
-        # TODO: see chargeable_delays above
-        controllable = current_app.config['PERFORMANCE_CONTROLLABLE']
-        extra_controllable = current_app.config['PERFORMANCE_EXTRA_INFO_CONTROLLABLE']
-        all_controllable = controllable + extra_controllable
-        delay_codes = [
-            (delay_code, minutes)
-            for flight in self.flights
-            for delay_code, minutes in flight.origin_delay_codes()
-            if delay_code in all_controllable
-            and minutes is not None
-            and minutes > 30
-        ]
-        return delay_codes
+            delay for flight in self.flights
+            for delay in flight.controllable_destination_delays(over_minutes)]
