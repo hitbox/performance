@@ -57,13 +57,13 @@
                 <th>Assumed Best</th>
                 <td></td>{% set can_calculate = assumed_best and assumed_best.lanes > 0 %}
                 <td class="data number" title="(<monthly assumed lanes> - <MTD chargeable delays>) / <monthly assumed lanes>{% if can_calculate %}
-({{ assumed_best.lanes }} - {{ month_to_date.controllable_destination_delays_over15|length }}) / {{ assumed_best.lanes }}{% endif %}">{% if can_calculate %}
+({{ assumed_best.lanes }} - {{ month_to_date.controllable_destination_delays_over15|length }}) / {{ assumed_best.lanes }} = {{ '%0.4f'|format((assumed_best.lanes - month_to_date.controllable_destination_delays_over15|length) / assumed_best.lanes) }}{% endif %}">{% if can_calculate %}
                     {{ percent((assumed_best.lanes - month_to_date.controllable_destination_delays_over15|length) / assumed_best.lanes) }}
                 {% endif %}</td>
                 {% set assumed_best_qtd_lanes = assumed_bests_qtd|sum('lanes') %}
                 {% set can_calculate = assumed_best_qtd_lanes > 0 %}
                 <td class="data number" title="(<QTD assumed lanes> - <QTD chargeable delays>) / <QTD assumed lanes>{% if can_calculate %}
-({{ assumed_best_qtd_lanes }} - {{ quarter_to_date.controllable_destination_delays_over15|length }}) / {{ assumed_best_qtd_lanes }}{% endif %}">{% if can_calculate %}
+{# tooltip values #}({{ assumed_best_qtd_lanes }} - {{ quarter_to_date.controllable_destination_delays_over15|length }}) / {{ assumed_best_qtd_lanes }} = {{ '%0.4f'|format((assumed_best_qtd_lanes - quarter_to_date.controllable_destination_delays_over15|length) / assumed_best_qtd_lanes) }}{% endif %}">{% if can_calculate %}
                     {{ percent((assumed_best_qtd_lanes - quarter_to_date.controllable_destination_delays_over15|length) / assumed_best_qtd_lanes) }}
                 {% endif %}</td>
             </tr>
