@@ -161,9 +161,12 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         controllable_names = current_app.config['PERFORMANCE_CONTROLLABLE']
         flight_types = configured_performance_lanes_flighttypes()
         is_ground_turnback = self.origin_station == self.destination_station
+        # all cancelled delays must be controllable ones
         only_cancelled_controllable = all(
-            delay.code in controllable_names and delay.cancelled
-            for delay in self.destination_delays_objects())
+            delay.code in controllable_names
+            for delay in self.destination_delays_objects()
+            if delay.cancelled
+        )
         return (
             not is_ground_turnback
             and only_cancelled_controllable
