@@ -7,6 +7,7 @@ from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from performance.extensions import db
+from performance.exceptions import AppError
 from performance.models import FlightType
 from performance.models.mixin import MetaMixin
 
@@ -15,6 +16,10 @@ from .util import grouped_flights
 from performance.forms.fields import PercentField
 
 FLIGHTS_BY_TYPE_SORT = attrgetter('origin_departure_estimated_time')
+
+class ReportError(AppError):
+    pass
+
 
 def by_estimated_departure(flight):
     if isinstance(flight.origin_departure_estimated_time, time):
@@ -120,6 +125,11 @@ class Report(MetaMixin, db.Model):
         """
         All report's flights controllable destination delay codes.
         """
+        include_types = FlightType.query.filter(FlightType.name == 'Scheduled').all()
+        if not include_types:
+            raise ReportError('List of flight types to include is empty')
         return [
-            delay for flight in self.flights
-            for delay in flight.controllable_destination_delays(over_minutes)]
+            delay
+            for flight in self.flights
+            for delay in flight.controllable_destination_delays(over_minutes)
+            if flight.flight_type in include_types]
