@@ -2,12 +2,11 @@ from performance.views import select_date
 
 from performance.amazon.models import Report
 
-from .assumed_best.views import assumed_best_bp
+from .assumed_best import assumed_best_bp
 from .flight import flight_bp
-from .report.views import report_bp
+from .report import report_bp
 from .scheduled_flight import scheduled_flight_bp
 from .scheduled_report import scheduled_report_bp
-from .xhr import xhr_bp
 
 def init_app(app):
     """
@@ -21,4 +20,3 @@ def init_app(app):
     app.register_blueprint(
         select_date.select_date_blueprint(Report, 'date'),
         url_prefix='/select')
-    app.register_blueprint(xhr_bp, url_prefix='/xhr')

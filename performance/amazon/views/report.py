@@ -17,7 +17,7 @@ from performance.amazon.models import Flight
 from performance.amazon.models import Report
 from performance.amazon.models import ScheduledReport
 
-report_bp = Blueprint('report', __name__, template_folder='templates')
+report_bp = Blueprint('report', __name__, template_folder='../templates')
 
 def get_performance_from(reports):
     """

@@ -6,7 +6,7 @@ from performance.views.pluggable import UpdateDeleteView
 
 from performance.amazon.forms import FlightForm
 
-flight_bp = Blueprint('flight', __name__, template_folder='templates')
+flight_bp = Blueprint('flight', __name__, template_folder='../templates')
 
 flight_bp.add_url_rule(
     '/create/<int:report_id>',

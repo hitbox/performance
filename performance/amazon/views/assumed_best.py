@@ -8,10 +8,10 @@ from flask import url_for
 from performance.authorization import edit_check
 from performance.extensions import db
 
-from ...models import AssumedBest
-from ...forms import AssumedBestForm
+from ..models import AssumedBest
+from ..forms import AssumedBestForm
 
-assumed_best_bp = Blueprint('assumed_best', __name__, template_folder='templates')
+assumed_best_bp = Blueprint('assumed_best', __name__, template_folder='../templates')
 
 @assumed_best_bp.context_processor
 def context_processor():

@@ -14,7 +14,7 @@ from performance.amazon.models import ScheduledReport
 scheduled_report_bp = Blueprint(
     'scheduled_report',
     __name__,
-    template_folder = 'templates',
+    template_folder = '../templates',
 )
 
 def render_scheduled_report(scheduled_report):
