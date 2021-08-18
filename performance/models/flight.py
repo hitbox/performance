@@ -163,7 +163,7 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         is_ground_turnback = self.origin_station == self.destination_station
         # all cancelled delays must be controllable ones
         only_cancelled_controllable = all(
-            delay.code in controllable_names
+            delay.code in controllable_names or delay.code is None
             for delay in self.destination_delays_objects()
             if delay.cancelled
         )

@@ -28,6 +28,9 @@ def delaystring(text):
                     delay = Delay(code, minutes, True)
                     delays.append(delay)
                     break
+                else:
+                    delay = Delay(code, None, True)
+                    delays.append(delay)
                 # what if cancelled is the last code?
             else:
                 # take as non-cancelled code
