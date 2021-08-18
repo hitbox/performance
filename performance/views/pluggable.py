@@ -95,11 +95,19 @@ class BaseEditView(View):
     methods = ['GET', 'POST']
     template = 'pluggable/form.html'
 
-    def __init__(self, form_class, model=None, template=None, instance_name=None):
+    def __init__(
+        self,
+        form_class,
+        model=None,
+        template=None,
+        instance_name=None,
+        form_render_kw=None,
+    ):
         self.form_class = form_class
         self.model = model or self.form_class.Meta.model
         self.template = template or self.template
         self.instance_name = instance_name
+        self.form_render_kw = form_render_kw
 
 
 class UpdateDeleteView(BaseEditView):
@@ -120,6 +128,7 @@ class UpdateDeleteView(BaseEditView):
         context = dict(
             form = form,
             instance = instance,
+            form_render_kw = self.form_render_kw,
         )
         if self.instance_name:
             context[self.instance_name] = instance
