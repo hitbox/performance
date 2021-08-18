@@ -55,15 +55,16 @@
             <tr>
                 <th class="noprint"><a href="{{ url_for('assumed_best.edit', year=report.date.year, month=report.date.month, backurl=thisurl) }}"> edit</a></th>
                 <th>Assumed Best</th>
-                <td></td>
-                <td class="data number" title="(<monthly assumed lanes> - <month to date lanes>) / <monthly assumed lanes>">{% if assumed_best and assumed_best.lanes > 0 %}
-                    {{ percent((assumed_best.lanes - month_to_date.lanes|length)
-                        / assumed_best.lanes) }}
+                <td></td>{% set can_calculate = assumed_best and assumed_best.lanes > 0 %}
+                <td class="data number" title="(<monthly assumed lanes> - <month to date lanes>) / <monthly assumed lanes>{% if can_calculate %}
+({{ assumed_best.lanes}} - {{ month_to_date.lanes|length }}) / {{ assumed_best.lanes }}{% endif %}">{% if can_calculate %}
+                    {{ percent((assumed_best.lanes - month_to_date.lanes|length) / assumed_best.lanes) }}
                 {% endif %}</td>
                 {% set assumed_best_qtd_lanes = assumed_bests_qtd|sum('lanes') %}
-                <td class="data number" title="(<QTD assumed lanes> - <QTD lanes>) / <QTD assumed lanes>">{% if assumed_best_qtd_lanes > 0 %}
-                    {{ percent((assumed_best_qtd_lanes - quarter_to_date.lanes|length)
-                        / assumed_best_qtd_lanes) }}
+                {% set can_calculate = assumed_best_qtd_lanes > 0 %}
+                <td class="data number" title="(<QTD assumed lanes> - <QTD lanes>) / <QTD assumed lanes>{% if can_calculate %}
+({{ assumed_best_qtd_lanes }} - {{ quarter_to_date.lanes|length }}) / {{ assumed_best_qtd_lanes }}{% endif %}">{% if can_calculate %}
+                    {{ percent((assumed_best_qtd_lanes - quarter_to_date.lanes|length) / assumed_best_qtd_lanes) }}
                 {% endif %}</td>
             </tr>
         </tbody>
