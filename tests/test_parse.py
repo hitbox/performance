@@ -1,6 +1,6 @@
 import unittest
 
-from performance.parse import Delay
+from performance.delay import Delay
 from performance.parse import delaystring
 from performance.parse import formatdelays
 
