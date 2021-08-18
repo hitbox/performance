@@ -102,7 +102,7 @@ class FlightForm(
                 'label': 'ETD',
                 'render_kw': {
                     'class': 'flight date-entry',
-                    'placeholder': 'optional date',
+                    'placeholder': 'date',
                     'tabindex': '-1',
                 },
             },
@@ -116,7 +116,7 @@ class FlightForm(
             'origin_departure_actual_date': {
                 'label': 'ATD',
                 'render_kw': {
-                    'placeholder': 'optional date',
+                    'placeholder': 'date',
                     'class': 'flight date-entry',
                     'tabindex': '-1',
                 },
@@ -132,7 +132,7 @@ class FlightForm(
                 'label': 'Delays',
                 'render_kw': {
                     'autocomplete': 'off',
-                    'class': 'flight',
+                    'class': 'flight delay',
                     'style': 'width: 45rem',
                 },
             },
@@ -145,7 +145,7 @@ class FlightForm(
             'destination_arrival_estimated_date': {
                 'label': 'ETA',
                 'render_kw': {
-                    'placeholder': 'optional date',
+                    'placeholder': 'date',
                     'class': 'flight date-entry',
                     'tabindex': '-1',
                 },
@@ -160,7 +160,7 @@ class FlightForm(
             'destination_arrival_actual_date': {
                 'label': 'ATA',
                 'render_kw': {
-                    'placeholder': 'optional date',
+                    'placeholder': 'date',
                     'class': 'flight date-entry',
                     'tabindex': '-1',
                 },
@@ -176,7 +176,7 @@ class FlightForm(
                 'label': 'Delays',
                 'render_kw': {
                     'autocomplete': 'off',
-                    'class': 'flight',
+                    'class': 'flight delay',
                     'style': 'width: 45rem',
                 },
             },

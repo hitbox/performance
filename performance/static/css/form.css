@@ -114,3 +114,19 @@ form #destination_arrival_actual_time {
 form #origin_delays, form #destination_delays {
     width: 40rem;
 }
+
+form .flight {
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+.date-entry {
+    margin-right: 0;
+}
+
+label[for=origin_departure_estimated_time],
+label[for=origin_departure_actual_time],
+label[for=destination_arrival_estimated_time],
+label[for=destination_arrival_actual_time] {
+    display: none;
+}
