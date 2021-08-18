@@ -95,7 +95,7 @@ def view_report(id):
     """
     report = Report.query.get_or_404(id)
     context = get_context(report)
-    return render_template('report/print.html', **context)
+    return render_template('report/print_with_edit.html', **context)
 
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @edit_check

@@ -6,7 +6,7 @@
 
 {# just the <td>s of a flight table row #}
 
-{% if with_edit %}<td><a href="{{ url_for('flight.edit', id=flight.id, backurl=thisurl) }}">edit</a></td>{% endif %}
+{% if with_edit %}<td class="noprint"><a href="{{ url_for('flight.edit', id=flight.id, backurl=thisurl) }}">edit</a></td>{% endif %}
 <td class="data">{{ string(flight.tail_number) }}</td>
 <td class="data">{{ string(flight.flight_number) }}</td>
 {#- orgin -#}
@@ -22,9 +22,11 @@
 {% set diff = flight.destination_diff_minutes() or 0 %}<td class="data numeric{{ diff_class(diff) }}">{{ diff }}</td>
 <td class="data">{{ string(flight.destination_delays) }}</td>
 {#- controllable delays -#}
-{% for over_minutes in [15, 30] %}
-    {% set delays = flight.controllable_destination_delays(over_minutes) %}
-    <td{% if delays %} class="data late"{% endif %}>{{ yes(delays) }}</td>
-{% endfor %}
+{% if flight.flight_type.name == 'Scheduled' %}
+    {% for over_minutes in [15, 30] %}
+        {% set delays = flight.controllable_destination_delays(over_minutes) %}
+        <td{% if delays %} class="data late"{% endif %}>{{ yes(delays) }}</td>
+    {% endfor %}
+{% endif %}
 {#- weight -#}
 <td class="data numeric">{{ integer(flight.weight) }}</td>
