@@ -158,10 +158,17 @@ class ReportFlightBaseMixin(FlightBaseMixin):
                 if delay.is_controllable(over_minutes)]
 
     def is_lane(self):
+        controllable_names = current_app.config['PERFORMANCE_CONTROLLABLE']
         flight_types = configured_performance_lanes_flighttypes()
+        is_ground_turnback = self.origin_station == self.destination_station
+        only_cancelled_controllable = all(
+            delay.code in controllable_names and delay.cancelled
+            for delay in self.destination_delays_objects())
         return (
-            self.origin_station != self.destination_station
-            and self.flight_type in flight_types)
+            not is_ground_turnback
+            and only_cancelled_controllable
+            and self.flight_type in flight_types
+        )
 
     def origin_diff_minutes(self):
         est_date = self.origin_departure_estimated_date or self.report.date
