@@ -2,6 +2,7 @@ import unittest
 
 from performance.parse import Delay
 from performance.parse import delaystring
+from performance.parse import formatdelays
 
 class TestParseDelay(unittest.TestCase):
 
@@ -61,6 +62,11 @@ class TestParseDelay(unittest.TestCase):
 
     def test_parse_cancelled(self):
         self.check('XLD AAA', [Delay('AAA', None, True)])
+        self.check('XLD BBB12', [Delay('BBB', 12, True)])
+
+    def test_formatdelays(self):
+        self.assertEqual(formatdelays(delaystring('AAA1 BBB2 CCC')), 'AAA(1) BBB(2) CCC')
+        self.assertEqual(formatdelays(delaystring('AAA1 XLD BBB2 CCC')), 'AAA(1) XLD BBB(2) CCC')
 
 
 if __name__ == '__main__':

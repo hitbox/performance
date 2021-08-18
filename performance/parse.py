@@ -69,6 +69,15 @@ def delaystring(text):
 
     return delays
 
-def formatdelays(items):
-    return ' '.join(code.upper() + (f'({minutes})' if minutes else '')
-                    for code, minutes in items)
+def formatdelays(delays):
+    parts = []
+    for code, minutes, cancelled in delays:
+        if cancelled:
+            s = 'XLD '
+        else:
+            s = ''
+        s += code.upper()
+        if minutes:
+            s += f'({minutes})'
+        parts.append(s)
+    return ' '.join(parts)
