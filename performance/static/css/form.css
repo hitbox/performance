@@ -124,9 +124,10 @@ form .flight {
     margin-right: 0;
 }
 
-label[for=origin_departure_estimated_time],
-label[for=origin_departure_actual_time],
-label[for=destination_arrival_estimated_time],
-label[for=destination_arrival_actual_time] {
+/* hide the empty labels on the normal flight edit form */
+label.flight[for=origin_departure_estimated_time],
+label.flight[for=origin_departure_actual_time],
+label.flight[for=destination_arrival_estimated_time],
+label.flight[for=destination_arrival_actual_time] {
     display: none;
 }
