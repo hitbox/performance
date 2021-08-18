@@ -10,7 +10,9 @@ from performance.authorization import basic_check
 from performance.authorization import edit_check
 from performance.extensions import db
 
+from performance.amazon.forms import AssumedBestForm
 from performance.amazon.forms import ReportForm
+from performance.amazon.models import AssumedBest
 from performance.amazon.models import Flight
 from performance.amazon.models import Report
 from performance.amazon.models import ScheduledReport
@@ -20,6 +22,7 @@ report_bp = Blueprint('report', __name__, template_folder='templates')
 def get_performance_from(reports):
     """
     Return performance numbers (lanes, chargeable delays, and over-30 count).
+
     :param reports: list of reports.
     """
     lanes = [flight for report in reports for flight in report.lane_flights()]
@@ -50,21 +53,26 @@ def get_context(report):
     ).all()
     month_to_date = get_performance_from(month_to_date)
 
-    quarter_to_date = Report.query.filter(
+    reports_quarter_to_date = Report.query.filter(
         Report.date <= report.date,
         sa.func.date_part('year', Report.date) == report.date.year,
         Report.date_quarter == report.date_quarter,
     ).all()
+    # quarter to date assumed bests objects
+    assumed_bests_qtd = [
+        AssumedBest.query.filter(
+            AssumedBest.year == report.date.year,
+            AssumedBest.month == report.date.month,
+        ).one_or_none()
+        for report in reports_quarter_to_date
+    ]
+    assumed_bests_qtd = filter(None, assumed_bests_qtd)
     #
-    quarter_to_date = get_performance_from(quarter_to_date)
-    # assumed best lanes for quarter is effectively quarter-to-date
-    assumed_best_lanes_quarter_percent = None
-    if report.performance_meta:
-        best_lanes = report.performance_meta.assumed_best_lanes_quarter
-        if best_lanes:
-            assumed_best_lanes_quarter_percent = (best_lanes - quarter_to_date['chargeable_delays']) / best_lanes
-            assumed_best_lanes_quarter_percent = assumed_best_lanes_quarter_percent
-    #
+    quarter_to_date = get_performance_from(reports_quarter_to_date)
+    assumed_best = AssumedBest.query.filter(
+        AssumedBest.year == report.date.year,
+        AssumedBest.month == report.date.month,
+    ).one_or_none()
     context = dict(
         report = report,
         daily = dict(
@@ -74,7 +82,8 @@ def get_context(report):
         ),
         month_to_date = month_to_date,
         quarter_to_date = quarter_to_date,
-        assumed_best_lanes_quarter_percent = assumed_best_lanes_quarter_percent,
+        assumed_best = assumed_best,
+        assumed_bests_qtd = assumed_bests_qtd,
     )
     return context
 
@@ -93,6 +102,10 @@ def view_report(id):
 def edit_report(id):
     report = Report.query.get_or_404(id)
     form = ReportForm(obj=report)
+    assumed_best = AssumedBest.query.filter(
+        AssumedBest.year == report.date.year,
+        AssumedBest.month == report.date.month,
+    ).one_or_none()
 
     if form.validate_on_submit():
         if form.delete.data:
@@ -108,6 +121,7 @@ def edit_report(id):
     context = dict(
         form = form,
         report = report,
+        assumed_best = assumed_best,
     )
     return render_template('report/edit.html', **context)
 

@@ -1,92 +1,19 @@
 {% extends "report/base.html" %}
 
 {% set with_edit = true %}
+{% set thisurl = url_for(request.endpoint, **request.view_args) %}
 
 {% block main_head %}
 {{ super() }}
-{{ thisurl }}
 <h4>
     <a href="{{ url_for('report.view_report', id=report.id) }}">Printable</a>
 </h4>
+<div>
+    {% set edit_assumed_best = url_for('assumed_best.edit', year=report.date.year, month=report.date.month, backurl=thisurl) %}
+    <h4>Assumed best monthly</h4>
+    <a href="{{ edit_assumed_best }}">{% if assumed_best %}Lanes: {{ assumed_best.lanes }}{% else %}Edit assumed lanes{% endif %}</a>
+</div>
 {% endblock main_head %}
-
-
-{% block performance_previous_days_performance_percent %}
-<td>{{ form.previous_days_performance_percent() }}</td>
-{% endblock %}
-
-{% block performance_previous_days_performance_lanes %}
-<td>{{ form.previous_days_performance_lanes() }}</td>
-{% endblock %}
-
-{% block performance_previous_days_performance_late %}
-<td>{{ form.previous_days_performance_late() }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_percent %}
-<td>{{ form.arrival_performance_mtd_percent() }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_lanes %}
-<td>{{ form.arrival_performance_mtd_lanes() }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_late %}
-<td>{{ form.arrival_performance_mtd_late() }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_30_percent %}
-<td>{{ form.arrival_performance_mtd_30_percent() }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_30_lanes %}
-<td>{{ form.arrival_performance_mtd_30_lanes() }}</td>
-{% endblock %}
-
-{% block performance_arrival_performance_mtd_30_late %}
-<td>{{ form.arrival_performance_mtd_30_late() }}</td>
-{% endblock %}
-
-{% block performance_days_at_100_percent %}
-<td>{{ form.days_at_100_percent() }}</td>
-{% endblock %}
-
-{% block performance_assumed_best_arrival_performance_for_month_percent %}
-<td>{{ form.assumed_best_arrival_performance_for_month_percent() }}</td>
-{% endblock %}
-
-{% block performance_qtd_performance_percent %}
-<td>{{ form.qtd_performance_percent() }}</td>
-{% endblock %}
-
-{% block performance_qtd_performance_lanes %}
-<td>{{ form.qtd_performance_lanes() }}</td>
-{% endblock %}
-
-{% block performance_qtd_performance_late %}
-<td>{{ form.qtd_performance_late() }}</td>
-{% endblock %}
-
-{% block performance_assumed_best_lanes %}
-<td>{{ form.assumed_best_lanes() }}</td>
-{% endblock %}
-
-
-{% block performance_table %}
-<form action="{{ url_for(request.endpoint, **request.view_args) }}" id="reportform" method="POST">
-    {{ form.hidden_tag() }}
-    {{ super() }}
-
-    <h3>{{ form.system_detail.label }}</h3>
-    <p>{{ form.system_detail }}</p>
-
-    <p>
-    {{ form.submit }}
-    {{ form.delete }}
-    </p>
-</form>
-{% endblock performance_table %}
-
 
 {% block flights %}
     {% for flight_type, flights in report.flights_by_type() %}
