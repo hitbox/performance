@@ -3,6 +3,7 @@
 {% block main %}
 <h2>Assumed Best Performance</h2>
 <h3>{{ request.view_args.year }} {{ calendar.month_name[request.view_args.month] }}</h3>
+{% if request.args.backurl %}<h4><a href="{{ request.args.backurl }}">Back</a></h4>{% endif %}
 <form action="{{ url_for('assumed_best.edit', year=request.view_args.year, month=request.view_args.month) }}" method="POST">
     {{ form.hidden_tag() }}
     {% for field in form|rejectattr('type', 'in', ('CSRFTokenField', 'HiddenField', 'SubmitField')) %}
