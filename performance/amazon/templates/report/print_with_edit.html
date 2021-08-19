@@ -50,8 +50,3 @@
     </tfoot>{% endif %}
 </table>
 {% endblock comments %}
-
-
-{% block debug %}
-{% if request.args.debug %}{% include "report/debug_print.html" %}{% endif %}
-{% endblock debug %}
