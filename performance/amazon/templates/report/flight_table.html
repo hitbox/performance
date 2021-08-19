@@ -48,13 +48,13 @@
             </tr>
             {% endif %}
         </tbody>{% endif %}
-        <tfoot class="noprint">
+        <tfoot>
             {% if flights %}<tr>
                 <td>Total</td>
                 <td class=data>{{ flights|selectattr('is_lane')|list|length }}</td>
                 <td colspan="{{ ncols }}"></td>
             </tr>{% endif %}
-            {% if with_edit %}<tr>
+            {% if with_edit %}<tr class="noprint">
                 <td colspan="{{ ncols }}"><h4><a href="{{ url_for('flight.create', report_id=report.id, flight_type_id=flight_type.id, backurl=thisurl) }}">Add {{ flight_type.name }} flight</a></h4></td>
             </tr>{% endif %}
         </tfoot>
