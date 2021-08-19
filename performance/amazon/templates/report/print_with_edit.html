@@ -23,30 +23,30 @@
 
 
 {% block flights %}
-{% for flight_type, flights in report.flights_by_type() %}
-    {% include "report/flight_table.html" %}
-{% endfor %}
+    {% for flight_type, flights in report.flights_by_type() %}
+        {% include "report/flight_table.html" %}
+    {% endfor %}
 {% endblock flights %}
 
 
 {% block comments %}
-<h3>System Detail</h3>
-<table class="expand">
-    <tbody>
-        <tr>
-            <td>
-                <pre id=system-detail class="textfield">{{ report.system_detail }}</pre>
-            </td>
-        </tr>
-    </tbody>
-    {% if with_edit %}<tfoot class="noprint">
+    <h3>System Detail</h3>
+    <table class="expand">
+        <tbody>
             <tr>
-                <td colspan="4">
-                    <h4>
-                        <a href="{{ url_for('report.edit_report', id=report.id, backurl=thisurl) }}">Edit</a>
-                    </h4>
+                <td>
+                    <pre id=system-detail class="textfield">{{ report.system_detail }}</pre>
                 </td>
             </tr>
-    </tfoot>{% endif %}
-</table>
+        </tbody>
+        {% if with_edit %}<tfoot class="noprint">
+                <tr>
+                    <td colspan="4">
+                        <h4>
+                            <a href="{{ url_for('report.edit_report', id=report.id, backurl=thisurl) }}">Edit</a>
+                        </h4>
+                    </td>
+                </tr>
+        </tfoot>{% endif %}
+    </table>
 {% endblock comments %}
