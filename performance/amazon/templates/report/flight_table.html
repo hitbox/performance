@@ -53,7 +53,7 @@
         <tfoot class="noprint">
             {% if flights %}<tr>
                 <td>Total</td>
-                <td class=data>{{ flights|length }}</td>
+                <td class=data>{{ flights|selectattr('is_lane')|list|length }}</td>
                 <td colspan="{{ ncols }}"></td>
             </tr>{% endif %}
             {% if with_edit %}<tr>

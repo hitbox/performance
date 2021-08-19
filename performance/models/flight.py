@@ -157,6 +157,7 @@ class ReportFlightBaseMixin(FlightBaseMixin):
                 for delay in self.destination_delays_objects()
                 if delay.is_controllable(over_minutes)]
 
+    @property
     def is_lane(self):
         controllable_names = current_app.config['PERFORMANCE_CONTROLLABLE']
         flight_types = configured_performance_lanes_flighttypes()
