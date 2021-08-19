@@ -3,7 +3,12 @@
         background-color: white !important;
     }
 
-    body {
+    a {
+        text-decoration: none;
+    }
+
+    body,
+    a:link {
         background-color: white;
         color: black;
     }
@@ -26,5 +31,21 @@
 
     pre {
         font-size: 0.95rem;
+    }
+
+    h3,
+    th.top {
+        font-size: .7rem;
+    }
+
+    h3 {
+        margin: .5rem 0;
+    }
+
+    tbody > tr > th,
+    th,
+    td.data,
+    pre {
+        font-size: .6rem;
     }
 }
