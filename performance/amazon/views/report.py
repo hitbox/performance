@@ -46,12 +46,12 @@ def get_performance_from(reports):
 def get_context(report):
     """
     """
-    month_to_date = Report.query.filter(
+    month_to_date_reports = Report.query.filter(
         sa.func.date_part('year', Report.date) == report.date.year,
         sa.func.date_part('month', Report.date) == report.date.month,
         Report.date <= report.date,
     ).all()
-    month_to_date = get_performance_from(month_to_date)
+    month_to_date = get_performance_from(month_to_date_reports)
 
     reports_quarter_to_date = Report.query.filter(
         Report.date <= report.date,
@@ -73,6 +73,7 @@ def get_context(report):
         AssumedBest.year == report.date.year,
         AssumedBest.month == report.date.month,
     ).one_or_none()
+    #
     context = dict(
         report = report,
         daily = dict(
