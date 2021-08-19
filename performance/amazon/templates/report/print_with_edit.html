@@ -1,17 +1,7 @@
-{% extends "report/base.html" -%}
-
-{%- from "macros.html" import diff_class -%}
-{%- from "macros.html" import integer -%}
-{%- from "macros.html" import integer -%}
-{%- from "macros.html" import percent -%}
-{%- from "macros.html" import string -%}
-{%- from "macros.html" import time -%}
-{%- from "macros.html" import yes -%}
-
+{% extends "report/base.html" %}
 
 {% set thisurl = url_for(request.endpoint, **request.view_args) %}
 {% set with_edit = current_user.is_editor %}
-
 
 {% block main_head %}
     {{ super() }}
@@ -21,13 +11,11 @@
     {% include "report/performance.html" %}
 {% endblock %}
 
-
 {% block flights %}
     {% for flight_type, flights in report.flights_by_type() %}
         {% include "report/flight_table.html" %}
     {% endfor %}
 {% endblock flights %}
-
 
 {% block comments %}
     <h3>System Detail</h3>
@@ -40,13 +28,13 @@
             </tr>
         </tbody>
         {% if with_edit %}<tfoot class="noprint">
-                <tr>
-                    <td colspan="4">
-                        <h4>
-                            <a href="{{ url_for('report.edit_report', id=report.id, backurl=thisurl) }}">Edit</a>
-                        </h4>
-                    </td>
-                </tr>
+            <tr>
+                <td colspan="4">
+                    <h4>
+                        <a href="{{ url_for('report.edit_report', id=report.id, backurl=thisurl) }}">Edit</a>
+                    </h4>
+                </td>
+            </tr>
         </tfoot>{% endif %}
     </table>
 {% endblock comments %}

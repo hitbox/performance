@@ -1,15 +1,11 @@
-{%- from "macros.html" import diff_class -%}
-{%- from "macros.html" import integer -%}
-{%- from "macros.html" import string -%}
-{%- from "macros.html" import time -%}
-{%- from "macros.html" import yes -%}
+{% from "macros.html" import diff_class %}
+{% from "macros.html" import integer %}
+{% from "macros.html" import string %}
+{% from "macros.html" import time %}
+{% from "macros.html" import yes %}
+
 
 {# just the <td>s of a flight table row #}
-
-{#
-{% if with_edit %}<td class="noprint"><a href="">edit</a></td>{% endif %}
-#}
-
 <td class="data">{% if with_edit %}<a href="{{ url_for('flight.edit', id=flight.id, backurl=thisurl) }}">{% endif %}{{ string(flight.tail_number) }}{% if with_edit %}</a>{% endif %}</td>
 <td class="data">{{ string(flight.flight_number) }}</td>
 {#- orgin -#}
