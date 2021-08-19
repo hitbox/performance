@@ -178,8 +178,5 @@ def prompt_new(report_date):
     """
     Prompt to create new report.
     """
-    context = {
-        'report_date': report_date,
-        'scheduled_reports': ScheduledReport.query.all(),
-    }
-    return render_template('report/prompt_new.html', **context)
+    scheduled_reports = ScheduledReport.query.all()
+    return render_template('report/prompt_new.html', scheduled_reports=scheduled_reports)
