@@ -4,8 +4,7 @@
 {% from "macros.html" import time %}
 {% from "macros.html" import yes %}
 
-{% set thisurl = url_for(request.endpoint, **request.view_args) %}
-{% set ncols = 16 if with_edit else 15 %}
+{% set ncols = 15 %}
 {% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
 {% set include_controllable_columns = flight_type.name == 'Scheduled' %}
 
