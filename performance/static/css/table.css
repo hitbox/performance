@@ -20,6 +20,7 @@ td {
     padding: var(--cell-padding);
     /* make non-.data tds a little smaller */
     font-size: .925rem;
+    vertical-align: top;
 }
 
 td.data {
