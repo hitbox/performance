@@ -122,6 +122,11 @@ class FlightBaseMixin:
         if isinstance(value, str):
             return value.upper()
 
+    def first_not_none(self):
+        for attr in ['tail_number', 'flight_number']:
+            if getattr(self, attr) is not None:
+                return attr
+
 
 class ReportFlightBaseMixin(FlightBaseMixin):
     """

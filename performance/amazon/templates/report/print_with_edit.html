@@ -11,6 +11,12 @@
     {% include "report/performance.html" %}
 {% endblock %}
 
+{% block main_tail %}
+    <h4 class="noprint delete-report">
+        <a href="{{ url_for('report.delete_report', report_id=report.id) }}" onclick="return confirm('Delete report?');">Delete Report</a>
+    </h4>
+{% endblock %}
+
 {% block flights %}
     {% for flight_type, flights in report.flights_by_type() %}
         {% include "report/flight_table.html" %}

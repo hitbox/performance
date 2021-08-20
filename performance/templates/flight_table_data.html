@@ -5,9 +5,16 @@
 {% from "macros.html" import yes %}
 
 
+{% set edit_url = url_for('flight.edit', id=flight.id, backurl=thisurl) %}
+{% set first_not_none = flight.first_not_none() %}
+
 {# just the <td>s of a flight table row #}
-<td class="data">{% if with_edit %}<a href="{{ url_for('flight.edit', id=flight.id, backurl=thisurl) }}">{% endif %}{{ string(flight.tail_number) }}{% if with_edit %}</a>{% endif %}</td>
-<td class="data">{{ string(flight.flight_number) }}</td>
+{% set has_edit = with_edit and first_not_none == 'tail_number' %}
+<td class="data">{% if has_edit %}<a href="{{ edit_url }}">{% endif %}{{ string(flight.tail_number) }}{% if has_edit %}</a>{% endif %}</td>
+
+{% set has_edit = with_edit and first_not_none == 'flight_number' %}
+<td class="data">{% if has_edit %}<a href="{{ edit_url }}">{% endif %}{{ string(flight.flight_number) }}{% if has_edit %}</a>{% endif %}</td>
+
 {#- orgin -#}
 <td class="data">{{ string(flight.origin_station) }}</td>
 <td class="data">{{ time(flight.origin_departure_estimated_time) }}</td>
