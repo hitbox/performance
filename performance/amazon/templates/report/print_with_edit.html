@@ -4,43 +4,43 @@
 {% set with_edit = current_user.is_editor %}
 
 {% block main_head %}
-    {{ super() }}
-    <h4 class="noprint">
-        <a href="javascript:;" onclick="window.print(); return false">Print</a>
-    </h4>
-    {% include "report/performance.html" %}
+{{ super() }}
+<h4 class="noprint">
+    <a href="javascript:;" onclick="window.print(); return false">Print</a>
+</h4>
+{% include "report/performance.html" %}
 {% endblock %}
 
 {% block main_tail %}
-    <h4 class="noprint delete-report">
-        <a href="{{ url_for('report.delete_report', report_id=report.id) }}" onclick="return confirm('Delete report?');">Delete Report</a>
-    </h4>
+<h4 class="noprint delete-report">
+    <a href="{{ url_for('report.delete_report', report_id=report.id) }}" onclick="return confirm('Delete report?');">Delete Report</a>
+</h4>
 {% endblock %}
 
 {% block flights %}
-    {% for flight_type, flights in report.flights_by_type() %}
-        {% include "report/flight_table.html" %}
-    {% endfor %}
+{% for flight_type, flights in report.flights_by_type() %}
+{% include "report/flight_table.html" %}
+{% endfor %}
 {% endblock flights %}
 
 {% block comments %}
-    <h3>System Detail</h3>
-    <table class="expand">
-        <tbody>
-            <tr>
-                <td>
-                    <pre id=system-detail class="textfield">{{ report.system_detail }}</pre>
-                </td>
-            </tr>
-        </tbody>
-        {% if with_edit %}<tfoot class="noprint">
-            <tr>
-                <td colspan="4">
-                    <h4>
-                        <a href="{{ url_for('report.edit_report', id=report.id, backurl=thisurl) }}">Edit</a>
-                    </h4>
-                </td>
-            </tr>
-        </tfoot>{% endif %}
-    </table>
+<h3>System Detail</h3>
+<table class="expand">
+    <tbody>
+        <tr>
+            <td>
+                <pre id=system-detail class="textfield">{{ report.system_detail }}</pre>
+            </td>
+        </tr>
+    </tbody>
+    {% if with_edit %}<tfoot class="noprint">
+        <tr>
+            <td colspan="4">
+                <h4>
+                    <a href="{{ url_for('report.edit_report', id=report.id, backurl=thisurl) }}">Edit</a>
+                </h4>
+            </td>
+        </tr>
+    </tfoot>{% endif %}
+</table>
 {% endblock comments %}
