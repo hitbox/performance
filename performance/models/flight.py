@@ -165,6 +165,7 @@ class ReportFlightBaseMixin(FlightBaseMixin):
     @property
     def is_lane(self):
         controllable_names = current_app.config['PERFORMANCE_CONTROLLABLE']
+        controllable_names = [code.upper() for code in controllable_names]
         flight_types = configured_performance_lanes_flighttypes()
         is_ground_turnback = self.origin_station == self.destination_station
         # all cancelled delays must be controllable ones

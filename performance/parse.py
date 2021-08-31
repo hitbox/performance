@@ -22,6 +22,7 @@ def delaystring(text):
 
         # interpret and convert into Delay objects.
         for code, minutes in matches:
+            code = code.upper()
             if code == CANCELLED:
                 # consume next match making cancelled=True
                 for code, minutes in matches:
