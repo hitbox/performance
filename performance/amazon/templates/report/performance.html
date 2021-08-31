@@ -2,7 +2,7 @@
 {% from "macros.html" import percent %}
 
 
-{% macro render_assumed_best(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
+{% macro render_assumed_best_td(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
 <td class="data number" title="(<{{ to_date_string }} assumed lanes> - <{{ to_date_abbreviation }} chargeable delays>) / <{{ to_date_string }} assumed lanes>{% if can_calculate %}{# newline intended #}
 ({{ lanes }} - {{ ndelays }}) / {{ lanes }} = {{ '%0.4f'|format((lanes - ndelays) / lanes) }}{% endif %}">{% if can_calculate %}{{ percent((lanes - ndelays) / lanes) }}{% endif %}</td>
 {% endmacro %}
