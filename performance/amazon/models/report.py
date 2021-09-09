@@ -27,6 +27,29 @@ def by_estimated_departure(flight):
     else:
         return time(0,0)
 
+def flight_types_for_controllable_delays():
+    """
+    Return list of FlightType objects that should show controllable delays.
+    """
+    return FlightType.query.filter(FlightType.name == 'Scheduled').all()
+
+def controllable_destination_delays(report, over_minutes):
+    """
+    Returns the controllable destination delays for a report.
+    """
+    # this exists to put logic in a common place for
+    # `Report.controllable_destination_delays` and
+    # `Reprot.flights_with_controllable_destination_delays` so that one can
+    # return the delays and one can return the flights
+    include_types = flight_types_for_controllable_delays()
+    if not include_types:
+        raise ReportError('List of flight types to include is empty')
+    result = [(flight, delay)
+              for flight in report.flights
+              for delay in flight.controllable_destination_delays(over_minutes)
+              if flight.flight_type in include_types]
+    return result
+
 class Report(MetaMixin, db.Model):
     """
     Amazon Performance Report.
@@ -125,11 +148,10 @@ class Report(MetaMixin, db.Model):
         """
         All report's flights controllable destination delay codes.
         """
-        include_types = FlightType.query.filter(FlightType.name == 'Scheduled').all()
-        if not include_types:
-            raise ReportError('List of flight types to include is empty')
-        return [
-            delay
-            for flight in self.flights
-            for delay in flight.controllable_destination_delays(over_minutes)
-            if flight.flight_type in include_types]
+        return [delay for flight, delay in controllable_destination_delays(self, over_minutes)]
+
+    def flights_with_controllable_destination_delays(self, over_minutes):
+        """
+        """
+        items = controllable_destination_delays(self, over_minutes)
+        return list(set(flight for flight, delay in items))

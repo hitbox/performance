@@ -25,21 +25,21 @@
         </tr>
         <tr>{% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
             <th title="{{ controllable_delays_note }}">Chargeable Delays</th>
-            <td class="data number">{{ integer(daily.controllable_destination_delays_over15|length) }}</td>
-            <td class="data number">{{ integer(month_to_date.controllable_destination_delays_over15|length) }}</td>
-            <td class="data number">{{ integer(quarter_to_date.controllable_destination_delays_over15|length) }}</td>
+            <td class="data number">{{ integer(daily.flights_with_controllable_destination_delays_over15|length) }}</td>
+            <td class="data number">{{ integer(month_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
+            <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
         </tr>
         <tr>
             <th title="{{ controllable_delays_note }}">&gt;30 Count</th>
-            <td class="data number">{{ integer(daily.controllable_destination_delays_over30|length) }}</td>
-            <td class="data number">{{ integer(month_to_date.controllable_destination_delays_over30|length) }}</td>
-            <td class="data number">{{ integer(quarter_to_date.controllable_destination_delays_over30|length) }}</td>
+            <td class="data number">{{ integer(daily.flights_with_controllable_destination_delays_over30|length) }}</td>
+            <td class="data number">{{ integer(month_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
+            <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
         </tr>
         <tr>
             <th title="On-time Performance">On-time Perf.</th>
-            {{ render_assumed_best_td('daily', 'daily', true, daily.controllable_destination_delays_over15|length, assumed_best.lanes) }}
-            {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.controllable_destination_delays_over15|length, assumed_best.lanes) }}
-            {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.controllable_destination_delays_over15|length, assumed_best.lanes) }}
+            {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}
+            {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}
+            {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}
         </tr>
         <tr>
             <th><a href="{{ url_for('assumed_best.edit', year=report.date.year, month=report.date.month, backurl=thisurl) }}">Assumed Best</a></th>
