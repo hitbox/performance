@@ -37,9 +37,9 @@
         </tr>
         <tr>
             <th title="On-time Performance">On-time Perf.</th>
-            {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}
-            {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}
-            {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}
+            {% if assumed_best %}{{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}{% else %}<td></td>{% endif %}
+            {% if assumed_best %}{{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}{% else %}<td></td>{% endif %}
+            {% if assumed_best %}{{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over15|length, assumed_best.lanes) }}{% else %}<td></td>{% endif %}
         </tr>
         <tr>
             <th><a href="{{ url_for('assumed_best.edit', year=report.date.year, month=report.date.month, backurl=thisurl) }}">Assumed Best</a></th>
@@ -47,7 +47,7 @@
             {# MTD assumed best #}
             {% set can_calculate = assumed_best and assumed_best.lanes > 0 %}
             {% set ndelays = month_to_date.controllable_destination_delays_over15|length %}
-            {{ render_assumed_best_td('monthly', 'MTD', can_calculate, ndelays, assumed_best.lanes) }}
+            {% if assumed_best %}{{ render_assumed_best_td('monthly', 'MTD', can_calculate, ndelays, assumed_best.lanes) }}{% else %}<td></td>{% endif %}
             <td></td>
         </tr>
     </tbody>

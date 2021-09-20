@@ -123,7 +123,7 @@ def edit_report(id):
     ).one_or_none()
 
     if form.validate_on_submit():
-        if form.delete.data:
+        if hasattr(form, 'delete') and form.delete.data:
             db.session.delete(report)
         elif form.submit.data:
             form.populate_obj(report)
@@ -174,7 +174,7 @@ def create_report_from_schedule(report_date, schedule_id):
     )
     db.session.add(report)
     db.session.commit()
-    return redirect(url_for('.edit_report', id=report.id))
+    return redirect(url_for('.view_report', id=report.id))
 
 @report_bp.route('/create_blank_report/<date:report_date>')
 @edit_check

@@ -70,41 +70,6 @@ class Report(MetaMixin, db.Model):
         ),
     )
 
-    performance_meta_id = db.Column(db.Integer, db.ForeignKey('performance_meta.id'))
-    # XXX: was this performance_meta field a mistake? think what we need is
-    #      objects linked to these reports by month/year and quarter/year.
-    # TODO: need month/year object that stores "assumed best lanes" and possibly other things.
-    performance_meta = db.relationship('performance.amazon.models.performance_meta.PerformanceMeta')
-
-    # TODO: all these can be removed with the "automatic calculation" changes?
-    # NOTE: previous is actually today (legacy problem).
-    previous_days_performance_percent = db.Column(
-        db.Float, info=dict(form_field_class=PercentField))
-    previous_days_performance_lanes = db.Column(db.Integer)
-    previous_days_performance_late = db.Column(db.Integer)
-
-    arrival_performance_mtd_percent = db.Column(
-        db.Float, info=dict(form_field_class=PercentField))
-    arrival_performance_mtd_lanes = db.Column(db.Integer)
-    arrival_performance_mtd_late = db.Column(db.Integer)
-
-    days_at_100_percent = db.Column(db.Integer)
-
-    qtd_performance_percent = db.Column(
-        db.Float, info=dict(form_field_class=PercentField))
-    qtd_performance_lanes = db.Column(db.Integer)
-    qtd_performance_late = db.Column(db.Integer)
-
-    assumed_best_arrival_performance_for_month_percent = db.Column(
-        db.Float, info=dict(form_field_class=PercentField))
-    assumed_best_arrival_performance_for_month_lanes = db.Column(db.Integer)
-    assumed_best_arrival_performance_for_month_late = db.Column(db.Integer)
-
-    arrival_performance_mtd_30_percent = db.Column(
-        db.Float, info=dict(form_field_class=PercentField))
-    arrival_performance_mtd_30_lanes = db.Column(db.Integer)
-    arrival_performance_mtd_30_late = db.Column(db.Integer)
-
     @hybrid_property
     def date_quarter(self):
         """
