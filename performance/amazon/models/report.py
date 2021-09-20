@@ -44,10 +44,13 @@ def controllable_destination_delays(report, over_minutes):
     include_types = flight_types_for_controllable_delays()
     if not include_types:
         raise ReportError('List of flight types to include is empty')
-    result = [(flight, delay)
-              for flight in report.flights
-              for delay in flight.controllable_destination_delays(over_minutes)
-              if flight.flight_type in include_types]
+    result = [
+        (flight, delay)
+        for flight in report.flights
+        for delay in flight.controllable_destination_delays(over_minutes)
+        if flight.flight_type in include_types
+        and delay.is_controllable(over_minutes)
+    ]
     return result
 
 class Report(MetaMixin, db.Model):
