@@ -167,19 +167,20 @@ class ReportFlightBaseMixin(FlightBaseMixin):
 
     @property
     def is_lane(self):
-        controllable_names = current_app.config['PERFORMANCE_CONTROLLABLE']
-        controllable_names = [code.upper() for code in controllable_names]
+        """
+        Flight is a configured FlightType and its only delays are configured
+        delays that are cancelled.
+        """
+        key = 'PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS'
+        include_cancelled_delays = current_app.config[key]
         flight_types = configured_performance_lanes_flighttypes()
-        is_ground_turnback = self.origin_station == self.destination_station
-        # all cancelled delays must be controllable ones
-        only_cancelled_controllable = all(
-            delay.code in controllable_names or delay.code is None
-            for delay in self.destination_delays_objects()
-            if delay.cancelled
-        )
+        delays = self.destination_delays_objects()
+        def is_included(delay):
+            return (delay.code in include_cancelled_delays
+                    and delay.cancelled)
         return (
-            not is_ground_turnback
-            and only_cancelled_controllable
+            # the only delay is in the include list and is cancelled
+            all(is_included(delay) for delay in delays)
             and self.flight_type in flight_types
         )
 
