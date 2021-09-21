@@ -60,7 +60,7 @@ class Report(MetaMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    date = db.Column(db.Date)
+    date = db.Column(db.Date, unique=True)
     flights = db.relationship(
         'performance.amazon.models.flight.Flight',
         backref = 'report',
