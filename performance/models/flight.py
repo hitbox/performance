@@ -7,6 +7,9 @@ from .. import parse
 from ..extensions import db
 
 def configured_performance_lanes_flighttypes():
+    """
+    The FlightType's that count for lanes.
+    """
     from .flight_type import FlightType
     flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
     flight_types = FlightType.query.filter(FlightType.name.in_(flight_types_names)).all()
