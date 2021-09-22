@@ -175,12 +175,9 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         include_cancelled_delays = current_app.config[key]
         flight_types = configured_performance_lanes_flighttypes()
         delays = self.destination_delays_objects()
-        def is_included(delay):
-            return (delay.code in include_cancelled_delays
-                    and delay.cancelled)
         return (
             # the only delay is in the include list and is cancelled
-            all(is_included(delay) for delay in delays)
+            all(delay.code in include_cancelled_delays for delay in delays if delay.cancelled)
             and self.flight_type in flight_types
         )
 
