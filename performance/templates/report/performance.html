@@ -36,7 +36,7 @@
             <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
         </tr>
         <tr>
-            <th title="On-time Performance">On-time Perf.</th>
+            <th title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
             {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over15|length, daily.lanes|length) }}
             {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over15|length, month_to_date.lanes|length) }}
             {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over15|length, quarter_to_date.lanes|length) }}
