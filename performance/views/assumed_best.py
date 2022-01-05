@@ -9,7 +9,6 @@ from performance.authorization import edit_check
 from performance.extensions import db
 
 from ..models import AssumedBest
-from ..forms import AssumedBestForm
 
 assumed_best_bp = Blueprint('assumed_best', __name__, template_folder='../templates')
 
@@ -23,6 +22,9 @@ def context_processor():
 @assumed_best_bp.route('/edit/<int:year>/<int:month>', methods=['GET', 'POST'])
 @edit_check
 def edit(year, month):
+    # NOTE: wtforms-alchemy is too aggressive
+    from ..forms import AssumedBestForm
+
     if year is None or month is None:
         assumed_best = None
     else:

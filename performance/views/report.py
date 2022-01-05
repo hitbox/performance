@@ -6,18 +6,15 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-from performance.authorization import basic_check
-from performance.authorization import edit_check
-from performance.extensions import db
+from ..authorization import basic_check
+from ..authorization import edit_check
+from ..extensions import db
+from ..models import AssumedBest
+from ..models import Flight
+from ..models import Report
+from ..models import ScheduledReport
 
-from performance.amazon.forms import AssumedBestForm
-from performance.amazon.forms import ReportForm
-from performance.amazon.models import AssumedBest
-from performance.amazon.models import Flight
-from performance.amazon.models import Report
-from performance.amazon.models import ScheduledReport
-
-report_bp = Blueprint('report', __name__, template_folder='../templates')
+report_bp = Blueprint('report', __name__)
 
 def get_performance_from(reports):
     """
@@ -115,6 +112,8 @@ def view_report(id):
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @edit_check
 def edit_report(id):
+    from .forms import ReportForm
+
     report = Report.query.get_or_404(id)
     form = ReportForm(obj=report)
     assumed_best = AssumedBest.query.filter(

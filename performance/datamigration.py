@@ -1,19 +1,18 @@
 from collections import defaultdict
 from pathlib import Path
 
-from ..extensions import db
-from ..mdbreader import mdbreader
-from ..models import FlightType
-from ..utils import datefromiso
-from ..utils import float_or_none
-from ..utils import int_or_none
-from ..utils import str_or_none
-from ..utils import timefromiso
-
+from .extensions import db
+from .mdbreader import mdbreader
 from .models import Flight
+from .models import FlightType
 from .models import Report
 from .models import ScheduledFlight
 from .models import ScheduledReport
+from .utils import datefromiso
+from .utils import float_or_none
+from .utils import int_or_none
+from .utils import str_or_none
+from .utils import timefromiso
 
 class Migrator:
     """

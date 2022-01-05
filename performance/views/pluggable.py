@@ -103,6 +103,8 @@ class BaseEditView(View):
         instance_name=None,
         form_render_kw=None,
     ):
+        if callable(form_class):
+            form_class = form_class()
         self.form_class = form_class
         self.model = model or self.form_class.Meta.model
         self.template = template or self.template

@@ -12,14 +12,11 @@ from flask_login import logout_user
 
 from ..extensions import db
 from ..extensions import login_manager
-from ..forms import LoginForm
-from ..forms import ResetPasswordForm
 from ..models import User
 
 login_manager.login_message_category = 'warning'
-login_manager.login_view \
-    = login_manager.refresh_view \
-    = 'user.login'
+login_manager.login_view = 'user.login'
+login_manager.refresh_view = 'user.login'
 
 user_bp = Blueprint('user', __name__)
 
@@ -32,6 +29,7 @@ def login():
     """
     Login page
     """
+    from ..forms import LoginForm
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter(
@@ -50,6 +48,7 @@ def reset_password():
     """
     Reset password form
     """
+    from ..forms import ResetPasswordForm
     form = ResetPasswordForm()
     if form.validate_on_submit():
         form.populate_obj(current_user)

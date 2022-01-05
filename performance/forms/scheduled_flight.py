@@ -1,18 +1,17 @@
 import sqlalchemy as sa
 
-from flask import request
 from wtforms import HiddenField
 from wtforms_alchemy import ClassMap
 from wtforms_alchemy import QuerySelectField
 
-from ...forms import defaults
-from ...forms.base import ModelForm
-from ...forms.fields import StringTimeField
-from ...forms.mixins import BackLinkMixin
-from ...forms.mixins import SubmitUpdateDeleteMixin
-from ...models import FlightType
-
+from ..models import FlightType
 from ..models import ScheduledFlight
+
+from . import defaults
+from .base import ModelForm
+from .fields import StringTimeField
+from .mixins import BackLinkMixin
+from .mixins import SubmitUpdateDeleteMixin
 
 class ScheduledFlightForm(
     BackLinkMixin,

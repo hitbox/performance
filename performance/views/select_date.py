@@ -18,11 +18,16 @@ def select_date_blueprint(ReportClass, date_attr_name):
     Return routes using configured ReportClass to compensate for differences
     between `performance.amazon` and `performance.dhl`.
     """
+    # TODO: flatten. "plugging in" a specific model is no long needed.
     select_date_bp = Blueprint('select_date', __name__)
 
     @select_date_bp.route('/<int:year>/<int:month>')
     @basic_check
     def index(year, month):
+        """
+        Display a calendar with indication of existing reports and with links
+        to the reports.
+        """
         today = datetime.date.today()
         firstweekday = current_app.config['FIRSTWEEKDAY']
         monthobj = Month(year, month, firstweekday)

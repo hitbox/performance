@@ -13,8 +13,6 @@ from performance.models.mixin import MetaMixin
 
 from .util import grouped_flights
 
-from performance.forms.fields import PercentField
-
 FLIGHTS_BY_TYPE_SORT = attrgetter('origin_departure_estimated_time')
 
 class ReportError(AppError):
@@ -39,7 +37,7 @@ def controllable_destination_delays(report, over_minutes):
     """
     # this exists to put logic in a common place for
     # `Report.controllable_destination_delays` and
-    # `Reprot.flights_with_controllable_destination_delays` so that one can
+    # `Report.flights_with_controllable_destination_delays` so that one can
     # return the delays and one can return the flights
     include_types = flight_types_for_controllable_delays()
     if not include_types:
@@ -62,7 +60,7 @@ class Report(MetaMixin, db.Model):
 
     date = db.Column(db.Date, unique=True)
     flights = db.relationship(
-        'performance.amazon.models.flight.Flight',
+        'Flight',
         backref = 'report',
         cascade = 'all,delete-orphan',
     )

@@ -20,6 +20,9 @@ class FlightType(db.Model):
 
 
 class FlightTypeRelationshipMixin:
+    """
+    Mixin adds a relationship to FlightType.
+    """
 
     @declared_attr
     def flight_type_id(cls):

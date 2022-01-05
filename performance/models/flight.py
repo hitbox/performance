@@ -6,6 +6,9 @@ from flask import current_app
 from .. import parse
 from ..extensions import db
 
+from .mixin import MetaMixin
+from .flight_type import FlightTypeRelationshipMixin
+
 def configured_performance_lanes_flighttypes():
     """
     The FlightType's that count for lanes.
@@ -208,3 +211,17 @@ class ReportFlightBaseMixin(FlightBaseMixin):
             if est_dt >= act_dt:
                 minutes *= -1
             return minutes
+
+
+class Flight(
+    FlightTypeRelationshipMixin,
+    MetaMixin,
+    ReportFlightBaseMixin,
+    db.Model,
+):
+    """
+    A flight appearing on a report.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+    report_id = db.Column(db.Integer, db.ForeignKey('report.id'))

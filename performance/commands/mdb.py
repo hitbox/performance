@@ -1,10 +1,11 @@
 import click
 
+from flask import current_app
 from flask.cli import AppGroup
 
-from ...extensions import db
-
-from ..external_data.mdb import Migrator
+from ..datamigration import Migrator
+from ..extensions import db
+from ..mdbreader import mdbreader
 
 mdb_cli = AppGroup('mdb', help='Data commands')
 

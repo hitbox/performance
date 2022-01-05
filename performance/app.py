@@ -12,7 +12,7 @@ from . import views
 
 def create_app():
     """
-    Amazon/DHL shared app.
+    Performance report Flask app.
     """
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_envvar('PERFORMANCE_CONFIG')

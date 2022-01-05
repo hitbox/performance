@@ -5,11 +5,11 @@ from flask import render_template
 from flask import url_for
 from markupsafe import Markup
 
-from performance.authorization import edit_check
-from performance.models import FlightType
-from performance.views.pluggable import ListView
+from ..authorization import edit_check
+from ..models import FlightType
+from ..models import ScheduledReport
 
-from performance.amazon.models import ScheduledReport
+from .pluggable import ListView
 
 scheduled_report_bp = Blueprint(
     'scheduled_report',

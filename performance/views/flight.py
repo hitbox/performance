@@ -1,23 +1,23 @@
 from flask import Blueprint
-from flask import request
-from flask import render_template
-from flask import redirect
 
 from performance.authorization import edit_check
-from performance.extensions import db
 from performance.views.pluggable import CreateView
 from performance.views.pluggable import UpdateDeleteView
 
-from performance.dhl.forms import FlightForm
+flight_bp = Blueprint('flight', __name__, template_folder='../templates')
 
-flight_bp = Blueprint('flight', __name__, template_folder='templates')
+def flight_form_class():
+    # NOTE: temp workaround for wtforms-alchemy's aggressiveness
+    from ..forms import FlightForm
+    return FlightForm
+
 
 flight_bp.add_url_rule(
     '/create/<int:report_id>',
     view_func = edit_check(
         CreateView.as_view(
             'create',
-            FlightForm,
+            flight_form_class,
             template = 'flight/form.html',
         )))
 
@@ -26,6 +26,6 @@ flight_bp.add_url_rule(
     view_func = edit_check(
         UpdateDeleteView.as_view(
             'edit',
-            FlightForm,
+            flight_form_class,
             template = 'flight/form.html',
         )))
