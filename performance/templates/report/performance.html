@@ -42,7 +42,7 @@
             {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over15|length, quarter_to_date.lanes|length) }}
         </tr>
         <tr>
-            <th><a href="{{ url_for('assumed_best.edit', year=report.date.year, month=report.date.month, backurl=thisurl) }}">Assumed Best</a></th>
+            <th><a href="{{ url_for('assumed_best.edit', year=report.date.year, month=report.date.month, backurl=thisurl) }}">Assumed Best Arrival Performance for the Month</a></th>
             <td>{# deliberately empty #}</td>
             {# MTD assumed best #}
             {% set can_calculate = assumed_best and assumed_best.lanes > 0 %}
