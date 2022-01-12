@@ -112,7 +112,7 @@ def view_report(id):
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @edit_check
 def edit_report(id):
-    from .forms import ReportForm
+    from ..forms import ReportForm
 
     report = Report.query.get_or_404(id)
     form = ReportForm(obj=report)
