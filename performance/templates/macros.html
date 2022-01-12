@@ -70,6 +70,30 @@
 {%- endmacro -%}
 
 
+{% macro render_form_simple1(form) %}
+{{ form.hidden_tag() }}
+{# normal fields #}
+{% for field in form|rejectattr('type', 'in', ['CSRFTokenField', 'HiddenField', 'SubmitField']) %}
+<div>
+    {% if field.type == 'BooleanType' %}
+        {{ field }}{{ field.label }}
+    {% elif field.type == 'TextAreaField' %}
+        <div>{{ field.label }}</div>
+        {{ field }}
+    {% else %}
+        {{ field.label }}{{ field }}
+    {% endif %}
+</div>
+{% endfor %}
+{# buttons #}
+<div>
+{% for field in form|selectattr('type', 'in', ['SubmitField']) %}
+    {{ field }}
+{% endfor %}
+</div>
+{% endmacro %}
+
+
 {%- macro render_pagination(pagination, endpoint) -%}
 {%- if pagination.pages > 1 -%}<div class="pagination rowwise centered">
     {%- for page in pagination.iter_pages() %}
