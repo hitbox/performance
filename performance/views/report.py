@@ -16,6 +16,13 @@ from ..models import ScheduledReport
 
 report_bp = Blueprint('report', __name__)
 
+def get_report_form_class():
+    """
+    Wrap in function to avoid the aggressiveness of wtforms_alchemy.
+    """
+    from ..forms import ReportForm
+    return ReportForm
+
 def get_performance_from(reports):
     """
     Return performance numbers (lanes, chargeable delays, and over-30 count).
@@ -99,21 +106,30 @@ def get_context(report):
     )
     return context
 
-@report_bp.route('/view/<int:id>')
+@report_bp.route('/view/<int:id>', methods=['GET', 'POST'])
 @basic_check
 def view_report(id):
     """
     View Report object.
     """
+    ReportForm = get_report_form_class()
     report = Report.query.get_or_404(id)
+    form = ReportForm(obj=report)
+
+    # only updating the comments (system detail)
+    form.submit.label.text = 'Update System Detail'
+    if form.validate_on_submit():
+        report.system_detail = form.system_detail.data
+        db.session.commit()
+        return redirect(url_for(request.endpoint, _anchor='system-detail', **request.view_args))
+
     context = get_context(report)
-    return render_template('report/print_with_edit.html', **context)
+    return render_template('report/print_with_edit.html', form=form, **context)
 
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @edit_check
 def edit_report(id):
-    from ..forms import ReportForm
-
+    ReportForm = get_report_form_class()
     report = Report.query.get_or_404(id)
     form = ReportForm(obj=report)
     assumed_best = AssumedBest.query.filter(

@@ -48,4 +48,9 @@
     pre {
         font-size: .90rem;
     }
+
+    /* the textarea on printable page */
+    #system_detail {
+        border: none;
+    }
 }
