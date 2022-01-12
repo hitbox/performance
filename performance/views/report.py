@@ -52,10 +52,14 @@ def get_performance_from(reports):
     ]
     result = dict(
         lanes = lanes,
-        controllable_destination_delays_over15 = controllable_destination_delays_over15,
-        controllable_destination_delays_over30 = controllable_destination_delays_over30,
-        flights_with_controllable_destination_delays_over15 = flights_with_controllable_destination_delays_over15,
-        flights_with_controllable_destination_delays_over30 = flights_with_controllable_destination_delays_over30,
+        controllable_destination_delays_over15
+            = controllable_destination_delays_over15,
+        controllable_destination_delays_over30
+            = controllable_destination_delays_over30,
+        flights_with_controllable_destination_delays_over15
+            = flights_with_controllable_destination_delays_over15,
+        flights_with_controllable_destination_delays_over30
+            = flights_with_controllable_destination_delays_over30,
     )
     return result
 
@@ -94,10 +98,14 @@ def get_context(report):
         report = report,
         daily = dict(
             lanes = report.lane_flights(),
-            controllable_destination_delays_over15 = report.controllable_destination_delays(15),
-            controllable_destination_delays_over30 = report.controllable_destination_delays(30),
-            flights_with_controllable_destination_delays_over15 = report.flights_with_controllable_destination_delays(15),
-            flights_with_controllable_destination_delays_over30 = report.flights_with_controllable_destination_delays(30),
+            controllable_destination_delays_over15
+                = report.controllable_destination_delays(15),
+            controllable_destination_delays_over30
+                = report.controllable_destination_delays(30),
+            flights_with_controllable_destination_delays_over15
+                = report.flights_with_controllable_destination_delays(15),
+            flights_with_controllable_destination_delays_over30
+                = report.flights_with_controllable_destination_delays(30),
         ),
         month_to_date = month_to_date,
         quarter_to_date = quarter_to_date,
