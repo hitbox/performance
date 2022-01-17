@@ -150,7 +150,8 @@ class ReportFlightBaseMixin(FlightBaseMixin):
     @db.validates('origin_delays', 'destination_delays')
     def format_delays(self, key, value):
         if isinstance(value, str):
-            return parse.formatdelays(parse.delaystring(value))
+            delays = parse.delaystring(value)
+            return parse.formatdelays(delays)
 
     def origin_delays_objects(self):
         return parse.delaystring(self.origin_delays)
