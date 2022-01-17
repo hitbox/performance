@@ -1,6 +1,8 @@
 import sqlalchemy as sa
 
 from flask import Blueprint
+from flask import current_app
+from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -113,6 +115,24 @@ def get_context(report):
         assumed_bests_qtd = assumed_bests_qtd,
     )
     return context
+
+
+@report_bp.route('/view/<date:report_date>')
+@basic_check
+def view_report_for_date(report_date):
+    """
+    Redirect from report date to id.
+    """
+    report = Report.query.filter(Report.date == report_date).one_or_none()
+    if report is None:
+        # Alert and redirect to new report
+        if 'DATEFMT' in current_app.config:
+            date_str = report_date.strftime(current_app.config['DATEFMT'])
+        else:
+            date_str = str(report_date)
+        flash(f'{date_str} not found.', 'info')
+        return redirect(url_for('.prompt_new', report_date=report_date))
+    return redirect(url_for('.view_report', id=report.id))
 
 @report_bp.route('/view/<int:id>', methods=['GET', 'POST'])
 @basic_check
