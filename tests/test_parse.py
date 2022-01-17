@@ -20,8 +20,6 @@ class TestParseDelay(unittest.TestCase):
         self.check('AAA', [Delay('AAA', None, False)])
         self.check('AAA    ', [Delay('AAA', None, False)])
         self.check('AAA BBB', [Delay('AAA', None, False), Delay('BBB', None, False)])
-        # case preserved
-        self.check('AbC dEF', [Delay('AbC', None, False), Delay('dEF', None, False)])
 
     def test_parse_code_and_minutes(self):
         self.check('AAA1', [Delay('AAA', 1, False)])
