@@ -14,11 +14,7 @@
 
 {% macro render_day(day) %}
     {% if day.number %}
-        {% if not current_user.is_editor %}
-            <div class="day">{{ day.number }}</div>
-        {% else %}
-            <a class="day{% if day.date == today %} today{% endif %}" href="{{ render_url_for(day) }}">{% if day.report %}&starf; {% endif %}{{ day.number }}</a>
-        {% endif %}
+        <a class="day{% if day.date == today %} today{% endif %}" href="{{ render_url_for(day) }}">{% if day.report %}&starf; {% endif %}{{ day.number }}</a>
     {% else %}
         <div class="day"></div>
     {% endif %}
