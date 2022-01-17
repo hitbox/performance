@@ -25,12 +25,3 @@ class Delay(namedtuple('Delay', ['code', 'minutes', 'cancelled'])):
                 or (self.minutes and self.minutes > over_minutes))
         )
         return is_controllable
-
-    def as_text(self):
-        parts = []
-        if self.cancelled:
-            parts.append(CANCELLED)
-        parts.append(self.code)
-        if self.minutes:
-            parts.append(str(self.minutes))
-        return ' '.join(parts)
