@@ -18,6 +18,14 @@ def create_app():
     app.config.from_envvar('PERFORMANCE_CONFIG')
     config.raise_for_config(app)
 
+    @app.context_processor
+    def context_processor():
+        import datetime
+        context = dict(
+            datetime = datetime,
+        )
+        return context
+
     commands.init_app(app)
     converters.init_app(app)
     extensions.init_app(app)
