@@ -3,6 +3,9 @@ from collections import namedtuple
 from flask import current_app
 
 class Delay(namedtuple('Delay', ['code', 'minutes', 'cancelled'])):
+    """
+    A flight delay code, the minutes and if the code is cancelled.
+    """
 
     def is_controllable(self, over_minutes):
         """
