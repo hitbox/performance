@@ -16,6 +16,10 @@ th {
     vertical-align: bottom;
 }
 
+thead > tr > th {
+    background: LightGray;
+}
+
 td {
     padding: var(--cell-padding);
     /* make non-.data tds a little smaller */

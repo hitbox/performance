@@ -150,3 +150,17 @@ ul.buttons > li {
 .delete-report {
     margin-top: 5rem;
 }
+
+.flights-table {
+    margin-top: 2rem;
+}
+
+.flight-type-name {
+    text-align: left;
+    font-size: 1.05rem;
+}
+
+#system-detail-text {
+    border: 1px solid black;
+    padding: .2rem;
+}

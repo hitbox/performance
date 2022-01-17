@@ -1,8 +1,4 @@
 @media print {
-    *:hover {
-        background-color: white !important;
-    }
-
     a {
         text-decoration: none;
     }
@@ -49,8 +45,4 @@
         font-size: .90rem;
     }
 
-    /* the textarea on printable page */
-    #system_detail {
-        border: none;
-    }
 }

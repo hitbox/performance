@@ -8,15 +8,16 @@
 {% endmacro %}
 
 
-<h3>Performance</h3>
 <table>
-    <tbody>
+    <thead>
         <tr>
             <th></th>
             <th class="top">Daily</th>
             <th class="top" title="Month To Date">Monthly</th>
             <th class="top" title="Quarter To Date">QTD</th>
         </tr>
+    </thead>
+    <tbody>
         <tr>
             <th>Lanes</th>
             <td class="data number">{{ integer(daily.lanes|length) }}</td>
@@ -30,7 +31,7 @@
             <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
         </tr>
         <tr>
-            <th title="{{ controllable_delays_note }}">&gt;30 Count</th>
+            <th title="{{ controllable_delays_note }}">Delays &gt;30 Count</th>
             <td class="data number">{{ integer(daily.flights_with_controllable_destination_delays_over30|length) }}</td>
             <td class="data number">{{ integer(month_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
             <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>

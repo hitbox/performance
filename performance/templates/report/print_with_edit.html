@@ -14,13 +14,6 @@
 {% endblock %}
 
 
-{% block main_tail %}
-<h4 class="noprint delete-report">
-    <a href="{{ url_for('report.delete_report', report_id=report.id) }}" onclick="return confirm('Delete report?');">Delete Report</a>
-</h4>
-{% endblock main_tail %}
-
-
 {% block flights %}
 {% for flight_type, flights in report.flights_by_type() %}
 {% include "report/flight_table.html" %}
@@ -31,25 +24,25 @@
 {% block comments %}
 <h3 id="system-detail">System Detail</h3>
 {% set system_detail_form_name = 'system-detail-form' %}
+
+{% if not with_edit %}
+<pre id="system-detail-text">{{ form.system_detail.data }}</pre>
+{% else %}
 <form id="{{ system_detail_form_name }}" action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
     {{ form.hidden_tag() }}
+    <div>
+    {{ form.system_detail }}
+    </div>
+    <div>
+    {{ form.submit(class_='noprint') }}
+    </div>
 </form>
-<table class="expand">
-    <tbody>
-        <tr>
-            <td>
-                {{ form.system_detail(form=system_detail_form_name) }}
-            </td>
-        </tr>
-    </tbody>
-    {% if with_edit %}<tfoot class="noprint">
-        <tr>
-            <td colspan="4">
-                <h4>
-                    {{ form.submit(form=system_detail_form_name) }}
-                </h4>
-            </td>
-        </tr>
-    </tfoot>{% endif %}
-</table>
+{% endif %}
 {% endblock comments %}
+
+
+{% block main_tail %}
+<h4 class="noprint delete-report">
+    <a href="{{ url_for('report.delete_report', report_id=report.id) }}" onclick="return confirm('Delete report?');">Delete Report</a>
+</h4>
+{% endblock main_tail %}

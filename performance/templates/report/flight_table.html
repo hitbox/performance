@@ -3,16 +3,22 @@
 {% set include_controllable_columns = flight_type.name == 'Scheduled' %}
 
 
+{% macro render_flight_type_th(colspan, text) %}
+<th class="flight-type-name" colspan="{{ colspan }}">{{ flight_type.name }}</th>
+{% endmacro %}
+
+
 {# different grouping than DHL #}
 <div{% if not flights %} class="noprint"{% endif %}>
-    <h3>{{ flight_type.name }}</h3>
-    <table class="expand">
+    <table class="expand flights-table">
         {% if flights %}<thead>
-            {% if include_controllable_columns %}<tr>
-                <th colspan="{{ ncols - 3 }}"></th>
+            <tr>{% if include_controllable_columns %}
+                {{ render_flight_type_th(ncols - 3, flight_type.name) }}
                 <th colspan="2">ABX Controllable</th>
                 <th></th>
-            </tr>{% endif %}
+            {% else %}
+                {{ render_flight_type_th(ncols, flight_type.name) }}
+            {% endif %}</tr>
             <tr>
                 <th>Tail</th>
                 <th>Flight</th>
