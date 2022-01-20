@@ -24,18 +24,19 @@ class TestParseDelay(unittest.TestCase):
     def test_parse_code_and_minutes(self):
         self.check('AAA1', [Delay('AAA', 1, False)])
         self.check('AAA(1)', [Delay('AAA', 1, False)])
+        # parse handles many kinds of user input
         expected = [Delay('BBB', 123, False)]
         self.check('BBB123', expected)
         self.check('BBB(123)', expected)
         self.check('BBB(123', expected)
         self.check('BBB123)', expected)
-        # two
+        # two delay codes and minutes
         expected = [Delay('AAA', 123, False), Delay('BBB', 456, False)]
         self.check('AAA123BBB456', expected)
         self.check('AAA(123)BBB(456)', expected)
         self.check('AAA(123) BBB(456)', expected)
         self.check('AAA(123)    BBB(456)', expected)
-        # three
+        # three delay codes and minutes
         expected = [Delay('AAA', 123, False), Delay('BBB', 456, False),
                     Delay('CCC', 789, False)]
         self.check('AAA123BBB456CCC789', expected)
@@ -44,7 +45,7 @@ class TestParseDelay(unittest.TestCase):
         self.check('    AAA(123)    BBB(456)   CCC(789)', expected)
         self.check('AAA(123)    BBB  (456)   CCC     (789)', expected)
         self.check('AAA(123) BBB ( 456  ) CCC(  789    )', expected)
-        #
+        # mixed with and without minutes
         self.check('AAA BBB123 CCC',
                 [Delay('AAA', None, False), Delay('BBB', 123, False),
                  Delay('CCC', None, False)])

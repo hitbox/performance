@@ -15,7 +15,6 @@ def root_context():
     from .extensions import login_manager
     from .forms import LoginForm
     from .forms import UserForm
-    from .utils import ppattr
 
     context = locals()
     # add all the database models

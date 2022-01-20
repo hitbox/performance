@@ -1,6 +1,24 @@
 {% extends 'pluggable/form.html' %}
 
+
+{% from "macros.html" import render_diff_minutes_text %}
+
+
 {% macro render_input_group(field) %}{{ field.label }}{{ field }}{% endmacro %}
+
+
+{% macro render_diff_minutes_field(id) %}
+<label for="{{ id }}">{{ render_diff_minutes_text() }}</label>
+<input readonly id="{{ id }}" class="flight" tabindex="-1" value=""></input>
+{% endmacro %}
+
+
+{% block head %}
+{{ super() }}
+{% assets filters='jsmin', output='gen/flight-edit.js', 'js/flight-edit.js' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+<script>const FLIGHT_ID = {{ request.view_args.id|safe }};</script>
+{% endblock head %}
+
 
 {% block inside_form %}
     {{ form.hidden_tag() }}
@@ -19,6 +37,7 @@
         {{ render_input_group(form.origin_departure_estimated_time) }}
         {{ render_input_group(form.origin_departure_actual_date) }}
         {{ render_input_group(form.origin_departure_actual_time) }}
+        {{ render_diff_minutes_field("origin-diff-minutes") }}
         <div>{{ render_input_group(form.origin_delays) }}</div>
     </fieldset>
     <fieldset>
@@ -28,6 +47,7 @@
         {{ render_input_group(form.destination_arrival_estimated_time) }}
         {{ render_input_group(form.destination_arrival_actual_date) }}
         {{ render_input_group(form.destination_arrival_actual_time) }}
+        {{ render_diff_minutes_field("destination-diff-minutes") }}
         <div>{{ render_input_group(form.destination_delays) }}</div>
     </fieldset>
     <fieldset>

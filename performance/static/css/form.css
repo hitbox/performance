@@ -89,8 +89,12 @@ form #leg {
     width: 2rem;
 }
 
-form #flight_number, form #tail_number, form #weight {
+form #flight_number, form #tail_number {
     width: 4rem;
+}
+
+form #weight {
+    width: 8rem;
 }
 
 form #origin_station, form #destination_station {
@@ -101,14 +105,24 @@ form #origin_departure_estimated_date,
 form #origin_departure_actual_date,
 form #destination_arrival_estimated_date,
 form #destination_arrival_actual_date {
-    width: 5rem;
+    width: 6rem;
 }
 
 form #origin_departure_estimated_time,
 form #origin_departure_actual_time,
 form #destination_arrival_estimated_time,
-form #destination_arrival_actual_time {
+form #destination_arrival_actual_time,
+/* javascript populated estimated/actual diff minutes */
+form #origin-diff-minutes,
+form #destination-diff-minutes {
     width: 3rem;
+}
+
+/* javascript populated estimated/actual diff minutes */
+/* red if starts with dash and is not zero */
+form #origin-diff-minutes:not([value^="-"]):not([value="0"]),
+form #destination-diff-minutes:not([value^="-"]):not([value="0"]) {
+    color: var(--flight-late-color);
 }
 
 form #origin_delays, form #destination_delays {

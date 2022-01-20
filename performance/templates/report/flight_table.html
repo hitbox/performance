@@ -1,3 +1,6 @@
+{% from "macros.html" import render_diff_minutes_text %}
+
+
 {% set ncols = 15 %}
 {% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
 {% set include_controllable_columns = flight_type.name == 'Scheduled' %}
@@ -25,12 +28,12 @@
                 <th>Orig</th>
                 <th>ETD</th>
                 <th>ATD</th>
-                <th>(+/-)</th>
+                <th>{{ render_diff_minutes_text() }}</th>
                 <th title="{{ controllable_delays_note }}">Delay Codes</th>
                 <th>Dest</th>
                 <th>ETA</th>
                 <th>ATA</th>
-                <th>(+/-)</th>
+                <th>{{ render_diff_minutes_text() }}</th>
                 <th title="{{ controllable_delays_note }}">Delay Codes</th>
                 {% if include_controllable_columns %}
                 <th>&gt;&nbsp;15</th>

@@ -3,6 +3,7 @@
 {%- from "macros.html" import string -%}
 {%- from "macros.html" import time -%}
 {%- from "macros.html" import yes -%}
+{% from "macros.html" import render_diff_minutes_text %}
 
 
 {% macro render_flights_table(report, with_edit=false) %}
@@ -26,12 +27,12 @@
                 <th>Orig</th>
                 <th>ETD</th>
                 <th>ATD</th>
-                <th>(+/-)</th>
+                <th>{{ render_diff_minutes_text() }}</th>
                 <th>Delay Codes</th>
                 <th>Dest</th>
                 <th>ETA</th>
                 <th>ATA</th>
-                <th>(+/-)</th>
+                <th>{{ render_diff_minutes_text() }}</th>
                 <th>Delay Codes</th>
                 <th>&gt;&nbsp;15</th>
                 <th>&gt;&nbsp;30</th>

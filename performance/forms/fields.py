@@ -2,6 +2,8 @@ from wtforms import Field
 from wtforms.widgets import TextInput
 from wtforms_components import TimeField
 
+from .. import parse
+
 class StringTimeField(TimeField):
     """
     String input time field that automatically inserts the colon
@@ -21,6 +23,9 @@ class StringTimeField(TimeField):
 
 
 class PercentField(Field):
+    """
+    Allow user to enter percent values in a whole number.
+    """
     widget = TextInput()
 
     def _value(self):
@@ -36,3 +41,20 @@ class PercentField(Field):
             self.data = float()
 
 
+class DelayCodesField(Field):
+    """
+    Delay codes field.
+    """
+    widget = TextInput()
+
+    def _value(self):
+        if self.data:
+            return parse.formatdelays(self.data)
+        else:
+            return ''
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = parse.delaystring(valuelist[0])
+        else:
+            self.data = []

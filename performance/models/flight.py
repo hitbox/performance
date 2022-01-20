@@ -5,6 +5,7 @@ from flask import current_app
 
 from .. import parse
 from ..extensions import db
+from ..types import DelayCodesType
 
 from .mixin import MetaMixin
 from .flight_type import FlightTypeRelationshipMixin
@@ -129,6 +130,10 @@ class FlightBaseMixin:
             return value.upper()
 
     def first_truthy(self):
+        """
+        Hacky function to return first truthy attribute name for use in making
+        the edit link. Maybe this should be a template macro?
+        """
         for attr in ['tail_number', 'flight_number']:
             if getattr(self, attr):
                 return attr
@@ -144,20 +149,8 @@ class ReportFlightBaseMixin(FlightBaseMixin):
     destination_arrival_actual_date = db.Column(db.Date)
     destination_arrival_actual_time = db.Column(db.Time)
 
-    origin_delays = db.Column(db.String)
-    destination_delays = db.Column(db.String)
-
-    @db.validates('origin_delays', 'destination_delays')
-    def format_delays(self, key, value):
-        if isinstance(value, str):
-            delays = parse.delaystring(value)
-            return parse.formatdelays(delays)
-
-    def origin_delays_objects(self):
-        return parse.delaystring(self.origin_delays)
-
-    def destination_delays_objects(self):
-        return parse.delaystring(self.destination_delays)
+    origin_delays = db.Column(DelayCodesType)
+    destination_delays = db.Column(DelayCodesType)
 
     def controllable_destination_delays(self, over_minutes):
         """
@@ -166,7 +159,7 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         XXX: comment is wrong.
         """
         return [delay
-                for delay in self.destination_delays_objects()
+                for delay in self.destination_delays
                 if delay.is_controllable(over_minutes)]
 
     @property
@@ -178,7 +171,7 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         key = 'PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS'
         include_cancelled_delays = current_app.config[key]
         flight_types = configured_performance_lanes_flighttypes()
-        delays = self.destination_delays_objects()
+        delays = self.destination_delays
         return (
             # the only delay is in the include list and is cancelled
             all(delay.code in include_cancelled_delays for delay in delays if delay.cancelled)
@@ -186,32 +179,22 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         )
 
     def origin_diff_minutes(self):
-        est_date = self.origin_departure_estimated_date or self.report.date
-        est_time = self.origin_departure_estimated_time
-        act_date = self.origin_departure_actual_date or self.report.date
-        act_time = self.origin_departure_actual_time
-        if all([est_date, est_time, act_date, act_time]):
-            est_dt = dt.datetime.combine(est_date, est_time)
-            act_dt = dt.datetime.combine(act_date, act_time)
-            a, b = sorted([est_dt, act_dt])
-            minutes = (b - a).seconds // 60
-            if est_dt >= act_dt:
-                minutes *= -1
-            return minutes
+        minutes = diff_minutes(
+            self.origin_departure_estimated_date or self.report.date,
+            self.origin_departure_estimated_time,
+            self.origin_departure_actual_date or self.report.date,
+            self.origin_departure_actual_time,
+        )
+        return minutes
 
     def destination_diff_minutes(self):
-        est_date = self.destination_arrival_estimated_date or self.report.date
-        est_time = self.destination_arrival_estimated_time
-        act_date = self.destination_arrival_actual_date or self.report.date
-        act_time = self.destination_arrival_actual_time
-        if all([est_date, est_time, act_date, act_time]):
-            est_dt = dt.datetime.combine(est_date, est_time)
-            act_dt = dt.datetime.combine(act_date, act_time)
-            a, b = sorted([est_dt, act_dt])
-            minutes = (b - a).seconds // 60
-            if est_dt >= act_dt:
-                minutes *= -1
-            return minutes
+        minutes = diff_minutes(
+            self.destination_arrival_estimated_date or self.report.date,
+            self.destination_arrival_estimated_time,
+            self.destination_arrival_actual_date or self.report.date,
+            self.destination_arrival_actual_time,
+        )
+        return minutes
 
 
 class Flight(
@@ -226,3 +209,18 @@ class Flight(
 
     id = db.Column(db.Integer, primary_key=True)
     report_id = db.Column(db.Integer, db.ForeignKey('report.id'))
+
+
+def diff_minutes(est_date, est_time, act_date, act_time):
+    """
+    If all truthy, calculate the difference in minute between estimated and
+    actual dates and times.
+    """
+    if all([est_date, est_time, act_date, act_time]):
+        est_dt = dt.datetime.combine(est_date, est_time)
+        act_dt = dt.datetime.combine(act_date, act_time)
+        a, b = sorted([est_dt, act_dt])
+        minutes = (b - a).seconds // 60
+        if est_dt >= act_dt:
+            minutes *= -1
+        return minutes

@@ -8,10 +8,12 @@ from wtforms_alchemy import QuerySelectField
 
 from performance.forms import defaults
 from performance.forms.base import ModelForm
+from performance.forms.fields import DelayCodesField
 from performance.forms.fields import StringTimeField
 from performance.forms.mixins import BackLinkMixin
 from performance.forms.mixins import SubmitUpdateDeleteMixin
 from performance.models import FlightType
+from performance.types import DelayCodesType
 
 from ..models import Flight
 
@@ -25,7 +27,10 @@ class FlightForm(
 ):
     class Meta:
         model = Flight
-        type_map = ClassMap({sa.Time: StringTimeField})
+        type_map = ClassMap({
+            sa.Time: StringTimeField,
+            DelayCodesType: DelayCodesField,
+        })
         only = [
             'leg',
             'flight_number',
@@ -101,7 +106,7 @@ class FlightForm(
             'origin_departure_estimated_date': {
                 'label': 'ETD',
                 'render_kw': {
-                    'class': 'flight date-entry',
+                    'class': 'flight origin date-entry',
                     'placeholder': 'date',
                     'tabindex': '-1',
                 },
@@ -109,7 +114,7 @@ class FlightForm(
             'origin_departure_estimated_time': {
                 'label': '',
                 'render_kw': {
-                    'class': 'flight time-entry',
+                    'class': 'flight origin time-entry',
                     'placeholder': 'ETD',
                 },
             },
@@ -117,14 +122,14 @@ class FlightForm(
                 'label': 'ATD',
                 'render_kw': {
                     'placeholder': 'date',
-                    'class': 'flight date-entry',
+                    'class': 'flight origin date-entry',
                     'tabindex': '-1',
                 },
             },
             'origin_departure_actual_time': {
                 'label': '',
                 'render_kw': {
-                    'class': 'flight time-entry',
+                    'class': 'flight origin time-entry',
                     'placeholder': 'ATD',
                 },
             },
@@ -146,14 +151,14 @@ class FlightForm(
                 'label': 'ETA',
                 'render_kw': {
                     'placeholder': 'date',
-                    'class': 'flight date-entry',
+                    'class': 'flight destination date-entry',
                     'tabindex': '-1',
                 },
             },
             'destination_arrival_estimated_time': {
                 'label': '',
                 'render_kw': {
-                    'class': 'flight time-entry',
+                    'class': 'flight destination time-entry',
                     'placeholder': 'ETA',
                 },
             },
@@ -161,14 +166,14 @@ class FlightForm(
                 'label': 'ATA',
                 'render_kw': {
                     'placeholder': 'date',
-                    'class': 'flight date-entry',
+                    'class': 'flight destination date-entry',
                     'tabindex': '-1',
                 },
             },
             'destination_arrival_actual_time': {
                 'label': '',
                 'render_kw': {
-                    'class': 'flight time-entry',
+                    'class': 'flight destination time-entry',
                     'placeholder': 'ATA',
                 },
             },

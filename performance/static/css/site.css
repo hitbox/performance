@@ -18,6 +18,9 @@
 
     --head-padding: 4px 6px;
     --cell-padding: 3px 6px;
+
+
+    --flight-late-color: red;
 }
 
 [data-theme="dark"] {
@@ -119,7 +122,7 @@ nav > * {
 }
 
 .data.late {
-    color: red;
+    color: var(--flight-late-color);
 }
 
 ul.flat {
@@ -163,4 +166,12 @@ ul.buttons > li {
 #system-detail-text {
     border: 1px solid black;
     padding: .2rem;
+}
+
+.delay-code {
+    margin-right: .7rem;
+}
+
+.delay-code:last-child {
+    margin-right: 0rem;
 }

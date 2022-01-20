@@ -113,14 +113,18 @@
 
 {%- macro integer(v) %}{% if v is number %}{{ '{:,d}'.format(v) }}{% elif kwargs.or_zero %}0{% endif %}{% endmacro -%}
 
+
 {%- macro string(v) %}{% if v %}{{ v }}{% endif %}{% endmacro -%}
 
 
 {%- macro blank_if_none(s) %}{% if s is not none %}{{ s }}{% endif %}{% endmacro -%}
 
+
 {%- macro blank_if_falsy(s) %}{% if s %}{{ s }}{% endif %}{% endmacro -%}
 
+
 {%- macro diff_class(diff) %}{% if diff is not none %}{% if diff < 0 %} early{% elif diff > 0 %} late{% else %} ontime{% endif %}{% endif %}{% endmacro -%}
+
 
 {%- macro percent(v) %}
 {% if v is number %}
@@ -128,14 +132,29 @@
 {% elif kwargs.or_zero %}0
 {%- endif %}{% endmacro -%}
 
-{%- macro render_delaycodes(delays) %}{% for delay in delays %}{% if not loop.first %} {% endif %}{% if delay.code.controllable %}<span class="controllable">{% endif %}{{delay.code.name}}{% if delay.minutes %}({{delay.minutes}}){% endif %}{% if delay.code.controllable %}</span>{% endif %}{% endfor %}{% endmacro -%}
 
 {%- macro time(t) %}{% if t %}{{ t.strftime('%H:%M') }}{% endif %}{% endmacro -%}
 
+
 {%- macro yesno(bool) %}{% if bool %}Yes{% else %}No{% endif %}{% endmacro -%}
 
+
 {%- macro yes(bool) %}{% if bool %}Yes{% endif %}{% endmacro -%}
+
 
 {% macro render_javascript_injection(d) %}<script>{% for key, value in d.items() %}
     let {{ key }} = {{ value|tojson }};{% endfor %}
 </script>{% endmacro %}
+
+
+{# render list of delay code objects #}
+{% macro render_delays(delays) %}{% for delay in delays %}{{ render_delay(delay) }}{% endfor %}{% endmacro %}
+
+
+{# render individual delay code object #}
+{# duplicate: parse.py:formatdelays #}
+{% macro render_delay(delay) %}<span class="delay-code">{% if delay.cancelled %}XLD{% endif %}{{ delay.code }}{% if delay.minutes is integer %}({{ delay.minutes }}){% endif %}</span>{% endmacro %}
+
+
+{# text inside labels and headers indicating the estimated/actual difference minutes #}
+{% macro render_diff_minutes_text() %}(+/-){% endmacro %}
