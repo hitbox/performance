@@ -8,11 +8,6 @@ from .models import FlightType
 from .models import Report
 from .models import ScheduledFlight
 from .models import ScheduledReport
-from .utils import datefromiso
-from .utils import float_or_none
-from .utils import int_or_none
-from .utils import str_or_none
-from .utils import timefromiso
 
 class Migrator:
     """
@@ -242,3 +237,28 @@ class Migrator:
             legacy['schedules_flights'].append(rowdict)
 
         return legacy
+
+
+def datefromiso(s):
+    """
+    Assumes the full ISO date/time format
+    """
+    return None if not s else dt.date.fromisoformat(s[:10])
+
+def int_or_none(value):
+    return int(value) if value else None
+
+def float_or_none(value):
+    return float(value) if value else None
+
+def str_or_none(value):
+    return str(value) if value else None
+
+def timefromiso(s):
+    if not s or len(s) < 19:
+        return None
+    if re.search('\+\d\d:\d\d$', s):
+        # when you str() the datetime fields, using DAO, they come with a
+        # +00:00 at the end; slice that off
+        s = s[:-6]
+    return dt.time.fromisoformat(s[-8:])

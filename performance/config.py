@@ -1,5 +1,4 @@
 from .exceptions import AppError
-from .utils import exists_and_truthy
 
 _required_registry = {}
 _development_registry = {}
@@ -7,10 +6,6 @@ _development_registry = {}
 class ConfigError(Exception):
     pass
 
-
-def isint(value):
-    "An integer"
-    return isinstance(value, int)
 
 class String:
     "Is string"
@@ -43,6 +38,16 @@ class Dictionary:
     def __call__(self, value):
         return isinstance(value, dict)
 
+
+def exists_and_truthy(config, key):
+    """
+    key exists in config and evals to true
+    """
+    return key in config and config[key]
+
+def isint(value):
+    "An integer"
+    return isinstance(value, int)
 
 def require(key, validator, is_development=False):
     if is_development:

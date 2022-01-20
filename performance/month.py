@@ -1,9 +1,6 @@
 import calendar
 import datetime
 
-from .utils import nextmonth
-from .utils import prevmonth
-
 class Weekday:
     """
     Convenience class that provides useful attributes for a weekday.
@@ -76,3 +73,16 @@ class Month:
             year, month = nextmonth(self.year, self.month)
             self._nextmonth = self.__class__(year, month)
         return self._nextmonth
+
+
+def prevmonth(year, month):
+    if month == 1:
+        return (year - 1, 12)
+    else:
+        return (year, month - 1)
+
+def nextmonth(year, month):
+    if month == 12:
+        return (year + 1, 1)
+    else:
+        return (year, month + 1)
