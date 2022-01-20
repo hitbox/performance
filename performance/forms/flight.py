@@ -20,6 +20,19 @@ from ..models import Flight
 def report_id_from_view_args():
     return request.view_args['report_id']
 
+def date_field_render_kw(*classes, **extra):
+    classes = set(classes)
+    for cls in ['flight', 'date-entry']:
+        if cls not in classes:
+            classes.add(cls)
+    render_kw = {
+        'class': ' '.join(classes),
+        'placeholder': 'date',
+        'tabindex': '-1',
+        'title': 'Falls back to report date if blank.',
+    }
+    return render_kw
+
 class FlightForm(
     BackLinkMixin,
     ModelForm,
@@ -105,11 +118,7 @@ class FlightForm(
             },
             'origin_departure_estimated_date': {
                 'label': 'ETD',
-                'render_kw': {
-                    'class': 'flight origin date-entry',
-                    'placeholder': 'date',
-                    'tabindex': '-1',
-                },
+                'render_kw': date_field_render_kw('origin'),
             },
             'origin_departure_estimated_time': {
                 'label': '',
@@ -120,11 +129,7 @@ class FlightForm(
             },
             'origin_departure_actual_date': {
                 'label': 'ATD',
-                'render_kw': {
-                    'placeholder': 'date',
-                    'class': 'flight origin date-entry',
-                    'tabindex': '-1',
-                },
+                'render_kw': date_field_render_kw('origin'),
             },
             'origin_departure_actual_time': {
                 'label': '',
@@ -147,20 +152,9 @@ class FlightForm(
                     'class': 'flight narrowest',
                 },
             },
-            'destination_arrival_estimated_date': {
-                'label': 'ETA',
-                'render_kw': {
-                    'placeholder': 'date',
-                    'class': 'flight destination date-entry',
-                    'tabindex': '-1',
-                },
-            },
             'destination_arrival_estimated_time': {
                 'label': '',
-                'render_kw': {
-                    'class': 'flight destination time-entry',
-                    'placeholder': 'ETA',
-                },
+                'render_kw': date_field_render_kw('destination'),
             },
             'destination_arrival_actual_date': {
                 'label': 'ATA',
