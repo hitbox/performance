@@ -9,7 +9,7 @@
 
 {% macro render_diff_minutes_field(id) %}
 <label for="{{ id }}">{{ render_diff_minutes_text() }}</label>
-<input readonly id="{{ id }}" class="flight" tabindex="-1" value=""></input>
+<input readonly id="{{ id }}" class="flight" tabindex="-1" title="Difference between estimated and actual, in minutes." value=""></input>
 {% endmacro %}
 
 

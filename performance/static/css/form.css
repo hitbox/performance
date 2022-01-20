@@ -108,6 +108,13 @@ form #destination_arrival_actual_date {
     width: 6rem;
 }
 
+label[for="destination_arrival_estimated_time"],
+label[for="destination_arrival_actual_time"],
+label[for="origin_departure_estimated_time"],
+label[for="origin_departure_actual_time"] {
+    display: none;
+}
+
 form #origin_departure_estimated_time,
 form #origin_departure_actual_time,
 form #destination_arrival_estimated_time,
