@@ -152,17 +152,20 @@ class FlightForm(
                     'class': 'flight narrowest',
                 },
             },
+            'destination_arrival_estimated_date': {
+                'label': 'ATA',
+                'render_kw': date_field_render_kw('destination'),
+            },
             'destination_arrival_estimated_time': {
                 'label': '',
-                'render_kw': date_field_render_kw('destination'),
+                'render_kw': {
+                    'class': 'flight origin time-entry',
+                    'placeholder': 'ETA',
+                },
             },
             'destination_arrival_actual_date': {
                 'label': 'ATA',
-                'render_kw': {
-                    'placeholder': 'date',
-                    'class': 'flight destination date-entry',
-                    'tabindex': '-1',
-                },
+                'render_kw': date_field_render_kw('destination'),
             },
             'destination_arrival_actual_time': {
                 'label': '',
