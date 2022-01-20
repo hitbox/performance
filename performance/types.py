@@ -12,12 +12,16 @@ class DelayCodesType(sa.types.TypeDecorator):
         """
         Format delay code objects into a string.
         """
-        delays_string = parse.formatdelays(value)
-        return delays_string
+        if value:
+            delays_string = parse.formatdelays(value)
+            return delays_string
+        return ''
 
     def process_result_value(self, value, dialect):
         """
         Parse delay codes string into objects.
         """
-        delay_objects = parse.delaystring(value)
-        return delay_objects
+        if value:
+            delay_objects = parse.delaystring(value)
+            return delay_objects
+        return []
