@@ -236,5 +236,7 @@ def prompt_new(report_date):
     """
     Prompt to create new report.
     """
-    scheduled_reports = ScheduledReport.query.all()
-    return render_template('report/prompt_new.html', scheduled_reports=scheduled_reports)
+    # NOTE: letting MultipleResultsFound raise so that we will be reminded of
+    # the fact that this is hiding the ability to have multiple schedules.
+    scheduled_report = ScheduledReport.query.one()
+    return render_template('report/prompt_new.html', scheduled_report=scheduled_report)

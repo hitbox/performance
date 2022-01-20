@@ -1,16 +1,26 @@
 {% extends "base.html" -%}
 
+
 {%- block main %}<article>
     <h1>New Report</h1>
     <h3>{{ request.view_args.report_date.strftime(config.DATEFMT) }}</h3>
+    {# this is hiding the fact that there can be many scheduled reports to build from #}
+    <h4>
+        <a href="{{ url_for('report.create_report_from_schedule', report_date=request.view_args.report_date, schedule_id=scheduled_report.id) }}">Create new report</a>
+    </h4>
+    <h3>Blank</h3>
+    <h4>
+        <a href="{{ url_for('report.create_report_blank', report_date=request.view_args.report_date) }}">Create blank report</a>
+    </h4>
+</article>{% endblock main -%}
+
+
+{% block trash %}
+    {# this is the old code to show all the scheduled reports #}
     <h3>From Schedule</h3>
     {% for scheduled_report in scheduled_reports %}
     <h4>
         <a href="{{ url_for('report.create_report_from_schedule', report_date=request.view_args.report_date, schedule_id=scheduled_report.id) }}">{{ scheduled_report.name }}</a>
     </h4>
     {% endfor %}
-    <h3>Blank</h3>
-    <h4>
-        <a href="{{ url_for('report.create_report_blank', report_date=request.view_args.report_date) }}">Create blank report</a>
-    </h4>
-</article>{% endblock main -%}
+{% endblock trash %}
