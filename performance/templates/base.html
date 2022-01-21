@@ -17,10 +17,8 @@
     {% endblock head %}</head>
     <body>{% block body %}
         {% block topnav %}<nav class="noprint">
-            {% for endpoint, text in config.TOPNAVDEV %}
-                {{ render_nav_item(endpoint, text) }}
-            {% endfor %}
-            {% for endpoint, text in config.TOPNAV %}
+            {% set topnavs = [ ('scheduled_report.index', 'Schedule'), ('select_date.goto_today', 'Reports'), ('user.profile', 'Profile'), ] %}
+            {% for endpoint, text in topnavs %}
                 {{ render_nav_item(endpoint, text) }}
             {% endfor %}
             <div>
