@@ -162,3 +162,9 @@ label.flight[for=destination_arrival_actual_time] {
 .field-error {
     color: red;
 }
+
+/* a row inside a fieldset for the flight edit */
+.flight-form-row {
+    display: flex;
+    justify-content: space-between;
+}

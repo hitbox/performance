@@ -27,30 +27,60 @@
     {{ form.hidden_tag() }}
     <fieldset>
         <legend>Flight</legend>
-        {{ render_input_group(form.flight_type) }}
-        {{ render_input_group(form.leg) }}
-        {{ render_input_group(form.flight_number) }}
-        {{ render_input_group(form.tail_number) }}
-        {{ render_input_group(form.weight) }}
+        <div class="flight-form-row">
+            <div>
+                {{ render_input_group(form.flight_type) }}
+            </div>
+            <div>
+                {{ render_input_group(form.leg) }}
+            </div>
+            <div>
+                {{ render_input_group(form.flight_number) }}
+            </div>
+            <div>
+                {{ render_input_group(form.tail_number) }}
+            </div>
+            <div>
+                {{ render_input_group(form.weight) }}
+            </div>
+        </div>
     </fieldset>
     <fieldset>
         <legend>Origin</legend>
-        {{ render_input_group(form.origin_station) }}
-        {{ render_input_group(form.origin_departure_estimated_date) }}
-        {{ render_input_group(form.origin_departure_estimated_time) }}
-        {{ render_input_group(form.origin_departure_actual_date) }}
-        {{ render_input_group(form.origin_departure_actual_time) }}
-        {{ render_diff_minutes_field("origin-diff-minutes") }}
+        <div class="flight-form-row">
+            <div>{{ render_input_group(form.origin_station) }}</div>
+            <div>
+                {{ render_input_group(form.origin_departure_estimated_date) }}
+                {{ render_input_group(form.origin_departure_estimated_time) }}
+            </div>
+            <div>
+                {{ render_input_group(form.origin_departure_actual_date) }}
+                {{ render_input_group(form.origin_departure_actual_time) }}
+            </div>
+            <div>
+                {{ render_diff_minutes_field("origin-diff-minutes") }}
+            </div>
+        </div>
         <div>{{ render_input_group(form.origin_delays) }}</div>
     </fieldset>
     <fieldset>
         <legend>Destination</legend>
-        {{ render_input_group(form.destination_station) }}
-        {{ render_input_group(form.destination_arrival_estimated_date) }}
-        {{ render_input_group(form.destination_arrival_estimated_time) }}
-        {{ render_input_group(form.destination_arrival_actual_date) }}
-        {{ render_input_group(form.destination_arrival_actual_time) }}
-        {{ render_diff_minutes_field("destination-diff-minutes") }}
+        <div class="flight-form-row">
+            <div>
+                {{ render_input_group(form.destination_station) }}
+            </div>
+            <div>
+                {{ render_input_group(form.destination_arrival_estimated_date) }}
+                {{ render_input_group(form.destination_arrival_estimated_time) }}
+            </div>
+            <div>
+                {{ render_input_group(form.destination_arrival_actual_date) }}
+                {{ render_input_group(form.destination_arrival_actual_time) }}
+            </div>
+            <div>
+                {{ render_diff_minutes_field("destination-diff-minutes") }}
+            </div>
+        </div>
         <div>{{ render_input_group(form.destination_delays) }}</div>
     </fieldset>
     <fieldset>
