@@ -56,14 +56,4 @@ def init_app_development(app):
     from .todo import todo_bp
 
     app.register_blueprint(todo_bp, url_prefix='/todo')
-
-    @app.before_first_request
-    def alert_debugging_urls():
-        """
-        Alert user has debugginig page available.
-        """
-        debug_url = url_for('debug.index')
-        msg = '<a class="flash" href="%s">Debugging available here</a>' % debug_url
-        flash(msg, 'info')
-
     app.register_blueprint(debug_bp)
