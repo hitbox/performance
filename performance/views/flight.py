@@ -72,12 +72,12 @@ def _diff_minutes(data):
     if not est_date:
         est_date = flight.report.date
     else:
-        est_date = datetime.strptime(est_date, '%Y-%m-%d').date()
+        est_date = datetime.fromisoformat(est_date).date()
 
     if not act_date:
         act_date = flight.report.date
     else:
-        act_date = datetime.strptime(act_date, '%Y-%m-%d').date()
+        act_date = datetime.fromisoformat(act_date).date()
 
     est_time = datetime.strptime(est_time, '%H%M').time()
     act_time = datetime.strptime(act_time, '%H%M').time()
