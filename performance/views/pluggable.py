@@ -117,6 +117,7 @@ class UpdateDeleteView(BaseEditView):
     def dispatch_request(self, **ident):
         instance = self.model.query.get_or_404(ident)
         form = self.form_class(obj=instance)
+        form.submit.label.text = 'Update'
         if form.validate_on_submit():
             if form.delete.data:
                 db.session.delete(instance)
@@ -125,8 +126,6 @@ class UpdateDeleteView(BaseEditView):
             db.session.commit()
             if hasattr(form, 'backurl') and form.backurl.data:
                 return redirect(form.backurl.data)
-        elif request.method == 'GET':
-            form.submit.label.text = 'Update'
         context = dict(
             form = form,
             instance = instance,
