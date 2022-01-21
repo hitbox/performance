@@ -1,33 +1,60 @@
 import sqlalchemy as sa
 
+from flask import current_app
 from flask import request
 from wtforms import HiddenField
 from wtforms import SelectField
 from wtforms_alchemy import ClassMap
 from wtforms_alchemy import QuerySelectField
 
-from performance.forms import defaults
-from performance.forms.base import ModelForm
-from performance.forms.fields import DelayCodesField
-from performance.forms.fields import StringTimeField
-from performance.forms.mixins import BackLinkMixin
-from performance.forms.mixins import SubmitUpdateDeleteMixin
-from performance.models import FlightType
-from performance.types import DelayCodesType
-
 from ..models import Flight
+from ..models import FlightType
+from ..models import Report
+from ..types import DelayCodesType
+
+from . import defaults
+from .base import ModelForm
+from .fields import DelayCodesField
+from .fields import StringTimeField
+from .mixins import BackLinkMixin
+from .mixins import SubmitUpdateDeleteMixin
 
 def report_id_from_view_args():
     return request.view_args['report_id']
 
+def get_placeholder_date_string():
+    """
+    Show the flight's report date as the placeholder of the optional
+    estimated/actual origin/destination date fields. This is the date used when
+    these fields are left empty.
+    """
+    if request.endpoint == 'flight.create':
+        report_id = request.view_args['report_id']
+        report = Report.query.get(report_id)
+        date = report.date
+    elif request.endpoint == 'flight.edit':
+        flight_id = request.view_args['id']
+        flight = Flight.query.get(flight_id)
+        date = flight.report.date
+    else:
+        return 'date'
+    fmt = current_app.config['DATEFMT']
+    string = date.strftime(fmt)
+    return string
+
 def date_field_render_kw(*classes, **extra):
+    """
+    Return the render_kw dict for the date fields.
+    """
     classes = set(classes)
     for cls in ['flight', 'date-entry']:
         if cls not in classes:
             classes.add(cls)
+
+    placeholder_date_string = get_placeholder_date_string()
     render_kw = {
         'class': ' '.join(classes),
-        'placeholder': 'date',
+        'placeholder': placeholder_date_string,
         'tabindex': '-1',
         'title': 'Falls back to report date if blank.',
     }

@@ -22,22 +22,22 @@
 
 
 {% block comments %}
-<h3 id="system-detail">System Detail</h3>
-{% set system_detail_form_name = 'system-detail-form' %}
-
-{% if not with_edit %}
-<pre id="system-detail-text">{{ form.system_detail.data }}</pre>
-{% else %}
-<form id="{{ system_detail_form_name }}" action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
-    {{ form.hidden_tag() }}
-    <div>
-    {{ form.system_detail }}
-    </div>
-    <div>
-    {{ form.submit(class_='noprint') }}
-    </div>
-</form>
-{% endif %}
+    <h3 id="system-detail">System Detail</h3>
+    {% set system_detail_form_name = 'system-detail-form' %}
+    {% if not with_edit %}
+    <pre id="system-detail-text">{{ form.system_detail.data }}</pre>
+    {% else %}
+    {# system detail editor #}
+    <form id="{{ system_detail_form_name }}" action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+        {{ form.hidden_tag() }}
+        <div>
+        {{ form.system_detail }}
+        </div>
+        <div>
+        {{ form.submit(class_='noprint') }}
+        </div>
+    </form>
+    {% endif %}
 {% endblock comments %}
 
 

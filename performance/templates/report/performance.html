@@ -19,31 +19,31 @@
     </thead>
     <tbody>
         <tr>
-            <th>Lanes</th>
+            <th class="row">Lanes</th>
             <td class="data number">{{ integer(daily.lanes|length) }}</td>
             <td class="data number">{{ integer(month_to_date.lanes|length) }}</td>
             <td class="data number">{{ integer(quarter_to_date.lanes|length) }}</td>
         </tr>
         <tr>{% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
-            <th title="{{ controllable_delays_note }}">Chargeable Delays</th>
+            <th class="row" title="{{ controllable_delays_note }}">Chargeable Delays</th>
             <td class="data number">{{ integer(daily.flights_with_controllable_destination_delays_over15|length) }}</td>
             <td class="data number">{{ integer(month_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
             <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
         </tr>
         <tr>
-            <th title="{{ controllable_delays_note }}">Delays &gt;30 Count</th>
+            <th class="row" title="{{ controllable_delays_note }}">Delays &gt;30 Count</th>
             <td class="data number">{{ integer(daily.flights_with_controllable_destination_delays_over30|length) }}</td>
             <td class="data number">{{ integer(month_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
             <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
         </tr>
         <tr>
-            <th title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
+            <th class="row" title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
             {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over15|length, daily.lanes|length) }}
             {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over15|length, month_to_date.lanes|length) }}
             {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over15|length, quarter_to_date.lanes|length) }}
         </tr>
         <tr>
-            <th title="On-time Performance greater than 30 minutes">On-time Performance &gt; 30</th>
+            <th class="row" title="On-time Performance greater than 30 minutes">On-time Performance &gt; 30</th>
             {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over30|length, daily.lanes|length) }}
             {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over30|length, month_to_date.lanes|length) }}
             {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over30|length, quarter_to_date.lanes|length) }}

@@ -16,10 +16,22 @@
 {% endmacro %}
 
 
+{% set flight = instance %}
+
+
 {% block head %}
 {{ super() }}
 {% assets filters='jsmin', output='gen/flight-edit.js', 'js/flight-edit.js' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
-<script>const FLIGHT_ID = {{ request.view_args.id|safe }};</script>
+{# javascript injection #}
+<script>
+{# date to open datepickers to #}
+const fallbackDate = "{{ fallbackDate }}";
+const originDelayCodesId = "{{ form.origin_delays.id }}";
+const destinationDelayCodesId = "{{ form.destination_delays.id }}";
+{% set is_edit = request.endpoint.endswith('.edit') %}
+const isEdit = {{ is_edit|tojson }};
+{# communication to the backend for calculations and autofill #}
+</script>
 {% endblock head %}
 
 

@@ -1,11 +1,19 @@
 {% extends "base.html" %}
 
+
 {% block main %}
-    {% block main_head %}<h3>
+    {% block main_head %}
+    <h4>
         <div class="noprint">
-            <a href="{{ url_for('report.view_report_for_date', report_date = report.date - datetime.timedelta(days=1)) }}">Previous</a>
-            <a href="{{ url_for('report.view_report_for_date', report_date = report.date + datetime.timedelta(days=1)) }}">Next</a>
+            <div id="previous-next-navigation">
+                {% for days in [-1, 1] %}
+                    {% set report_date = report.date+datetime.timedelta(days=days) %}
+                    <a href="{{ url_for('report.view_report_for_date', report_date=report_date) }}">{{ report_date.strftime(config.DATEFMT) }}</a>
+                {% endfor %}
+            </div>
         </div>
+    </h4>
+    <h3>
         {{ config.PERFORMANCE_REPORT_TITLE }}: {{ report.date.strftime(config.DATEFMT) }}
     </h3>{% endblock main_head %}
     {% block flights %}{% endblock %}

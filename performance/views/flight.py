@@ -5,13 +5,15 @@ from flask import jsonify
 from flask import request
 from flask import url_for
 
-from performance.authorization import edit_check
-from performance.views.pluggable import CreateView
-from performance.views.pluggable import UpdateDeleteView
-
+from .. import parse
+from ..authorization import edit_check
+from ..delay import Delay
 from ..models import Flight
+from ..models import Report
 from ..models.flight import diff_minutes as diff_minutes_func
 from ..utils import massage_time
+from ..views.pluggable import CreateView
+from ..views.pluggable import UpdateDeleteView
 
 flight_bp = Blueprint('flight', __name__)
 
@@ -20,6 +22,19 @@ def flight_form_class():
     from ..forms import FlightForm
     return FlightForm
 
+def create_context_processor():
+    report_id = request.view_args['report_id']
+    report = Report.query.get(report_id)
+    return dict(
+        fallbackDate = report.date
+    )
+
+def update_delete_context_processor():
+    flight_id = request.view_args['id']
+    flight = Flight.query.get(flight_id)
+    return dict(
+        fallbackDate = flight.report.date,
+    )
 
 flight_bp.add_url_rule(
     '/create/<int:report_id>',
@@ -28,6 +43,7 @@ flight_bp.add_url_rule(
             'create',
             flight_form_class,
             template = 'flight/form.html',
+            context_processor = create_context_processor,
         )))
 
 flight_bp.add_url_rule(
@@ -37,6 +53,7 @@ flight_bp.add_url_rule(
             'edit',
             flight_form_class,
             template = 'flight/form.html',
+            context_processor = update_delete_context_processor,
         )))
 
 @flight_bp.context_processor
@@ -44,9 +61,10 @@ def context_processor():
     """
     Javascript injection for calculating estimated/actual diff minutes.
     """
+    # NOTE: more injection is done inside the templates
     context = dict(
         javascript_injection = dict(
-            DIFF_MINUTES_URL = url_for('.diff_minutes'),
+            FLIGHT_CALCS = url_for('.flight_calculations'),
         ),
     )
     return context
@@ -55,8 +73,7 @@ def _diff_minutes(data):
     """
     Calculate estimated/actual difference in minutes.
     """
-    flight_id = int(data['flightId'])
-    flight = Flight.query.get_or_404(flight_id)
+    fallback_date = datetime.fromisoformat(data['fallbackDate'])
 
     est_date = data['estimatedDate']
     est_time = massage_time(data['estimatedTime'])
@@ -64,12 +81,12 @@ def _diff_minutes(data):
     act_time = massage_time(data['actualTime'])
 
     if not est_date:
-        est_date = flight.report.date
+        est_date = fallback_date
     else:
         est_date = datetime.fromisoformat(est_date).date()
 
     if not act_date:
-        act_date = flight.report.date
+        act_date = fallback_date
     else:
         act_date = datetime.fromisoformat(act_date).date()
 
@@ -79,20 +96,48 @@ def _diff_minutes(data):
     minutes = diff_minutes_func(est_date, est_time, act_date, act_time)
     return minutes
 
-@flight_bp.route('/diff/minutes', methods=['POST'])
+def _delays(data):
+    delayCodes = data['delayCodes']
+    delay_objects = parse.delaystring(delayCodes)
+
+    # add placeholder delay code for unaccounted late minutes
+    minutes = data['minutes']
+    if minutes and minutes > 0:
+        accounted_minutes = sum(delay.minutes for delay in delay_objects)
+        missing_minutes = minutes - accounted_minutes
+        if missing_minutes > 0:
+            placeholder_delay = Delay('???', missing_minutes, False)
+            delay_objects += [placeholder_delay]
+
+    delays_string = parse.formatdelays(delay_objects)
+
+    # uppercasing is normally done by Flight model validation
+    delays_string = delays_string.upper()
+    return delays_string
+
+@flight_bp.route('/calcs', methods=['POST'])
 @edit_check
-def diff_minutes():
+def flight_calculations():
     """
     Frontend API point for return the estimated/actual difference in minutes
     for a flight.
     """
     # need flight id to use report for date fallback
     data = request.get_json()
-    result = dict(minutes=None)
+
+    # defaults
+    result = dict(
+        minutes = None,
+        delays_string = data['delayCodes'],
+    )
+
+    # update with minutes--delays uses it
     try:
         result['minutes'] = _diff_minutes(data)
-    except (TypeError, ValueError) as e:
-        result['status'] = 'error'
-    else:
-        result['status'] = 'success'
+    except (TypeError, ValueError):
+        pass
+
+    data['minutes'] = result['minutes']
+    result['delays_string'] = _delays(data)
+
     return jsonify(result)

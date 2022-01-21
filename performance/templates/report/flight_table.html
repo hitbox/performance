@@ -54,7 +54,7 @@
         </tbody>{% endif %}
         <tfoot>
             {% if flights %}<tr>
-                <th>Total</th>
+                <th class="row">Total</th>
                 <td class="data number">{{ flights|selectattr('is_lane')|list|length }}</td>
                 <td colspan="{{ ncols }}"></td>
             </tr>{% endif %}
