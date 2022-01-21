@@ -2,9 +2,12 @@
 
 
 {% from "macros.html" import render_diff_minutes_text %}
+{% from "macros.html" import render_field_errors %}
 
 
-{% macro render_input_group(field) %}{{ field.label }}{{ field }}{% endmacro %}
+{% macro render_input_group(field) %}
+{{ field.label }}{{ field }}{% if field.errors %}{{ render_field_errors(field.errors) }}{% endif %}
+{% endmacro %}
 
 
 {% macro render_diff_minutes_field(id) %}

@@ -152,3 +152,8 @@ label.flight[for=destination_arrival_estimated_time],
 label.flight[for=destination_arrival_actual_time] {
     display: none;
 }
+
+/* error message for form field */
+.field-error {
+    color: red;
+}

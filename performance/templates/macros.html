@@ -5,6 +5,11 @@
 {% set button_types = ['SubmitField', 'DeleteField'] %}
 
 
+{% macro render_field_errors(errors) %}
+{% for error in errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+{% endmacro %}
+
+
 {%- macro render_field(field) -%}
     {%- set left, right = (field.label, field) -%}
     {%- set lkwargs, rkwargs = ( {'title': field.description, 'class_': 'checkbox-label'}, field.render_kw if field.render_kw is not none else {} ) -%}
@@ -17,11 +22,7 @@
     {% if field.type not in ("HiddenField", "QuilljsDeltaField") %}
     {%- if left is not none %}{{ left(**lkwargs) }}{% endif -%}
     {% endif %}
-    {%- if field.errors -%}
-        {%- for error in field.errors -%}
-            <p class="help-block">{{ error }}</p>
-        {%- endfor -%}
-    {%- endif -%}
+    {%- if field.errors -%}{{ render_field_errors(field.errors) }}{%- endif -%}
     {%- if right is not none %}{{ right(**rkwargs) }}{% endif -%}
 {%- endmacro -%}
 
