@@ -7,7 +7,7 @@ table.expand {
 }
 
 table, th, td {
-    border: 1px solid var(--font-color);
+    border: 1px solid var(--table-border-color);
 }
 
 th {
@@ -30,6 +30,14 @@ td {
 td.data {
     font-family: monospace;
     font-size: 1rem;
+}
+
+th {
+    color: var(--table-th-color);
+}
+
+th.row {
+    color: var(--font-color);
 }
 
 th.top {

@@ -19,8 +19,13 @@
     --head-padding: 4px 6px;
     --cell-padding: 3px 6px;
 
-
     --flight-late-color: red;
+
+    --table-border-color: black;
+    --table-th-color: black;
+
+    --input-color: default;
+    --input-background: default;
 }
 
 [data-theme="dark"] {
@@ -37,6 +42,11 @@
     --a-date-today-background-color: DarkOliveGreen;
 
     --data-href-background-color: #111;
+
+    --table-border-color: DarkGray;
+
+    --input-color: White;
+    --input-background: #222;
 }
 
 body {

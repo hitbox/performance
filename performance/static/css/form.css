@@ -7,6 +7,11 @@ fieldset {
     padding: 1rem;
 }
 
+input, textarea, select {
+    color: var(--input-color);
+    background-color: var(--input-background);
+}
+
 input, select {
     margin: var(--input-margin-topbottom) 0;
     padding: 0.5rem;
