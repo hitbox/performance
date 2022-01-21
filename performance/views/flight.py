@@ -58,6 +58,9 @@ def massage_time(string):
     return value
 
 def _diff_minutes(data):
+    """
+    Calculate estimated/actual difference in minutes.
+    """
     flight_id = int(data['flightId'])
     flight = Flight.query.get_or_404(flight_id)
 
@@ -85,6 +88,10 @@ def _diff_minutes(data):
 @flight_bp.route('/diff/minutes', methods=['POST'])
 @edit_check
 def diff_minutes():
+    """
+    Frontend API point for return the estimated/actual difference in minutes
+    for a flight.
+    """
     # need flight id to use report for date fallback
     data = request.get_json()
     result = dict(minutes=None)
