@@ -22,7 +22,7 @@ input[type=submit] {
 }
 
 label {
-    margin: 1rem;
+    margin: 1rem .25rem;
 }
 
 /* flight/form.html: makes things line up nicely */
