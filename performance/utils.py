@@ -20,3 +20,11 @@ def snakecase(s):
         return '_' + match.group()
     result = re.sub(pattern, repl, s).lower().replace('._', '.')
     return result
+
+def massage_time(string):
+    """
+    Return string stripped of all but digits and left-padded with zeros to four places.
+    """
+    value = int(''.join(c for c in string if c.isdigit()))
+    value = f'{value:04d}'
+    return value

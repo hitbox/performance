@@ -11,6 +11,7 @@ from performance.views.pluggable import UpdateDeleteView
 
 from ..models import Flight
 from ..models.flight import diff_minutes as diff_minutes_func
+from ..utils import massage_time
 
 flight_bp = Blueprint('flight', __name__)
 
@@ -49,13 +50,6 @@ def context_processor():
         ),
     )
     return context
-
-def massage_time(string):
-    # keep only digits
-    value = int(''.join(c for c in string if c.isdigit()))
-    # left-pad with zero to four places
-    value = f'{value:04d}'
-    return value
 
 def _diff_minutes(data):
     """
