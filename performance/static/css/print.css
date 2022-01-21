@@ -40,9 +40,11 @@
 
     tbody > tr > th,
     th,
+    th.row,
     td.data,
     pre {
         font-size: .90rem;
+        color: black;
     }
 
 }
