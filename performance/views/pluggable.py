@@ -102,6 +102,7 @@ class BaseEditView(View):
         template=None,
         instance_name=None,
         form_render_kw=None,
+        context_processor = None,
     ):
         if callable(form_class):
             form_class = form_class()
@@ -110,6 +111,16 @@ class BaseEditView(View):
         self.template = template or self.template
         self.instance_name = instance_name
         self.form_render_kw = form_render_kw
+        self.context_processor = context_processor
+
+    def get_context(self, **context):
+        if callable(self.context_processor):
+            extra = self.context_processor()
+            if extra:
+                context.update(extra)
+        context.setdefault('form_render_kw', self.form_render_kw)
+        context.setdefault('instance_name', self.instance_name)
+        return context
 
 
 class UpdateDeleteView(BaseEditView):
@@ -126,13 +137,10 @@ class UpdateDeleteView(BaseEditView):
             db.session.commit()
             if hasattr(form, 'backurl') and form.backurl.data:
                 return redirect(form.backurl.data)
-        context = dict(
+        context = self.get_context(
             form = form,
             instance = instance,
-            form_render_kw = self.form_render_kw,
         )
-        if self.instance_name:
-            context[self.instance_name] = instance
         return render_template(self.template, **context)
 
 
@@ -150,4 +158,7 @@ class CreateView(BaseEditView):
         elif request.method == 'GET':
             form.submit.label.text = 'Create'
             del form.delete
-        return render_template(self.template, form=form)
+        context = self.get_context(
+            form = form,
+        )
+        return render_template(self.template, **context)
