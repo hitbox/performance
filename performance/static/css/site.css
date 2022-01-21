@@ -185,3 +185,9 @@ ul.buttons > li {
 .delay-code:last-child {
     margin-right: 0rem;
 }
+
+#previous-next-navigation {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
