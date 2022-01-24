@@ -40,6 +40,19 @@
         margin: .5rem 0;
     }
 
+    /* hide the little expand icon for <details><summary>... */
+    /* https://justmarkup.com/articles/2020-09-22-styling-and-animation-details/ */
+    summary {
+        list-style: none;
+    }
+    summary::-webkit-details-marker {
+        display: none;
+    }
+    /* hide after <summary> */
+    details > *:not(:first-child) {
+        display: none;
+    }
+
     tbody > tr > th,
     th,
     th.row,
