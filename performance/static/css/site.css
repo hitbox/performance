@@ -191,3 +191,7 @@ ul.buttons > li {
     display: flex;
     justify-content: space-between;
 }
+
+details:hover {
+    cursor: pointer;
+}
