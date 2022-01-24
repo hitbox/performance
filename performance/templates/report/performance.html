@@ -2,9 +2,48 @@
 {% from "macros.html" import percent %}
 
 
-{% macro render_assumed_best_td(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
+{% macro OLD_render_assumed_best_td(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
+{# the original <td> renderer that shows how this is calculated #}
 <td class="data number" title="(<{{ to_date_string }} assumed lanes> - <{{ to_date_abbreviation }} chargeable delays>) / <{{ to_date_string }} assumed lanes>{% if can_calculate and lanes > 0 %}{# newline intended #}
 ({{ lanes }} - {{ ndelays }}) / {{ lanes }} = {{ '%0.4f'|format((lanes - ndelays) / lanes) }}{% endif %}">{% if can_calculate and lanes > 0 %}{{ percent((lanes - ndelays) / lanes) }}{% endif %}</td>
+{% endmacro %}
+
+
+{% macro render_performance_formula(to_date_string, to_date_abbreviation) %}
+{# firefox and a few others support this #}
+<math>
+    <mrow>
+        <mfrac>
+            <mrow>
+                <mo>(</mo>
+                <mi>{{ to_date_string }} assumed lanes</mi>
+                <mo>-</mo>
+                <mi>{{ to_date_abbreviation }} chargeable delays</mi>
+                <mo>)</mo>
+            </mrow>
+            <mrow>
+                <mi>{{ to_date_string }} assumed lanes</mi>
+            </mrow>
+        </mfrac>
+    </mrow>
+</math>
+{% endmacro %}
+
+
+{% macro render_assumed_best_td_inner(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
+{% if kwargs.get('with_mathml') %}
+<details>
+    <summary>{% if can_calculate and lanes > 0 %}{{ percent((lanes - ndelays) / lanes) }}{% endif %}</summary>
+    {{ render_performance_formula(to_date_string, to_date_abbreviation) }}
+</details>
+{% else %}
+{% if can_calculate and lanes > 0 %}{{ percent((lanes - ndelays) / lanes) }}{% endif %}
+{% endif %}
+{% endmacro %}
+
+
+{% macro render_assumed_best_td(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
+<td class="data number">{{ render_assumed_best_td_inner(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) }}</td>
 {% endmacro %}
 
 
