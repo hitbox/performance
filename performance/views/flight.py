@@ -97,6 +97,10 @@ def _diff_minutes(data):
     return minutes
 
 def _delays(data):
+    # NOTE
+    # Any previous ??? delay code is stripped off by parse.delaystring. This is
+    # a happy accident that means these do not show on the report and will not
+    # be duplicated by this function.
     delayCodes = data['delayCodes']
     delay_objects = parse.delaystring(delayCodes)
 
