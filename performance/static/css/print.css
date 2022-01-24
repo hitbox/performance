@@ -4,7 +4,9 @@
     }
 
     body,
-    a:link {
+    a:link,
+    input,
+    textarea {
         background-color: white;
         color: black;
     }
