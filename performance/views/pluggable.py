@@ -104,6 +104,9 @@ class BaseEditView(View):
         form_render_kw=None,
         context_processor = None,
     ):
+        """
+        :param form_class: form class or callable.
+        """
         if callable(form_class):
             form_class = form_class()
         self.form_class = form_class

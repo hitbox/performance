@@ -19,6 +19,8 @@ from .fields import StringTimeField
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
 
+# FIXME: form instantiation hits the database.
+
 def report_id_from_view_args():
     return request.view_args['report_id']
 

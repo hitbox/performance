@@ -30,16 +30,18 @@ class CreateScheduledFlightView(CreateView):
         return render_template(self.template, form=form)
 
 
-def scheduled_flight_form(*args, **kwargs):
-    from performance.amazon.forms import ScheduledFlightForm
-    return ScheduledFlightForm(*args, **kwargs)
+def get_scheduled_flight_form_class():
+    # NOTE: must delay importing because wtforms_alchemy is very aggressive
+    from ..forms import ScheduledFlightForm
+    return ScheduledFlightForm
 
 scheduled_flight_bp.add_url_rule(
     '/create/<int:scheduled_report_id>',
     view_func = edit_check(
         CreateScheduledFlightView.as_view(
             'create',
-            scheduled_flight_form,
+            get_scheduled_flight_form_class,
+            template = 'scheduled_flight_edit.html',
         )))
 
 scheduled_flight_bp.add_url_rule(
@@ -47,5 +49,6 @@ scheduled_flight_bp.add_url_rule(
     view_func = edit_check(
         UpdateDeleteView.as_view(
             'edit',
-            scheduled_flight_form,
+            get_scheduled_flight_form_class,
+            template = 'scheduled_flight_edit.html',
         )))

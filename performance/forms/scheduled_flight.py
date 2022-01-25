@@ -31,19 +31,47 @@ class ScheduledFlightForm(
         fields_order = ['flight_type'] + only + ['submit', 'delete']
         # overriding estimated times labels because there's no date fields
         field_args = {
+            'flight_number': {
+                'render_kw': {
+                    'class': 'flight',
+                },
+            },
+            'origin_station': {
+                'label': 'Orig.',
+                'render_kw': {
+                    'class': 'flight',
+                },
+            },
+            'destination_station': {
+                'label': 'Dest.',
+                'render_kw': {
+                    'class': 'flight',
+                },
+            },
             'origin_departure_estimated_time': {
                 'label': 'ETD',
+                'render_kw': {
+                    'class': 'flight origin',
+                    'placeholder': 'ETD',
+                },
             },
             'destination_arrival_estimated_time': {
                 'label': 'ETA',
+                'render_kw': {
+                    'class': 'flight origin',
+                    'placeholder': 'ETA',
+                },
             },
         }
 
     scheduled_report_id = HiddenField()
 
     flight_type = QuerySelectField(
-        'Flight Type',
+        'Type',
         default = defaults.flight_type,
         get_label = 'name',
-        query_factory = lambda: FlightType.query.order_by(FlightType.report_order).all()
+        query_factory = lambda: FlightType.query.order_by(FlightType.report_order).all(),
+        render_kw = {
+            'class': 'flight',
+        },
     )

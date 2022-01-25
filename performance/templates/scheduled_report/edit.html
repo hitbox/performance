@@ -2,7 +2,7 @@
 
 {% block main %}
 <article>{% set backurl = url_for(request.endpoint, **request.view_args) %}
-    <h2>Schedule: {{ scheduled_report.name }}</h2>
+    <h1>Schedule</h1>
     {% for flight_type, scheduled_flights in grouped %}<div>
         <h3>{{ flight_type.name }} Flights</h3>
         {% include "scheduled_report/scheduled_flight_table.html" %}

@@ -117,7 +117,8 @@ label[for="destination_arrival_estimated_time"],
 label[for="destination_arrival_actual_time"],
 label[for="origin_departure_estimated_time"],
 label[for="origin_departure_actual_time"] {
-    display: none;
+    /* FIXME */
+    /*display: none;*/
 }
 
 form #origin_departure_estimated_time,
@@ -150,14 +151,6 @@ form .flight {
     margin-right: 0;
 }
 
-/* hide the empty labels on the normal flight edit form */
-label.flight[for=origin_departure_estimated_time],
-label.flight[for=origin_departure_actual_time],
-label.flight[for=destination_arrival_estimated_time],
-label.flight[for=destination_arrival_actual_time] {
-    display: none;
-}
-
 /* error message for form field */
 .field-error {
     color: red;
@@ -167,4 +160,13 @@ label.flight[for=destination_arrival_actual_time] {
 .flight-form-row {
     display: flex;
     justify-content: space-between;
+}
+
+.scheduled-flight-form {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.scheduled-flight-form.buttons {
+    margin-top: 2rem;
 }
