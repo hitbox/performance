@@ -13,8 +13,9 @@ def root_context():
     from .extensions import db
     from .extensions import htmlmin
     from .extensions import login_manager
-    from .forms import LoginForm
-    from .forms import UserForm
+
+    # NOTE: not importing forms because some are dependent on request context
+    #       and this should be fixed.
 
     context = locals()
     # add all the database models
