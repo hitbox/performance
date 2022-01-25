@@ -180,7 +180,7 @@ class FlightForm(
                 },
             },
             'destination_arrival_estimated_date': {
-                'label': 'ATA',
+                'label': 'ETA',
                 'render_kw': date_field_render_kw('destination'),
             },
             'destination_arrival_estimated_time': {
