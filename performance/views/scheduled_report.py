@@ -41,18 +41,3 @@ def edit(id):
         grouped = grouped,
     )
     return render_template('scheduled_report/edit.html', **context)
-
-def trash():
-    def render_scheduled_report(scheduled_report):
-        href = url_for('scheduled_report.edit', id=scheduled_report.id)
-        text = scheduled_report.name
-        return Markup(f'<a href="{href}">{text}</a>')
-
-    scheduled_report_bp.add_url_rule('/',
-        view_func = edit_check(
-            ListView.as_view(
-                'index',
-                ScheduledReport,
-                item_renderer = render_scheduled_report,
-                page_title = 'Scheduled Reports',
-            )))
