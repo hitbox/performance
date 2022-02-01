@@ -17,10 +17,9 @@
     {% endblock head %}</head>
     <body>{% block body %}
         {% block topnav %}<nav class="noprint">
-            {% set topnavs = [ ('scheduled_report.index', 'Schedule'), ('select_date.goto_today', 'Reports'), ('user.profile', 'Profile'), ] %}
-            {% for endpoint, text in topnavs %}
-                {{ render_nav_item(endpoint, text) }}
-            {% endfor %}
+            {% if current_user.is_admin %}{{ render_nav_item('scheduled_report.index', 'Schedule') }}{% endif %}
+            {{ render_nav_item('select_date.goto_today', 'Reports') }}
+            {{ render_nav_item('user.profile', 'Profile') }}
             <div>
                 <label for=theme-1>Dark Theme</label>
                 <input class=theme-toggler id=theme-1 type=checkbox>
@@ -33,4 +32,3 @@
         {% block body_last %}{% endblock body_last %}
     {% endblock %}</body>
 </html>
-

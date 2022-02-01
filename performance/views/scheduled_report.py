@@ -6,6 +6,7 @@ from flask import render_template
 from flask import url_for
 from markupsafe import Markup
 
+from ..authorization import admin_check
 from ..authorization import edit_check
 from ..models import FlightType
 from ..models import ScheduledReport
@@ -15,12 +16,14 @@ from .pluggable import ListView
 scheduled_report_bp = Blueprint('scheduled_report', __name__)
 
 @scheduled_report_bp.route('/')
+@admin_check
 def index():
     # hiding the fact that's there's possibly more than one
     scheduled_report = ScheduledReport.query.first()
     return redirect(url_for('.edit', id=scheduled_report.id))
 
 @scheduled_report_bp.route('/<int:id>')
+@admin_check
 @edit_check
 def edit(id):
     """
