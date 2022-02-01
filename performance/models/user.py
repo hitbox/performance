@@ -4,6 +4,9 @@ from sqlalchemy_utils import PasswordType
 from ..extensions import db
 
 class User(UserMixin, db.Model):
+    """
+    A user of the web app with certain privileges.
+    """
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
