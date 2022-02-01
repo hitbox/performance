@@ -5,7 +5,7 @@
     --input-background-color: white;
 
     --a-unvisited-color: MediumBlue;
-    --a-visited-color: RebeccaPurple;
+    --a-visited-color: MediumBlue;
     --a-hover-color: Red;
     --a-active-color: Plum;
 
@@ -35,7 +35,7 @@
     --input-background-color: #333;
 
     --a-unvisited-color: Orange;
-    --a-visited-color: OrangeRed;
+    --a-visited-color: Orange;
     --a-hover-color: White;
     --a-active-color: Red;
 
