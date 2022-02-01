@@ -154,7 +154,7 @@
 
 {# render individual delay code object #}
 {# duplicate: parse.py:formatdelays #}
-{% macro render_delay(delay) %}<span class="delay-code">{% if delay.cancelled and delay.code != 'XLD' %}XLD{% endif %}{{ delay.code }}{% if delay.minutes is integer %}({{ delay.minutes }}){% endif %}</span>{% endmacro %}
+{% macro render_delay(delay) %}<span class="delay-code">{% if delay.cancelled and delay.code != 'XLD' %}XLD {% endif %}{{ delay.code }}{% if delay.minutes is integer %}({{ delay.minutes }}){% endif %}</span>{% endmacro %}
 
 
 {# text inside labels and headers indicating the estimated/actual difference minutes #}
