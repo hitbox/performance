@@ -18,7 +18,7 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-from performance.amazon.models import Report
+from performance.models import Report
 target_metadata = Report.metadata
 
 # other values from the config, defined by the needs of env.py,
