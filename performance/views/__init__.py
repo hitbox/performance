@@ -10,6 +10,7 @@ from ..month import Weekday
 from . import select_date
 from .assumed_best import assumed_best_bp
 from .flight import flight_bp
+from .flight_type import flight_type_bp
 from .report import report_bp
 from .scheduled_flight import scheduled_flight_bp
 from .scheduled_report import scheduled_report_bp
@@ -45,6 +46,10 @@ def init_app(app):
     # TODO: flatten
     blueprint = select_date.select_date_blueprint(Report, 'date')
     app.register_blueprint(blueprint, url_prefix='/select')
+
+    # just has command line interface
+    app.register_blueprint(flight_type_bp)
+
     if app.env == 'development':
         init_app_development(app)
 
