@@ -13,7 +13,9 @@ class ScheduledReport(
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, unique=True)
+    display_order = db.Column(db.Integer)
+
     scheduled_flights = db.relationship('ScheduledFlight', backref='scheduled_report')
 
     def grouped_flights(self):

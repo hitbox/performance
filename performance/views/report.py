@@ -236,7 +236,19 @@ def prompt_new(report_date):
     """
     Prompt to create new report.
     """
-    # NOTE: letting MultipleResultsFound raise so that we will be reminded of
-    # the fact that this is hiding the ability to have multiple schedules.
-    scheduled_report = ScheduledReport.query.one()
-    return render_template('report/prompt_new.html', scheduled_report=scheduled_report)
+    template = 'report/prompt_new.html'
+    scheduled_reports_onlyone = current_app.config.get('SCHEDULED_REPORTS_ONLYONE', False)
+    if scheduled_reports_onlyone:
+        scheduled_report = ScheduledReport.query.one()
+        context = dict(
+            scheduled_report = scheduled_report
+        )
+    else:
+        # all scheduled reports
+        scheduled_reports = ScheduledReport.query.order_by(
+                ScheduledReport.display_order
+            ).all()
+        context = dict(
+            scheduled_reports = scheduled_reports,
+        )
+    return render_template(template, **context)

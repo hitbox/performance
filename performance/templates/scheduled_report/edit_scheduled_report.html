@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% from "macros.html" import string %}
+{% from "macros.html" import time %}
+
+
+{% set backurl = url_for(request.endpoint, **request.view_args) %}
+
+{% macro render_create_link(scheduled_flight, flight_type) %}
+<h4>
+    <a href="{{ url_for('scheduled_flight.create', scheduled_report_id=scheduled_report.id, flight_type_id=flight_type.id, backurl=backurl) }}">Add {{ flight_type.name }} Flight</a>
+</h4>
+{% endmacro %}
+
+
+{% macro render_table(scheduled_report, flight_type, scheduled_flights) %}
+<table class="expand">
+    <thead>
+        <tr>{% set ncols = 6 %}
+            <th></th>
+            <th>Flight</th>
+            <th>Orig</th>
+            <th>ETD</th>
+            <th>Dest</th>
+            <th>ETA</th>
+        </tr>
+    </thead>
+    <tbody>{% if not scheduled_flights %}
+        <tr>
+            <td colspan="{{ ncols }}">
+                <h4>None</h4>
+            </td>
+        </tr>
+        {% else %}
+            {% for flight in scheduled_flights %}
+        <tr>
+            <td class="data">
+                <a href="{{ url_for('scheduled_flight.edit', id=flight.id, backurl=backurl) }}">edit</a>
+            </td>
+            <td class="data">{{ string(flight.flight_number) }}</td>
+            <td class="data">{{ string(flight.origin_station) }}</td>
+            <td class="data">{{ time(flight.origin_departure_estimated_time) }}</td>
+            <td class="data">{{ string(flight.destination_station) }}</td>
+            <td class="data">{{ time(flight.destination_arrival_estimated_time) }}</td>
+        </tr>{% endfor %}
+    {% endif %}</tbody>
+    <tfoot class="noprint">
+        <tr>
+            <td class="data" colspan="{{ ncols }}">
+                {{ render_create_link(scheduled_report, flight_type) }}
+            </td>
+        </tr>
+    </tfoot>
+</table>
+{% endmacro %}
+
+
+{% block main %}
+<article>
+    <h1>Schedule "{{ scheduled_report.name }}"</h1>
+    {% for flight_type in flight_types %}<section class="scheduled-report">
+        <h3>{{ flight_type.name }} Flights</h3>
+        {% set flights = scheduled_report.scheduled_flights|selectattr('flight_type.id', 'eq', flight_type.id)|sort(attribute='flight_number') %}
+        {% if not flights %}
+            {{ render_create_link(scheduled_report, flight_type) }}
+        {% else %}
+            {{ render_table(scheduled_report, flight_type, flights) }}
+        {% endif %}
+    </section>{% endfor %}
+</article>{% endblock main %}

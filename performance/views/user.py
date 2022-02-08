@@ -71,7 +71,7 @@ def profile():
     """
     return render_template('profile.html')
 
-@user_bp.cli.command('add', help='Add user')
+@user_bp.cli.command('add', help='Add user.')
 @click.option('--username')
 @click.option('--email')
 @click.password_option()

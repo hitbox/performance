@@ -124,7 +124,7 @@
 {%- macro blank_if_falsy(s) %}{% if s %}{{ s }}{% endif %}{% endmacro -%}
 
 
-{%- macro diff_class(diff) %}{% if diff is not none %}{% if diff < 0 %} early{% elif diff > 0 %} late{% else %} ontime{% endif %}{% endif %}{% endmacro -%}
+{%- macro diff_class(diff) %}{% if diff is not none %}{% if diff < (config.EARLY_LT or 0) %} early{% elif diff > (config.LATE_GT or 0) %} late{% else %} ontime{% endif %}{% endif %}{% endmacro -%}
 
 
 {%- macro percent(v) %}

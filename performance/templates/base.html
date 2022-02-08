@@ -17,7 +17,9 @@
     {% endblock head %}</head>
     <body>{% block body %}
         {% block topnav %}<nav class="noprint">
-            {% if current_user.is_admin %}{{ render_nav_item('scheduled_report.index', 'Schedule') }}{% endif %}
+            {% if current_user.is_admin %}
+                {{ render_nav_item('scheduled_report.list', 'Schedule') }}
+            {% endif %}
             {{ render_nav_item('select_date.goto_today', 'Reports') }}
             {{ render_nav_item('user.profile', 'Profile') }}
             <div>
