@@ -57,13 +57,15 @@
 
 {% block main %}
 <article>
+    {% if not config.SCHEDULED_REPORTS_ONLYONE %}
     <h1>Schedule "{{ scheduled_report.name }}"</h1>
+    {% endif %}
     {% for flight_type in flight_types %}<section class="scheduled-report">
-        <h3>{{ flight_type.name }} Flights</h3>
         {% set flights = scheduled_report.scheduled_flights|selectattr('flight_type.id', 'eq', flight_type.id)|sort(attribute='flight_number') %}
         {% if not flights %}
             {{ render_create_link(scheduled_report, flight_type) }}
         {% else %}
+            <h3>{{ flight_type.name }} Flights</h3>
             {{ render_table(scheduled_report, flight_type, flights) }}
         {% endif %}
     </section>{% endfor %}
