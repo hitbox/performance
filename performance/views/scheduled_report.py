@@ -3,6 +3,7 @@ from operator import attrgetter
 import click
 
 from flask import Blueprint
+from flask import current_app
 from flask import redirect
 from flask import render_template
 from flask import url_for
@@ -23,14 +24,18 @@ def list():
     """
     List scheduled reports.
     """
-    scheduled_reports = ScheduledReport.query.order_by(
-        ScheduledReport.display_order
-    ).all()
-    context = dict(
-        scheduled_reports = scheduled_reports,
-    )
-    template = 'scheduled_report/list_scheduled_reports.html'
-    return render_template(template, **context)
+    if current_app.config.get('SCHEDULED_REPORTS_ONLYONE'):
+        scheduled_report = ScheduledReport.query.one()
+        return redirect(url_for('.edit', id=scheduled_report.id))
+    else:
+        scheduled_reports = ScheduledReport.query.order_by(
+            ScheduledReport.display_order
+        ).all()
+        context = dict(
+            scheduled_reports = scheduled_reports,
+        )
+        template = 'scheduled_report/list_scheduled_reports.html'
+        return render_template(template, **context)
 
 @scheduled_report_bp.route('/<int:id>')
 @admin_check
