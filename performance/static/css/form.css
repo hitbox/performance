@@ -77,7 +77,8 @@ form #weight {
     width: 8rem;
 }
 
-form #origin_station, form #destination_station {
+form #origin_station,
+form #destination_station {
     width: 3rem;
 }
 
