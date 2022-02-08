@@ -59,31 +59,6 @@ form > .buttons > * {
 
 /* report form styling */
 
-/* form ids inside a performance grid */
-form #dhl_previous_overall_performance,
-form #dhl_previous_overall_performance_lanes,
-form #dhl_previous_overall_performance_late,
-form #dhl_todays_arrival_performance_front_half,
-form #dhl_todays_arrival_performance_front_half_lanes,
-form #dhl_todays_arrival_performance_front_half_late,
-form #dhl_arrival_performance_wtd,
-form #dhl_arrival_performance_wtd_lanes,
-form #dhl_arrival_performance_wtd_late,
-form #dhl_arrival_performance_mtd,
-form #dhl_arrival_performance_mtd_lanes,
-form #dhl_arrival_performance_mtd_late,
-form #dhl_arrival_performance_mtd_30_percent,
-form #dhl_arrival_performance_mtd_30_lanes,
-form #dhl_arrival_performance_mtd_30_late,
-form #dhl_days_at_100_percent,
-form #dhl_assumed_best_arrival_performance_for_month_percent,
-form #dhl_qtd_performance {
-    width: 3rem;
-    /* inputs push the cells out too much, bring them back in */
-    padding: .25rem;
-    margin: .1rem;
-}
-
 input.narrowest {
     width: 4rem;
 }
