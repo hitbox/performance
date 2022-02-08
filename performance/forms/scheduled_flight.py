@@ -33,32 +33,32 @@ class ScheduledFlightForm(
         field_args = {
             'flight_number': {
                 'render_kw': {
-                    'class': 'flight',
+                    'class': 'scheduled flight',
                 },
             },
             'origin_station': {
                 'label': 'Orig.',
                 'render_kw': {
-                    'class': 'flight',
+                    'class': 'scheduled flight',
                 },
             },
             'destination_station': {
                 'label': 'Dest.',
                 'render_kw': {
-                    'class': 'flight',
+                    'class': 'scheduled flight',
                 },
             },
             'origin_departure_estimated_time': {
                 'label': 'ETD',
                 'render_kw': {
-                    'class': 'flight origin',
+                    'class': 'scheduled flight origin',
                     'placeholder': 'ETD',
                 },
             },
             'destination_arrival_estimated_time': {
                 'label': 'ETA',
                 'render_kw': {
-                    'class': 'flight origin',
+                    'class': 'scheduled flight origin',
                     'placeholder': 'ETA',
                 },
             },

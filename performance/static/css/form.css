@@ -82,6 +82,16 @@ form #destination_station {
     width: 3rem;
 }
 
+form #flight_type.scheduled,
+form #flight_number.scheduled,
+form #origin_station.scheduled,
+form #destination_station.scheduled,
+form #origin_departure_estimated_time.scheduled,
+form #destination_arrival_estimated_time.scheduled {
+    box-sizing: border-box;
+    width: 100%;
+}
+
 form #origin_departure_estimated_date,
 form #origin_departure_actual_date,
 form #destination_arrival_estimated_date,
