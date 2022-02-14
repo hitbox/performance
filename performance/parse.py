@@ -41,7 +41,8 @@ def delaystring(text):
     return delays
 
 def formatdelays(delays):
-    # duplicate: macros.html:render_delay
+    # similar: macros.html:render_delay
+    # used by forms to populate inputs
     parts = []
     for code, minutes, cancelled in delays:
         if cancelled:

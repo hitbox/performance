@@ -178,6 +178,37 @@ ul.buttons > li {
     padding: .2rem;
 }
 
+ol.pagination {
+    list-style-type: none;
+    padding: 0;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.pill {
+
+}
+
+ol.delay-codes {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.delay-codes > * {
+    margin: 0 4px;
+}
+
+.delay-codes > *:first-child {
+    margin-left: 0;
+}
+
+.delay-codes > *:last-child {
+    margin-right: 0;
+}
+
 .delay-code {
     margin-right: .7rem;
 }

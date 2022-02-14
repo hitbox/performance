@@ -18,6 +18,9 @@ def create_app():
     app.config.from_envvar('PERFORMANCE_CONFIG')
     config.raise_for_config(app)
 
+    app.config.setdefault('LATE_GT', 0)
+    app.config.setdefault('EARLY_LT', 0)
+
     @app.context_processor
     def context_processor():
         import datetime
