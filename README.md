@@ -17,3 +17,7 @@ DHL Report Legacy
 
 * The `details` table simply exists like an entity table. Several other tables add attributes.
 *
+
+# INCIDENTS
+
+* #16585 hide delays from report for config LATE_GT.
