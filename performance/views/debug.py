@@ -16,7 +16,7 @@ def index():
     flash('Error Message', 'error')
     flash('Multiline flash message\nLine 1\nLine 2', 'info')
     flash('TODO message only for development', 'todo')
-    return render_template('debug.html')
+    return render_template('debug/debug.html')
 
 @debug_bp.route('/return-abort/<int:error>')
 def return_abort(error):
