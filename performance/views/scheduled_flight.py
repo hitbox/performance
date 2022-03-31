@@ -3,7 +3,7 @@ from flask import request
 from flask import render_template
 from flask import redirect
 
-from ..authorization import admin_check
+from ..authorization import edit_schedule_check
 from ..authorization import edit_check
 from ..extensions import db
 from ..models import FlightType
@@ -38,18 +38,18 @@ def get_scheduled_flight_form_class():
 
 scheduled_flight_bp.add_url_rule(
     '/create/<int:scheduled_report_id>',
-    view_func = admin_check(edit_check(
+    view_func = edit_schedule_check(
         CreateScheduledFlightView.as_view(
             'create',
             get_scheduled_flight_form_class,
             template = 'scheduled_flight_edit.html',
-        ))))
+        )))
 
 scheduled_flight_bp.add_url_rule(
     '/edit/<int:id>',
-    view_func = admin_check(edit_check(
+    view_func = edit_schedule_check(
         UpdateDeleteView.as_view(
             'edit',
             get_scheduled_flight_form_class,
             template = 'scheduled_flight_edit.html',
-        ))))
+        )))

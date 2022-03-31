@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+
+
+{% from "macros.html" import render_pagination %}
+{% from "macros.html" import yesno %}
+
+
+{% block main %}
+<h3>Users</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th{% if User.is_admin.doc %} title="{{ User.is_admin.doc }}"{% endif %}>Admin?</th>
+            <th{% if User.is_editor.doc %} title="{{ User.is_editor.doc }}"{% endif %}>Editor?</th>
+            <th{% if User.is_active.doc %} title="{{ User.is_active.doc }}"{% endif %}>Active?</th>
+            <th{% if User.reset_password.doc %} title="{{ User.reset_password.doc }}"{% endif %}>Reset Password?</th>
+            <th{% if User.can_edit_schedule.doc %} title="{{ User.can_edit_schedule.doc }}"{% endif %}>Schedule Edit?</th>
+        </tr>
+    </thead>
+    <tbody>{% for user in users.items %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td><a href="mailto:{{ user.email }}">{{ user.email }}</td>
+            <td>{{ yesno(user.is_admin) }}</td>
+            <td>{{ yesno(user.is_editor) }}</td>
+            <td>{{ yesno(user.is_active) }}</td>
+            <td>{{ yesno(user.reset_password) }}</td>
+            <td>{{ yesno(user.can_edit_schedule) }}</td>
+        </tr>{% endfor %}
+    </tbody>
+</table>
+{{ render_pagination(users) }}
+{% endblock main %}

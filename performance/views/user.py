@@ -72,14 +72,23 @@ def profile():
     return render_template('profile.html')
 
 @user_bp.cli.command('add', help='Add user.')
-@click.option('--username')
-@click.option('--email')
+@click.option('--username', prompt=True,)
+@click.option('--email', prompt=True,)
 @click.password_option()
 @click.option('--reset-password/--no-reset-password', default=True,
               help='Require user to reset password.')
-@click.option('--is-editor', default=False, is_flag=True, help='Allow edit')
-@click.option('--is-admin', default=False, is_flag=True, help='Allow admin')
-def add(username, email, password, reset_password, is_editor, is_admin):
+@click.option('--is-editor', default=False, is_flag=True, help='Allow edit', prompt=True)
+@click.option('--is-admin', default=False, is_flag=True, help='Allow admin', prompt=True)
+@click.option('--can-edit-schedule', default=False, is_flag=True, help='User can edit schedules', prompt=True)
+def add(
+    username,
+    email,
+    password,
+    reset_password,
+    is_editor,
+    is_admin,
+    can_edit_schedule,
+):
     """
     Add User
     """
@@ -90,6 +99,7 @@ def add(username, email, password, reset_password, is_editor, is_admin):
         reset_password = reset_password,
         is_editor = is_editor,
         is_admin = is_admin,
+        can_edit_schedule = can_edit_schedule,
     )
     db.session.add(user)
     db.session.commit()

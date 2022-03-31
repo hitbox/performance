@@ -44,6 +44,19 @@ def edit_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
+def edit_schedule_required(func):
+    """
+    View requires logged in user to be admin or to have edit schedule privileges.
+    """
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        is_admin = getattr(current_user, 'is_admin', False)
+        can_edit_schedule = getattr(current_user, 'can_edit_schedule', False)
+        if (not (is_admin or can_edit_schedule)):
+            abort(403)
+        return func(*args, **kwargs)
+    return decorated_view
+
 def admin_required(func):
     """
     View requires logged in user to have admin privileges.
@@ -73,3 +86,9 @@ def admin_check(view):
     Admin user is logged in and doesn't require password change.
     """
     return admin_required(basic_check(view))
+
+def edit_schedule_check(view):
+    """
+    User is admin or can_edit_schedule flag is True.
+    """
+    return edit_schedule_required(basic_check(view))

@@ -18,6 +18,9 @@
     <body>{% block body %}
         {% block topnav %}<nav class="noprint">
             {% if current_user.is_admin %}
+                {{ render_nav_item('admin.index', 'Admin') }}
+            {% endif %}
+            {% if current_user.is_admin or current_user.can_edit_schedule %}
                 {{ render_nav_item('scheduled_report.list', 'Schedule') }}
             {% endif %}
             {{ render_nav_item('select_date.goto_today', 'Reports') }}

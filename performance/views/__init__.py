@@ -1,4 +1,3 @@
-from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import url_for
@@ -8,6 +7,7 @@ from ..models import Report
 from ..month import Weekday
 
 from . import select_date
+from .admin import admin_bp
 from .assumed_best import assumed_best_bp
 from .flight import flight_bp
 from .flight_type import flight_type_bp
@@ -43,6 +43,7 @@ def init_app(app):
     app.register_blueprint(report_bp, url_prefix='/report')
     app.register_blueprint(scheduled_flight_bp, url_prefix='/scheduled-flight')
     app.register_blueprint(scheduled_report_bp, url_prefix='/scheduled-report')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
     # TODO: flatten
     blueprint = select_date.select_date_blueprint(Report, 'date')
     app.register_blueprint(blueprint, url_prefix='/select')

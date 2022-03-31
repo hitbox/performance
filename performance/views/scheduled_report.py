@@ -1,5 +1,3 @@
-from operator import attrgetter
-
 import click
 
 from flask import Blueprint
@@ -8,8 +6,7 @@ from flask import redirect
 from flask import render_template
 from flask import url_for
 
-from ..authorization import admin_check
-from ..authorization import edit_check
+from ..authorization import edit_schedule_check
 from ..extensions import db
 from ..models import FlightType
 from ..models import ScheduledReport
@@ -18,8 +15,14 @@ from .pluggable import ListView
 
 scheduled_report_bp = Blueprint('scheduled_report', __name__)
 
+@scheduled_report_bp.before_request
+@edit_schedule_check
+def before_request():
+    """
+    Enforce user can edit schedules.
+    """
+
 @scheduled_report_bp.route('/')
-@admin_check
 def list():
     """
     List scheduled reports.
@@ -38,8 +41,6 @@ def list():
         return render_template(template, **context)
 
 @scheduled_report_bp.route('/<int:id>')
-@admin_check
-@edit_check
 def edit(id):
     """
     Edit ScheduledReport.
