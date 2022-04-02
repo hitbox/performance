@@ -157,7 +157,8 @@
 {% macro render_delays(delays) %}
 {% set debug = kwargs.get('debug', config.TEMPLATE_DEBUG_DELAY_CODES) %}
 <ol class="delay-codes">{% for delay in delays %}
-{% if (delay.minutes is not integer) or (delay.minutes is integer and delay.minutes > config.LATE_GT) %}
+{# TODO: Incident 19896: remove this check here, it is done outside so as to show all delays for threshold met for total diff minutes #}
+{% if true or (delay.minutes is not integer) or (delay.minutes is integer and delay.minutes > config.LATE_GT) %}
     <li>
         {% if debug %}<span>{{ loop.index }}.</span>{% endif %}
         {{ render_delay(delay, **kwargs) }}

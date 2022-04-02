@@ -21,15 +21,15 @@
 <td class="data">{{ string(flight.origin_station) }}</td>
 <td class="data">{{ time(flight.origin_departure_estimated_time) }}</td>
 <td class="data">{{ time(flight.origin_departure_actual_time) }}</td>
-{% set diff = flight.origin_diff_minutes() or 0 %}<td class="data numeric{{ diff_class(diff) }}">{{ diff }}</td>
-<td class="data">{{ render_delays(flight.origin_delays) }}</td>
+{% set diff_minutes = flight.origin_diff_minutes() or 0 %}<td class="data numeric{{ diff_class(diff_minutes) }}">{{ diff_minutes }}</td>
+<td class="data">{% if diff_minutes > config.LATE_GT %}{{ render_delays(flight.origin_delays) }}{% endif %}</td>
 
 {#- destination -#}
 <td class="data">{{ string(flight.destination_station) }}</td>
 <td class="data">{{ time(flight.destination_arrival_estimated_time) }}</td>
 <td class="data">{{ time(flight.destination_arrival_actual_time) }}</td>
-{% set diff = flight.destination_diff_minutes() or 0 %}<td class="data numeric{{ diff_class(diff) }}">{{ diff }}</td>
-<td class="data">{{ render_delays(flight.destination_delays) }}</td>
+{% set diff_minutes = flight.destination_diff_minutes() or 0 %}<td class="data numeric{{ diff_class(diff_minutes) }}">{{ diff_minutes }}</td>
+<td class="data">{% if diff_minutes > config.LATE_GT %}{{ render_delays(flight.destination_delays) }}{% endif %}</td>
 
 {#- controllable delays -#}
 {% if flight.flight_type.name == 'Scheduled' %}
