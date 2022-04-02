@@ -174,7 +174,9 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         delays = self.destination_delays
         return (
             # the only delay is in the include list and is cancelled
-            all(delay.code in include_cancelled_delays for delay in delays if delay.cancelled)
+            all(delay.code in include_cancelled_delays
+                for delay in delays
+                if delay.cancelled)
             and self.flight_type in flight_types
         )
 
