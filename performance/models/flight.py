@@ -181,6 +181,9 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         )
 
     def origin_diff_minutes(self):
+        """
+        Destination diff est./act. minutes; possibly None.
+        """
         minutes = diff_minutes(
             self.origin_departure_estimated_date or self.report.date,
             self.origin_departure_estimated_time,
@@ -190,6 +193,9 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         return minutes
 
     def destination_diff_minutes(self):
+        """
+        Destination diff est./act. minutes; possibly None.
+        """
         minutes = diff_minutes(
             self.destination_arrival_estimated_date or self.report.date,
             self.destination_arrival_estimated_time,
