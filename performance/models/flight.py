@@ -192,6 +192,18 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         )
         return minutes
 
+    def origin_diff_minutes_value(self):
+        """
+        Ensure a value for origin diff minutes.
+        """
+        return self.origin_diff_minutes() or 0
+
+    def show_origin_delays(self):
+        """
+        Return True that origin delays should show.
+        """
+        return self.origin_diff_minutes_value() > current_app.config['LATE_GT']
+
     def destination_diff_minutes(self):
         """
         Destination diff est./act. minutes; possibly None.
@@ -203,6 +215,18 @@ class ReportFlightBaseMixin(FlightBaseMixin):
             self.destination_arrival_actual_time,
         )
         return minutes
+
+    def destination_diff_minutes_value(self):
+        """
+        Ensure a value for destination diff minutes.
+        """
+        return self.destination_diff_minutes() or 0
+
+    def show_destination_delays(self):
+        """
+        Return True that destination delays should show.
+        """
+        return self.destination_diff_minutes_value() > current_app.config['LATE_GT']
 
 
 class Flight(
