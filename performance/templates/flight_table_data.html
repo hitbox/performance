@@ -12,10 +12,10 @@
 
 {# just the <td>s of a flight table row #}
 {% set has_edit = with_edit and edit_attr == 'tail_number' %}
-<td class="data">{% if has_edit %}<a href="{{ edit_url }}">{% endif %}{{ string(flight.tail_number) }}{% if has_edit %}</a>{% endif %}</td>
+<td class="data">{{ string(flight.tail_number) }}</td>
 
 {% set has_edit = with_edit and edit_attr == 'flight_number' %}
-<td class="data">{% if has_edit %}<a href="{{ edit_url }}">{% endif %}{{ string(flight.flight_number) }}{% if has_edit %}</a>{% endif %}</td>
+<td class="data">{{ string(flight.flight_number) }}</td>
 
 {#- orgin -#}
 <td class="data">{{ string(flight.origin_station) }}</td>

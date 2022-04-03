@@ -12,7 +12,8 @@
     /* select date for today */
     --a-date-today-background-color: Bisque;
 
-    --data-href-background-color: #111;
+    --data-href-hover-color: DarkOrange;
+    --data-href-hover-background-color: #333;
 
     --header-separation: 1.5rem;
 
@@ -41,7 +42,7 @@
 
     --a-date-today-background-color: DarkOliveGreen;
 
-    --data-href-background-color: #111;
+    --data-href-hover-background-color: #111;
 
     --table-border-color: DarkGray;
 
@@ -102,10 +103,12 @@ nav > * {
 
 /* links from data-href attribute */
 [data-href] {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 [data-href]:hover {
+    background-color: var(--data-href-hover-background-color);
+    color: var(--data-href-hover-color);
     cursor: pointer;
 }
 

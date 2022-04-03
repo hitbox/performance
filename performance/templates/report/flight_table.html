@@ -43,7 +43,7 @@
             </tr>
         </thead>
         <tbody>{% if flights %}
-            {% for flight in flights %}<tr>
+            {% for flight in flights %}<tr{% if with_edit %} data-href="{{ url_for('flight.edit', id=flight.id, backurl=thisurl) }}"{% endif %}>
                 {% include "flight_table_data.html" with context %}
             </tr>{% endfor %}
             {%- else -%}
