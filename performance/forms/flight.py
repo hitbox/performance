@@ -22,9 +22,7 @@ def report_id_from_view_args():
 
 def get_placeholder_date_string():
     """
-    Show the flight's report date as the placeholder of the optional
-    estimated/actual origin/destination date fields. This is the date used when
-    these fields are left empty.
+    Get the "current" report id from the view args.
     """
     if request.endpoint == 'flight.create':
         report_id = request.view_args['report_id']
