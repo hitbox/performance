@@ -1,9 +1,7 @@
 import sqlalchemy as sa
 
-from flask import current_app
 from flask import request
 from wtforms import HiddenField
-from wtforms import SelectField
 from wtforms_alchemy import ClassMap
 from wtforms_alchemy import QuerySelectField
 
