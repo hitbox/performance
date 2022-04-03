@@ -7,8 +7,8 @@ from .. import parse
 from ..extensions import db
 from ..types import DelayCodesType
 
-from .mixin import MetaMixin
 from .flight_type import FlightTypeRelationshipMixin
+from .mixin import MetaMixin
 
 def configured_performance_lanes_flighttypes():
     """

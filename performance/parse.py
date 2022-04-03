@@ -3,6 +3,7 @@ import re
 from .delay import Delay
 
 CANCELLED = 'XLD'
+PLACEHOLDER_CODE = 'XXX'
 
 _delaystring_re = re.compile(
     r'(?P<code>[a-zA-Z]{3})'
@@ -50,7 +51,7 @@ def formatdelays(delays):
     parts = []
     for code, minutes, cancelled in delays:
         if cancelled:
-            s = 'XLD '
+            s = f'{CANCELLED} '
         else:
             s = ''
         s += code.upper()

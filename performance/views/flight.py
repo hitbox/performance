@@ -96,8 +96,6 @@ def _diff_minutes(data):
     minutes = diff_minutes_func(est_date, est_time, act_date, act_time)
     return minutes
 
-PLACEHOLDER_CODE = 'XXX'
-
 def _delays(data):
     """
     Delay code processing for frontend. Add place holder delay code for
@@ -108,14 +106,14 @@ def _delays(data):
 
     # placeholder processing
     # ignoring existing placeholders
-    delay_objects = [delay for delay in delay_objects if delay.code != PLACEHOLDER_CODE]
+    delay_objects = [delay for delay in delay_objects if delay.code != parse.PLACEHOLDER_CODE]
     # add placeholder delay code for unaccounted late minutes
     minutes = data['minutes']
     if minutes and minutes > 0:
         accounted_minutes = sum(delay.minutes for delay in delay_objects)
         missing_minutes = minutes - accounted_minutes
         if missing_minutes > 0:
-            placeholder_delay = Delay(PLACEHOLDER_CODE, missing_minutes, False)
+            placeholder_delay = Delay(parse.PLACEHOLDER_CODE, missing_minutes, False)
             delay_objects += [placeholder_delay]
 
     # back to human readable
