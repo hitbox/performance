@@ -110,7 +110,8 @@ def _delays(data):
     # add placeholder delay code for unaccounted late minutes
     minutes = data['minutes']
     if minutes and minutes > 0:
-        accounted_minutes = sum(delay.minutes for delay in delay_objects)
+        accounted_minutes = sum(delay.minutes for delay in delay_objects
+                                if delay.minutes is not None)
         missing_minutes = minutes - accounted_minutes
         if missing_minutes > 0:
             placeholder_delay = Delay(parse.PLACEHOLDER_CODE, missing_minutes, False)
