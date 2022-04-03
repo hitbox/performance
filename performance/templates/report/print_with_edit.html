@@ -1,17 +1,31 @@
 {% extends "report/base.html" %}
 
 
+{% from "macros.html" import render_previous_next_navigation with context %}
+
+
 {% set thisurl = url_for(request.endpoint, **request.view_args) %}
 {% set with_edit = current_user.is_editor %}
 
 
-{% block main_head %}
-{{ super() }}
+{% block report_header %}
+<h4>
+    <div class="noprint">
+        {{ render_previous_next_navigation(report.date) }}
+    </div>
+    <h3>
+        {{ config.PERFORMANCE_REPORT_TITLE }}: {{ report.date.strftime(config.DATEFMT) }}
+    </h3>
+</h4>
+{% endblock report_header %}
+
+
+{% block report_main %}
 <h4 class="noprint">
     <a href="javascript:;" onclick="window.print(); return false">Print</a>
 </h4>
 {% include "report/performance.html" %}
-{% endblock %}
+{% endblock report_main %}
 
 
 {% block flights %}
@@ -41,8 +55,8 @@
 {% endblock comments %}
 
 
-{% block main_tail %}
+{% block report_footer %}
 <h4 class="noprint delete-report">
     <a href="{{ url_for('report.delete_report', report_id=report.id) }}" onclick="return confirm('Delete report?');">Delete Report</a>
 </h4>
-{% endblock main_tail %}
+{% endblock report_footer %}

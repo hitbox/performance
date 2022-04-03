@@ -224,3 +224,14 @@
 
 {# text inside labels and headers indicating the estimated/actual difference minutes #}
 {% macro render_diff_minutes_text() %}(+/-){% endmacro %}
+
+
+{% macro render_previous_next_navigation(report_date) %}
+<div id="previous-next-navigation">
+    {% for days in [-1, 1] %}
+        {% set offset_date = report_date + datetime.timedelta(days=days) %}
+        <a href="{{ url_for('report.view_report_for_date', report_date=offset_date) }}">{{ offset_date.strftime(config.DATEFMT) }}</a>
+    {% endfor %}
+</div>
+{% endmacro %}
+

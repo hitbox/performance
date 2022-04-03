@@ -2,21 +2,9 @@
 
 
 {% block main %}
-    {% block main_head %}
-    <h4>
-        <div class="noprint">
-            <div id="previous-next-navigation">
-                {% for days in [-1, 1] %}
-                    {% set report_date = report.date+datetime.timedelta(days=days) %}
-                    <a href="{{ url_for('report.view_report_for_date', report_date=report_date) }}">{{ report_date.strftime(config.DATEFMT) }}</a>
-                {% endfor %}
-            </div>
-        </div>
-    </h4>
-    <h3>
-        {{ config.PERFORMANCE_REPORT_TITLE }}: {{ report.date.strftime(config.DATEFMT) }}
-    </h3>{% endblock main_head %}
-    {% block flights %}{% endblock %}
-    {% block comments %}{% endblock %}
-    {% block main_tail %}{% endblock %}
+    {% block report_header %}{% endblock report_header %}
+    {% block report_main %}{% endblock report_main %}
+    {% block flights %}{% endblock flights %}
+    {% block comments %}{% endblock comments %}
+    {% block report_footer %}{% endblock report_footer %}
 {% endblock main %}

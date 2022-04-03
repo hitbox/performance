@@ -1,17 +1,32 @@
-{% extends "base.html" -%}
+{% extends "report/base.html" -%}
+
+
+{# with context for datetime module #}
+{% from "macros.html" import render_previous_next_navigation with context %}
+
+
+{% set report_date = request.view_args.report_date %}
 
 
 {% macro render_create_link(scheduled_report, text) %}
 {% set match_weekday = config.PROMPT_NEW_MATCH_SCHEDULED_WEEKDAY_NAME or False %}
 <h4>
-    <a{% if match_weekday and scheduled_report.name.lower() == request.view_args.report_date.strftime('%A').lower() %} class="prompt-new-weekday-match"{% endif %} href="{{ url_for('report.create_report_from_schedule', report_date=request.view_args.report_date, schedule_id=scheduled_report.id) }}">{{ text }}</a>
+    <a{% if match_weekday and scheduled_report.name.lower() == report_date.strftime('%A').lower() %} class="prompt-new-weekday-match"{% endif %} href="{{ url_for('report.create_report_from_schedule', report_date=report_date, schedule_id=scheduled_report.id) }}">{{ text }}</a>
 </h4>
 {% endmacro %}
 
 
-{% block main %}<article>
+{% block report_header %}
+<h4>
+    <div class="noprint">{{ render_previous_next_navigation(report_date) }}</div>
+</h4>
+{% endblock report_header %}
+
+
+{# overwriting block "main" (because these templates were not designed well enough) #}
+{% block report_main %}<article id="new-report-prompt">
     <h1>New Report</h1>
-    <h3>{{ request.view_args.report_date.strftime(config.DATEFMT) }}</h3>
+    <h3>{{ report_date.strftime(config.DATEFMT) }}</h3>
     {% if config.SCHEDULED_REPORTS_ONLYONE %}
         {# this is hiding the fact that there can be many scheduled reports to build from #}
         {{ render_create_link(scheduled_report, 'Create new report') }}
@@ -23,6 +38,6 @@
     {% endif %}
     <h3>Blank</h3>
     <h4>
-        <a href="{{ url_for('report.create_report_blank', report_date=request.view_args.report_date) }}">Create blank report</a>
+        <a href="{{ url_for('report.create_report_blank', report_date=report_date) }}">Create blank report</a>
     </h4>
-</article>{% endblock main %}
+</article>{% endblock report_main %}
