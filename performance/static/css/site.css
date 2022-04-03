@@ -220,8 +220,15 @@ ol.delay-codes {
     margin-right: 0rem;
 }
 
+#new-report-prompt {
+    width: fit-content;
+    margin: 0 auto;
+}
+
 #previous-next-navigation {
-    margin-bottom: 1rem;
+    width: fit-content;
+    min-width: 900px;
+    margin: 0 auto 1rem auto;
     display: flex;
     justify-content: space-between;
 }
