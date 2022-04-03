@@ -252,7 +252,7 @@ def diff_minutes(est_date, est_time, act_date, act_time):
         est_dt = dt.datetime.combine(est_date, est_time)
         act_dt = dt.datetime.combine(act_date, act_time)
         a, b = sorted([est_dt, act_dt])
-        minutes = (b - a).total_seconds() // 60
+        minutes = int((b - a).total_seconds()) // 60
         if est_dt >= act_dt:
             minutes *= -1
         return minutes
