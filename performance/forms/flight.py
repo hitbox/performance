@@ -18,43 +18,16 @@ from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
 
 def report_id_from_view_args():
-    return request.view_args['report_id']
-
-def get_placeholder_date_string():
     """
     Get the "current" report id from the view args.
     """
-    if request.endpoint == 'flight.create':
-        report_id = request.view_args['report_id']
-        report = Report.query.get(report_id)
-        date = report.date
-    elif request.endpoint == 'flight.edit':
-        flight_id = request.view_args['id']
-        flight = Flight.query.get(flight_id)
-        date = flight.report.date
-    else:
-        return 'date'
-    fmt = current_app.config['DATEFMT']
-    string = date.strftime(fmt)
-    return string
+    return request.view_args['report_id']
 
-def date_field_render_kw(*classes, **extra):
-    """
-    Return the render_kw dict for the date fields.
-    """
-    classes = set(classes)
-    for cls in ['flight', 'date-entry']:
-        if cls not in classes:
-            classes.add(cls)
+DATE_FIELD_TITLE = 'Falls back to report date if blank.'
+DATE_FIELD_TABINDEX = '-1'
 
-    placeholder_date_string = get_placeholder_date_string()
-    render_kw = {
-        'class': ' '.join(classes),
-        'placeholder': placeholder_date_string,
-        'tabindex': '-1',
-        'title': 'Falls back to report date if blank.',
-    }
-    return render_kw
+def date_field_classes_string(*specific_classes):
+    return ' '.join(('flight', 'date-entry') + specific_classes)
 
 class FlightForm(
     BackLinkMixin,
@@ -141,7 +114,11 @@ class FlightForm(
             },
             'origin_departure_estimated_date': {
                 'label': 'ETD',
-                'render_kw': date_field_render_kw('origin'),
+                'render_kw': {
+                    'class': date_field_classes_string('origin'),
+                    'title': DATE_FIELD_TITLE,
+                    'tabindex': DATE_FIELD_TABINDEX,
+                },
             },
             'origin_departure_estimated_time': {
                 'label': '',
@@ -152,7 +129,11 @@ class FlightForm(
             },
             'origin_departure_actual_date': {
                 'label': 'ATD',
-                'render_kw': date_field_render_kw('origin'),
+                'render_kw': {
+                    'class': date_field_classes_string('origin'),
+                    'title': DATE_FIELD_TITLE,
+                    'tabindex': DATE_FIELD_TABINDEX,
+                },
             },
             'origin_departure_actual_time': {
                 'label': '',
@@ -177,7 +158,11 @@ class FlightForm(
             },
             'destination_arrival_estimated_date': {
                 'label': 'ETA',
-                'render_kw': date_field_render_kw('destination'),
+                'render_kw': {
+                    'class': date_field_classes_string('destination'),
+                    'title': DATE_FIELD_TITLE,
+                    'tabindex': DATE_FIELD_TABINDEX,
+                },
             },
             'destination_arrival_estimated_time': {
                 'label': '',
@@ -188,7 +173,11 @@ class FlightForm(
             },
             'destination_arrival_actual_date': {
                 'label': 'ATA',
-                'render_kw': date_field_render_kw('destination'),
+                'render_kw': {
+                    'class': date_field_classes_string('destination'),
+                    'title': DATE_FIELD_TITLE,
+                    'tabindex': DATE_FIELD_TABINDEX,
+                },
             },
             'destination_arrival_actual_time': {
                 'label': '',
@@ -227,3 +216,36 @@ class FlightForm(
             'autofocus': True,
         }
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dynamic_date_field_placeholder()
+
+    def dynamic_date_field_placeholder(self):
+        """
+        Dynamically add placeholder text to indicate what fallback date the
+        estimated/actual difference in minutes, will use.
+        """
+        # NOTE: not sure whether to be general here, and go with
+        #       .endswith('.create') and .endswith('.edit'). figure explicit is better.
+        if request.endpoint == 'flight.create':
+            report_id = report_id_from_view_args()
+            report = Report.query.get(report_id)
+            placeholder = report.date.isoformat()
+        elif request.endpoint == 'flight.edit':
+            flight_id = request.view_args['id']
+            flight = Flight.query.get(flight_id)
+            placeholder = flight.report.date.isoformat()
+        else:
+            placeholder = 'date'
+
+        attrnames = [
+            'origin_departure_estimated_date',
+            'origin_departure_actual_date',
+            'destination_arrival_estimated_date',
+            'destination_arrival_actual_date',
+        ]
+
+        for attrname in attrnames:
+            field = getattr(self, attrname)
+            field.render_kw['placeholder'] = placeholder
