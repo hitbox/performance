@@ -23,18 +23,22 @@ def flight_form_class():
     return FlightForm
 
 def create_context_processor():
+    # XXX: shares a lot with forms.flight.FlightForm:__init__
     report_id = request.view_args['report_id']
     report = Report.query.get(report_id)
-    return dict(
+    context = dict(
         fallbackDate = report.date
     )
+    return context
 
 def update_delete_context_processor():
+    # XXX: shares a lot with forms.flight.FlightForm:__init__
     flight_id = request.view_args['id']
     flight = Flight.query.get(flight_id)
-    return dict(
+    context = dict(
         fallbackDate = flight.report.date,
     )
+    return context
 
 flight_bp.add_url_rule(
     '/create/<int:report_id>',
