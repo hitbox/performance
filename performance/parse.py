@@ -6,9 +6,13 @@ CANCELLED = 'XLD'
 
 _delaystring_re = re.compile(
     r'(?P<code>[a-zA-Z]{3})'
-    r'\s*\(?\s*'
-    r'(?P<minutes>[0-9]{,3}\s*)'
-    r'?\s*\)?')
+    r'\s*' # whitespace
+    r'\(?' # optional left parenthesis
+    r'\s*' # whitespace
+    r'(?P<minutes>[0-9]*)?' # optional number of minutes
+    r'\s*' # whitespace
+    r'\)?' # optional right parenthesis
+    )
 
 def delaystring(text):
     """

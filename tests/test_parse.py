@@ -58,6 +58,8 @@ class TestParseDelay(unittest.TestCase):
         self.check('AAA() BBB123 CCC',
                 [Delay('AAA', None, False), Delay('BBB', 123, False),
                  Delay('CCC', None, False)])
+        #
+        self.check('AAA(123456)', [Delay('AAA', 123456, False)])
 
     def test_parse_cancelled(self):
         self.check('XLD AAA', [Delay('AAA', None, True)])
