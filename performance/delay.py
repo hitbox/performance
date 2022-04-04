@@ -25,3 +25,17 @@ class Delay(namedtuple('Delay', ['code', 'minutes', 'cancelled'])):
                 or (self.minutes and self.minutes > over_minutes))
         )
         return is_controllable
+
+    def code_text(self):
+        """
+        The code part as showable.
+        """
+        from .parse import CANCELLED
+
+        strings = []
+        if self.cancelled and self.code != CANCELLED:
+            strings.append(CANCELLED)
+        if self.code:
+            strings.append(self.code)
+        text = ' '.join(strings)
+        return text

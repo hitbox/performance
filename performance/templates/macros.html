@@ -189,10 +189,7 @@
 {# NOTE: the only observed XLD is Delay(code='XLD', minutes=None, cancelled=True) #}
 
 <span class="delay-code">
-    {%- if delay.cancelled and delay.code != "XLD" -%}
-    <span class="delay-code cancelled">XLD</span>
-    {%- endif -%}
-    <span>{{ delay.code }}</span>
+    <span class="delay-code{% if delay.cancelled %} cancelled{% endif %}">{{ delay.code_text() }}</span>
     {%- if delay.minutes is integer %}<span>({{ delay.minutes }})</span>{% endif -%}
 </span>
 
