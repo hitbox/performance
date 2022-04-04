@@ -121,3 +121,10 @@ class Report(MetaMixin, db.Model):
         """
         items = controllable_destination_delays(self, over_minutes)
         return list(set(flight for flight, delay in items))
+
+    def flight_type_count(self, flight_type):
+        """
+        Return count of flights considered to be lanes.
+        """
+        return len([flight for flight in self.flights
+                    if flight.flight_type == flight_type])

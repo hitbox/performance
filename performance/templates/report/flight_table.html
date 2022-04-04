@@ -55,7 +55,7 @@
         <tfoot>
             {% if flights %}<tr>
                 <th class="row">Total</th>
-                <td class="data number">{{ flights|selectattr('is_lane')|list|length }}</td>
+                <td class="data number">{{ report.flight_type_count(flight_type) }}</td>
                 <td colspan="{{ ncols }}"></td>
             </tr>{% endif %}
             {% if with_edit %}<tr class="noprint">
