@@ -274,6 +274,10 @@ details:hover {
         width: 800px;
     }
 
+    #report-nav {
+        width: 900px;
+    }
+
     #flight-form-back {
         /* want this link on the left side */
         margin-left: 0;

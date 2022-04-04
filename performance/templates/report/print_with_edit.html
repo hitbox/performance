@@ -9,7 +9,7 @@
 
 
 {% block header %}
-<nav>
+<nav id="report-nav">
     <div class="noprint">
         <a href="{{ url_for('report.view_report_for_date', report_date=prev_date) }}">{{ prev_date.strftime(config.DATEFMT) }}</a>
     </div>
