@@ -33,7 +33,9 @@
         {% endblock topnav %}</nav>
         {% include "flash.html" %}
         <main>{% block main %}
+            {% block header %}{% endblock header %}
             {% block content %}{% endblock %}
+            {% block footer %}{% endblock footer %}
         {% endblock %}</main>
         {% block body_last %}{% endblock body_last %}
     {% endblock %}</body>
