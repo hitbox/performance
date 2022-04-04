@@ -8,8 +8,8 @@ fieldset {
 }
 
 input, textarea, select {
-    color: var(--input-color);
-    background-color: var(--input-background);
+    color: inherit;
+    background-color: inherit;
 }
 
 input, select {
@@ -23,6 +23,12 @@ input[type=submit] {
 
 label {
     margin: 1rem .25rem;
+}
+
+textarea {
+    font-family: monospace;
+    font-size: 1rem;
+    padding: 4px 8px;
 }
 
 /* flight/form.html: makes things line up nicely */

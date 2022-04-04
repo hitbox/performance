@@ -4,8 +4,8 @@
     --input-font-color: black;
     --input-background-color: white;
 
-    --a-unvisited-color: MediumBlue;
-    --a-visited-color: MediumBlue;
+    --a-unvisited-color: DarkSlateGrey;
+    --a-visited-color: DarkSlateGrey;
     --a-hover-color: Red;
     --a-active-color: Plum;
 
@@ -50,13 +50,16 @@
     --input-background: #222;
 }
 
+@media screen {
+    body {
+        padding-bottom: 100%;
+    }
+}
+
 body {
     display: flex;
     flex-direction: column;
-    color: var(--font-color);
-    background-color: var(--background-color);
     font-family: arial;
-    padding-bottom: 100%;
 }
 
 main {
@@ -68,47 +71,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: var(--header-separation) 0;
 }
 
-a:link {
-    color: var(--a-unvisited-color);
-}
-
-a:visited {
-    color: var(--a-visited-color);
-}
-
-a:hover, [data-href]:hover {
-    color: var(--a-hover-color);
-}
-
-a:active, [data-href]:active {
-    color: var(--a-active-color);
-}
-
 .click:hover {
-    cursor: pointer;
-}
-
-nav {
-    /* horizontal navigation elements */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: fit-content;
-    margin: 0 auto;
-}
-
-nav > * {
-    padding: 0 2rem;
-}
-
-/* links from data-href attribute */
-[data-href] {
-    text-decoration: none;
-}
-
-[data-href]:hover {
-    background-color: var(--data-href-hover-background-color);
-    color: var(--data-href-hover-color);
     cursor: pointer;
 }
 
@@ -135,7 +98,7 @@ nav > * {
 }
 
 .data.late {
-    color: var(--flight-late-color);
+    color: red;
 }
 
 ul.flat {
@@ -159,8 +122,18 @@ ul.buttons > li {
     justify-content: space-between;
 }
 
-.width50 {
-    width: 50%;
+.print-button {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: .67em 0;
+    display: block;
+    width: fit-content;
+}
+
+.report-title {
+    font-size: 1.7em;
+    font-weight: bold;
+    margin: .67em 0;
 }
 
 .delete-report {
@@ -184,13 +157,22 @@ ul.buttons > li {
 ol.pagination {
     list-style-type: none;
     padding: 0;
-    margin: 1rem 0;
+    margin: 1rem auto;
+    width: fit-content;
     display: flex;
     justify-content: space-between;
 }
 
-.pill {
+ol.pagination li {
+    margin: 0 1rem;
+}
 
+ol.pagination li:first-child {
+    margin-left: 0;
+}
+
+ol.pagination li:last-child {
+    margin-right: 0;
 }
 
 ol.delay-codes {
@@ -213,7 +195,7 @@ ol.delay-codes {
 }
 
 .delay-code {
-    margin-right: .7rem;
+    /*margin-right: .7rem;*/
 }
 
 .delay-code:last-child {
@@ -252,4 +234,87 @@ details:hover {
     background-color: grey;
     color: white;
     padding: 2px 4px;
+}
+
+@media only screen {
+    nav {
+        /* horizontal navigation elements */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    nav > * {
+        margin: 0 2rem;
+    }
+
+    nav > *:first-child {
+        margin-left: 0;
+    }
+
+    nav > *:last-child {
+        margin-right: 0;
+    }
+
+    nav.title {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    #calendar-nav,
+    #flight-form-back {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    #calendar-nav {
+        width: 800px;
+    }
+
+    #flight-form-back {
+        /* want this link on the left side */
+        margin-left: 0;
+    }
+
+    /* links from data-href attribute */
+    [data-href]:hover {
+        background-color: #333;
+        color: Orange;
+        cursor: pointer;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #ccc;
+        background-color: #222;
+    }
+
+    a:link {
+        color: Orange;
+    }
+
+    a:visited {
+        color: Orange;
+    }
+
+    a:hover, [data-href]:hover {
+        color: white;
+    }
+
+    [data-href]:hover {
+        background: #000;
+    }
+
+    a:active, [data-href]:active {
+        color: Red;
+    }
+
+    th:not(.row) {
+        color: DarkOrange;
+        background: inherit;
+    }
 }

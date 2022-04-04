@@ -150,20 +150,17 @@
 </script>{% endmacro %}
 
 
+{% macro render_delays(delays) %}
 {# render list of delay code objects #}
 {# NOTE: delay.minutes can be None #}
 {# NOTE: the only type of XLD observed: {Delay(code='XLD', minutes=None, cancelled=True)} #}
 {# NOTE: can't do a filter here because of complicated rules for showing #}
-{% macro render_delays(delays) %}
 {% set debug = kwargs.get('debug', config.TEMPLATE_DEBUG_DELAY_CODES) %}
 <ol class="delay-codes">{% for delay in delays %}
-{# TODO: Incident 19896: remove this check here, it is done outside so as to show all delays for threshold met for total diff minutes #}
-{% if true or (delay.minutes is not integer) or (delay.minutes is integer and delay.minutes > config.LATE_GT) %}
     <li>
         {% if debug %}<span>{{ loop.index }}.</span>{% endif %}
         {{ render_delay(delay, **kwargs) }}
     </li>
-{% endif %}
 {% endfor %}</ol>
 {% endmacro %}
 
@@ -178,16 +175,16 @@
 {% macro original_render_delay(delay) %}<span class="delay-code">{% if delay.cancelled and delay.code != 'XLD' %}XLD {% endif %}{{ delay.code }}{% if delay.minutes is integer %}({{ delay.minutes }}){% endif %}</span>{% endmacro %}
 
 
+{% macro render_delay(delay) %}
+
 {# render individual delay code object #}
 {# similar: parse.py:formatdelays #}
 {# NOTE: the check for cancelled and != XLD, is to avoid outputting XLD XLD. #}
-{% macro render_delay(delay) %}
-{% set debug = kwargs.get('debug', false) %}
 
+{% set debug = kwargs.get('debug', false) %}
 
 {# NOTE: unobserved a .cancelled delay with .minutes is integer #}
 {# NOTE: the only observed XLD is Delay(code='XLD', minutes=None, cancelled=True) #}
-
 <span class="delay-code">
     <span class="delay-code{% if delay.cancelled %} cancelled{% endif %}">{{ delay.code_text() }}</span>
     {%- if delay.minutes is integer %}<span>({{ delay.minutes }})</span>{% endif -%}

@@ -1,9 +1,9 @@
 {%- extends "base.html" -%}
 
 
-{% macro render_month_link(month) %}
-    {# abbreviated month name showing year if different than this page #}
-    <a href="{{ url_for('.index', year=month.year, month=month.month) }}">{{ month.abbr }}.{% if month.year != request.view_args.year %}&nbsp;{{ month.year }}{% endif %}</a>
+{% macro render_month_link(month_data) %}
+{# abbreviated month name showing year if different than this page #}
+<a href="{{ url_for('.index', year=month_data.year, month=month_data.month) }}">{{ month_data.abbr }}.{% if month_data.year != request.view_args.year %}&nbsp;{{ month_data.year }}{% endif %}</a>
 {% endmacro %}
 
 
@@ -21,17 +21,24 @@
 {% endmacro %}
 
 
+{% block header %}
+<nav class="title" id="calendar-nav">
+    <h4>{{ render_month_link(month.previous) }}</h4>
+    <h3>{{ month.name }}&nbsp;{{ month.year }}</h3>
+    <h4>{{ render_month_link(month.next) }}</h4>
+</nav>
+{% endblock header %}
+
+
 {% block content %}
-<div>
-    <div id=monthnav>
-        {{ render_month_link(month.previous) }}
-        <h3>{{ month.name }}&nbsp;{{ month.year }}</h3>
-        {{ render_month_link(month.next) }}
-    </div>
-    <div class=calendar>
-        {# XXX non-editor users get 403 error message #}
+<section>
+    <div class="calendar">
         {# weekdays #}{% for wd in month.weekdays %}<div class="wd">{{ wd.abbr }}</div>{% endfor %}{% for day in month.days %}{{ render_day(day) }}{% endfor %}
     </div>
-    <h4>&starf; Report exists</h4>
-    {% if (month.year, month.month) != (today.year, today.month) %}<h4><a href="{{ url_for('.goto_today') }}">Go to current calendar</a></h4>{% endif %}
-</div>{% endblock content %}
+</section>{% endblock content %}
+
+
+{% block footer %}
+<h4>&starf; Report exists</h4>
+{% if (month.year, month.month) != (today.year, today.month) %}<h4><a href="{{ url_for('.goto_today') }}">Go to current calendar</a></h4>{% endif %}
+{% endblock footer %}

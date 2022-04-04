@@ -13,7 +13,7 @@
     <div class="noprint">
         <a href="{{ url_for('report.view_report_for_date', report_date=prev_date) }}">{{ prev_date.strftime(config.DATEFMT) }}</a>
     </div>
-    <h3>
+    <div class="report-title">
         {{ config.PERFORMANCE_REPORT_TITLE }}: {{ report.date.strftime(config.DATEFMT) }}
     </div>
     <div class="noprint">
@@ -24,9 +24,9 @@
 
 
 {% block report_main %}
-<h4 class="noprint">
-    <a href="javascript:;" onclick="window.print(); return false">Print</a>
-</h4>
+<div class="noprint">
+    <a class="print-button" href="javascript:;" onclick="window.print(); return false">Print</a>
+</div>
 {% include "report/performance.html" %}
 {% endblock report_main %}
 

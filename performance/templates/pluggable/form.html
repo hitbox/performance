@@ -9,12 +9,20 @@
 {% endmacro %}
 
 
+{% block header %}
+{% if 'backurl' in request.args %}<nav>{{ render_back_link() }}</nav>{% endif %}
+{% endblock header %}
+
+
 {% block content %}
 <article>
-    {% if 'backurl' in request.args %}{{ render_back_link() }}{% endif %}
     <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
         {% block inside_form %}{{ render_form(form) }}{% endblock %}
     </form>
-    {% if 'backurl' in request.args %}{{ render_back_link() }}{% endif %}
 </article>
+{% if 'backurl' in request.args %}{{ render_back_link() }}{% endif %}
 {% endblock content %}
+
+
+{% block footer %}
+{% endblock %}

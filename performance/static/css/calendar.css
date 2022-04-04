@@ -1,25 +1,3 @@
-#monthnav {
-    display: grid;
-    grid-template-columns: repeat(3, calc(100% / 3));
-    text-align: center;
-}
-
-#monthnav a {
-    /* top/bottom spacing like the h tag in the middle */
-    padding: var(--header-separation) 0;
-}
-
-#monthnav a:first-child {
-    /* previous month link */
-    text-align: left;
-}
-
-#monthnav a:last-child {
-    /* next month link */
-    text-align: right;
-}
-
-/* use id instead? */
 .calendar {
     display: grid;
     grid-template-columns: repeat(7, auto);
@@ -31,21 +9,17 @@
 
 .wd {
     /* weekday formatting */
-    padding: .5rem 1rem;
+    padding: .1rem 1.5rem;
     font-size: .75rem;
     font-weight: bold;
 }
 
 .day {
-    /* cell in a calendar */
+    /* cell in a calendar representing a day */
     display: block;
-    /* observed size when date has a report */
-    /* setting the size so that the calendar doesn't jump around */
-    width: 50px;
-    height: 50px;
-    border: 1px solid var(--font-color);
     font-size: 1.25rem;
-    padding: 2rem;
+    padding: 48px;
+    border: 1px solid #aaa;
 }
 
 .legend {
@@ -54,11 +28,25 @@
 
 /* today's date link */
 .today {
-    background: var(--a-date-today-background-color);
+    background-color: var(--a-date-today-background-color);
 }
 
 /* this-weekday used on the import screen to highlight why this flight is included */
 .this-weekday {
     background-color: ForestGreen;
     color: white;
+}
+
+.day {
+    border-color: black;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+    .today, a.today:visited {
+        background-color: #111;
+    }
+
+    .day {
+        border-color: #555;
+    }
 }

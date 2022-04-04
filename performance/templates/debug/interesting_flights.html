@@ -11,30 +11,51 @@
 {% endmacro %}
 
 
+{% block header %}
+<h1>Interesting Flights for delay codes</h1>
+{% endblock %}
+
+
 {% block content %}
 <table>
     <thead>
         <tr>
             <th rowspan="2">Flight</th>
-            <th colspan="3">Orig.</th>
-            <th colspan="3">Dest.</th>
+            <th colspan="4">Orig.</th>
+            <th colspan="4">Dest.</th>
         </tr>
-        <tr>{% for _ in range(2) %}
+        <tr>
+            {# origin #}
+            <th>Show?</th>
             <th>New</th>
             <th>Original</th>
-            <th>Raw</th>{% endfor %}
+            <th>Raw</th>
+            {# destination #}
+            <th>Show?</th>
+            <th>New</th>
+            <th>Original</th>
+            <th>Raw</th>
         </tr>
     </thead>
     <tbody>{% for flight in interesting_flights.items %}
         <tr>
-            <td>{{ render_link(flight) }}</td>
-            {% for field in [flight.origin_delays, flight.destination_delays] %}
-                <td>{{ render_delays(field) }}</td>
-                <td>{{ original_render_delays(field) }}</td>
-                <td>{{ field }}</td>
-            {% endfor %}
+            {# origin #}
+            <td class="data">{{ render_link(flight) }}</td>
+            <td class="data">{{ flight.show_origin_delays() }}</td>
+            <td class="data">{{ render_delays(flight.origin_delays) }}</td>
+            <td class="data">{{ original_render_delays(flight.origin_delays) }}</td>
+            <td class="data">{{ flight.origin_delays }}</td>
+            {# destination #}
+            <td class="data">{{ flight.show_destination_delays() }}</td>
+            <td class="data">{{ render_delays(flight.destination_delays) }}</td>
+            <td class="data">{{ original_render_delays(flight.destination_delays) }}</td>
+            <td class="data">{{ flight.destination_delays }}</td>
         </tr>{% endfor %}
     </tbody>
 </table>
-{{ render_pagination(interesting_flights, request.endpoint) }}
 {% endblock content %}
+
+
+{% block footer %}
+{{ render_pagination(interesting_flights, request.endpoint) }}
+{% endblock footer %}

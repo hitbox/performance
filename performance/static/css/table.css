@@ -7,7 +7,7 @@ table.expand {
 }
 
 table, th, td {
-    border: 1px solid var(--table-border-color);
+    border: 1px solid black;
 }
 
 th {
@@ -16,7 +16,7 @@ th {
     vertical-align: bottom;
 }
 
-thead > tr > th {
+th:not(.row) {
     background: LightGray;
 }
 
@@ -32,14 +32,6 @@ td.data {
     font-size: 1rem;
 }
 
-th {
-    color: var(--table-th-color);
-}
-
-th.row {
-    color: var(--font-color);
-}
-
 th.top {
     text-align: center;
     font-size: .9rem;
@@ -48,4 +40,12 @@ th.top {
 tbody > tr > th {
     text-align: left;
     font-size: .9rem;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+
+    table, th, td {
+        border-color: #555;
+    }
+
 }
