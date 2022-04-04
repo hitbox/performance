@@ -14,8 +14,10 @@
 {% set has_edit = with_edit and edit_attr == 'tail_number' %}
 <td class="data">{{ string(flight.tail_number) }}</td>
 
+
 {% set has_edit = with_edit and edit_attr == 'flight_number' %}
 <td class="data">{{ string(flight.flight_number) }}</td>
+
 
 {#- orgin -#}
 <td class="data">{{ string(flight.origin_station) }}</td>
@@ -24,12 +26,14 @@
 {% set origin_diff_minutes = flight.origin_diff_minutes_value() %}<td class="data numeric{{ diff_class(origin_diff_minutes) }}">{{ origin_diff_minutes }}</td>
 <td class="data">{% if flight.show_origin_delays() %}{{ render_delays(flight.origin_delays) }}{% endif %}</td>
 
+
 {#- destination -#}
 <td class="data">{{ string(flight.destination_station) }}</td>
 <td class="data">{{ time(flight.destination_arrival_estimated_time) }}</td>
 <td class="data">{{ time(flight.destination_arrival_actual_time) }}</td>
 {% set destination_diff_minutes = flight.destination_diff_minutes_value() %}<td class="data numeric{{ diff_class(destination_diff_minutes) }}">{{ destination_diff_minutes }}</td>
 <td class="data">{% if flight.show_destination_delays() %}{{ render_delays(flight.destination_delays) }}{% endif %}</td>
+
 
 {#- controllable delays -#}
 {% if flight.flight_type.name == 'Scheduled' %}
