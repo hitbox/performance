@@ -16,14 +16,6 @@
 {% endmacro %}
 
 
-{% set flight = instance %}
-{% set report = flight.report or report %}
-
-
-{% block header %}
-{% endblock %}
-
-
 {% block head %}
 {{ super() }}
 {% assets filters='jsmin', output='gen/flight-edit.js', 'js/flight-edit.js' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}

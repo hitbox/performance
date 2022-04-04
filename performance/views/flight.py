@@ -27,7 +27,8 @@ def create_context_processor():
     report_id = request.view_args['report_id']
     report = Report.query.get(report_id)
     context = dict(
-        fallbackDate = report.date
+        fallbackDate = report.date,
+        report = report,
     )
     return context
 
@@ -37,6 +38,7 @@ def update_delete_context_processor():
     flight = Flight.query.get(flight_id)
     context = dict(
         fallbackDate = flight.report.date,
+        report = flight.report,
     )
     return context
 
