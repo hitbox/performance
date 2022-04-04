@@ -1,8 +1,5 @@
 "use strict";
 
-const currentTheme = localStorage.getItem(LOCALDATA_THEME_KEY);
-document.documentElement.setAttribute("data-theme", currentTheme);
-
 function initDatePickers() {
     // flatpickr date entry
 
@@ -21,21 +18,6 @@ function initDatePickers() {
             }
         );
     });
-}
-
-function initLightDarkMode() {
-    // Hook up dark/light mode toggle
-    const currentTheme = localStorage.getItem(LOCALDATA_THEME_KEY);
-    const checked = currentTheme && currentTheme === "dark";
-    const themeToggles = document.getElementsByClassName("theme-toggler");
-    for (let i = 0; i < themeToggles.length; i++) {
-        themeToggles[i].checked = checked;
-        themeToggles[i].addEventListener("change", function(e) {
-            let themeName = e.target.checked ? "dark" : "light";
-            document.documentElement.setAttribute("data-theme", themeName);
-            localStorage.setItem(LOCALDATA_THEME_KEY, themeName);
-        }, false);
-    }
 }
 
 function initDataHref() {
@@ -61,7 +43,6 @@ function initCloseButton() {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    initLightDarkMode();
     initDataHref();
     initCloseButton();
     initDatePickers();
