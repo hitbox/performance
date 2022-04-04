@@ -202,7 +202,11 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         """
         Return True that origin delays should show.
         """
-        return self.origin_diff_minutes_value() > current_app.config['LATE_GT']
+        late_gt = current_app.config['LATE_GT']
+        return (
+            self.origin_diff_minutes_value() > late_gt
+            or any(delay.cancelled for delay in self.origin_delays)
+        )
 
     def destination_diff_minutes(self):
         """
@@ -226,7 +230,11 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         """
         Return True that destination delays should show.
         """
-        return self.destination_diff_minutes_value() > current_app.config['LATE_GT']
+        late_gt = current_app.config['LATE_GT']
+        return (
+            self.destination_diff_minutes_value() > late_gt
+            or any(delay.cancelled for delay in self.destination_delays)
+        )
 
 
 class Flight(
