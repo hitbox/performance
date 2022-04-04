@@ -1,3 +1,5 @@
+import datetime
+
 import sqlalchemy as sa
 
 from flask import Blueprint
@@ -152,6 +154,9 @@ def view_report(id):
         return redirect(url_for(request.endpoint, _anchor='system-detail', **request.view_args))
 
     context = get_context(report)
+    context['prev_date'] = report.date - datetime.timedelta(days=1)
+    context['next_date'] = report.date + datetime.timedelta(days=1)
+
     return render_template('report/print_with_edit.html', form=form, **context)
 
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])

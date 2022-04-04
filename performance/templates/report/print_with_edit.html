@@ -8,16 +8,19 @@
 {% set with_edit = current_user.is_editor %}
 
 
-{% block report_header %}
-<h4>
+{% block header %}
+<nav>
     <div class="noprint">
-        {{ render_previous_next_navigation(report.date) }}
+        <a href="{{ url_for('report.view_report_for_date', report_date=prev_date) }}">{{ prev_date.strftime(config.DATEFMT) }}</a>
     </div>
     <h3>
         {{ config.PERFORMANCE_REPORT_TITLE }}: {{ report.date.strftime(config.DATEFMT) }}
-    </h3>
-</h4>
-{% endblock report_header %}
+    </div>
+    <div class="noprint">
+        <a href="{{ url_for('report.view_report_for_date', report_date=next_date) }}">{{ next_date.strftime(config.DATEFMT) }}</a>
+    </div>
+</nav>
+{% endblock header %}
 
 
 {% block report_main %}
