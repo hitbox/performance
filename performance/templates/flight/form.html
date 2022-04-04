@@ -32,10 +32,14 @@ const isEdit = {{ is_edit|tojson }};
 {% endblock head %}
 
 
-{% block inside_form %}
+{% block header %}
 <nav id="flight-form-back">
     <h3>Back to <a href="{{ request.args.backurl }}">{{ report.date.strftime(config.DATEFMT) }}</a></h3>
 </nav>
+{% endblock header %}
+
+
+{% block inside_form %}
 {{ form.hidden_tag() }}
 <fieldset>
     <legend>Flight</legend>
