@@ -65,6 +65,7 @@ class TestParseDelay(unittest.TestCase):
         self.check('XLD AAA', [Delay('AAA', None, True)])
         self.check('XLD BBB12', [Delay('BBB', 12, True)])
         self.check('XLD', [Delay('XLD', None, True)])
+        self.check('XLD XLD', [Delay('XLD', None, True)])
 
     def test_formatdelays(self):
         self.assertEqual(formatdelays(delaystring('AAA1 BBB2 CCC')), 'AAA(1) BBB(2) CCC')
