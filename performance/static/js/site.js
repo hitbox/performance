@@ -28,6 +28,9 @@ function initDataHref() {
         elements[i].addEventListener("click", function() {
             location.href = this.getAttribute("data-href");
         });
+        elements[i].addEventListener("auxclick", function() {
+            window.open(this.getAttribute("data-href"), "_blank");
+        });
     }
 
 }
