@@ -12,9 +12,9 @@
         {% if config.PERFORMANCE_JAVASCRIPT_INJECTION %}{{ render_javascript_injection(config.PERFORMANCE_JAVASCRIPT_INJECTION) }}{% endif %}
         {# data injection for javascript from views #}
         {% if javascript_injection %}{{ render_javascript_injection(javascript_injection) }}{% endif %}
-        {% assets filters='cssmin', output='gen/base.css', 'css/calendar.css', 'css/flash.css', 'css/form.css', 'css/table.css', 'css/site.css', 'css/external/flatpickr.min.css' %}<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">{% endassets %}
-        {% assets filters='cssmin', output='gen/print.css', 'css/print.css' %}<link rel="stylesheet" type="text/css" media="print" href="{{ ASSET_URL }}">{% endassets %}
-        {% assets filters='jsmin', output='gen/base.js', 'js/external/flatpickr.min.js', 'js/site.js' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+        {% assets 'screencss' %}<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">{% endassets %}
+        {% assets 'printcss' %}<link rel="stylesheet" type="text/css" media="print" href="{{ ASSET_URL }}">{% endassets %}
+        {% assets 'sitejs' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
     {% endblock head %}</head>
     <body>{% block body %}
         {% block topnav %}<nav class="noprint">

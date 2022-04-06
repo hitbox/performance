@@ -1,6 +1,5 @@
-from flask import flash
-from flask_assets import Bundle
-from flask_assets import Environment
+import flask_assets as fa
+
 from flask_htmlmin import HTMLMIN
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -29,12 +28,53 @@ class PrefixMiddleware:
             return [message]
 
 
-assets = Environment()
+assets = fa.Environment()
 db = SQLAlchemy()
 htmlmin = HTMLMIN()
 login_manager = LoginManager()
 
+def init_assets():
+    """
+    Register bundles for templates.
+    """
+    assets.register(
+        'screencss',
+        fa.Bundle(
+            'css/calendar.css',
+            'css/flash.css',
+            'css/form.css',
+            'css/table.css',
+            'css/site.css',
+            'css/external/flatpickr.min.css',
+            filters = 'cssmin',
+            output = 'gen/screen.css',
+        )
+    )
+    assets.register(
+        'printcss',
+        fa.Bundle(
+            '/css/print.css',
+            filters = 'cssmin',
+            output = 'gen/print.css',
+        )
+    )
+    assets.register(
+        'sitejs',
+        fa.Bundle(
+            'js/external/flatpickr.min.js',
+            'js/site.js',
+            filters = 'jsmin',
+            output = 'gen/site.js',
+        )
+    )
+
 def init_app(app):
+    """
+    Initialize extensions against application.
+    """
+
+    init_assets()
+
     assets.init_app(app)
     htmlmin.init_app(app)
     db.init_app(app)
