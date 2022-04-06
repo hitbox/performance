@@ -53,7 +53,7 @@ def init_assets():
     assets.register(
         'printcss',
         fa.Bundle(
-            '/css/print.css',
+            'css/print.css',
             filters = 'cssmin',
             output = 'gen/print.css',
         )
