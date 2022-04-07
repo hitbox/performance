@@ -6,6 +6,7 @@
     --header-separation: 1.5rem;
     /* tables */
     --th-color: var(--color);
+    --th-background-color: LightGray;
     --table-border-color: #333;
     --head-padding: 4px 6px;
     --cell-padding: 3px 6px;
@@ -51,10 +52,12 @@ th {
     font-size: .8rem;
     vertical-align: bottom;
     color: var(--th-color);
+    background-color: var(--th-background-color);
 }
 
 th.row {
     color: var(--color);
+    background-color: var(--background-color);
 }
 
 td {
