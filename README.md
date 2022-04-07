@@ -12,14 +12,17 @@ DIFF is the number of minutes between estimated and actual times, calculated suc
 
 LATE_GT is a configured threshold number of minutes, defaulting to zero.
 
+ALWAYS_SHOW_DELAY_CODES is a configured list of delay codes to show if DIFF threshold is not met. Abbreviated to ALWAYS below.
+
 ```mermaid
 flowchart TD
-    A{DIFF \n> LATE_GT?} -- Yes --> E
-    A -- No --> C
-    A -- No --> B{Any XLD code?}
-    B -- Yes --> E
-    B -- No --> C[Do not show]
-    E[Show delay codes]
+    DIFFTEST{DIFF \n> LATE_GT?} -- Yes --> SHOWCODES
+    DIFFTEST -- No.\nLoop delay codes --> ANOTHERCODE{Another\nDelay Code?}
+    ANOTHERCODE -- Yes --> CODETEST{XLD\nor\ncode in\nALWAYS?}
+    CODETEST -- Yes --> SHOWCODES
+    CODETEST -- No --> ANOTHERCODE
+    ANOTHERCODE -- No more\ndelay codes --> NOSHOW[Do not show]
+    SHOWCODES[Show delay codes]
 ```
 
 # INCIDENTS

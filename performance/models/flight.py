@@ -202,10 +202,9 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         """
         Return True that origin delays should show.
         """
-        late_gt = current_app.config['LATE_GT']
-        return (
-            self.origin_diff_minutes_value() > late_gt
-            or any(delay.cancelled for delay in self.origin_delays)
+        return should_show_delays(
+            self.origin_diff_minutes_value(),
+            self.origin_delays
         )
 
     def destination_diff_minutes(self):
@@ -230,10 +229,9 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         """
         Return True that destination delays should show.
         """
-        late_gt = current_app.config['LATE_GT']
-        return (
-            self.destination_diff_minutes_value() > late_gt
-            or any(delay.cancelled for delay in self.destination_delays)
+        return should_show_delays(
+            self.destination_diff_minutes_value(),
+            self.destination_delays
         )
 
 
@@ -264,3 +262,14 @@ def diff_minutes(est_date, est_time, act_date, act_time):
         if est_dt > act_dt:
             minutes *= -1
         return minutes
+
+def should_show_delays(diff_minutes, delays):
+    """
+    Return whether the delay codes should be shown.
+    """
+    late_gt = current_app.config['LATE_GT']
+    always_show_delay_cods = current_app.config['ALWAYS_SHOW_DELAY_CODES']
+    return (
+        diff_minutes > late_gt
+        or any(delay.cancelled or delay.code in always_show_delay_cods for delay in delays)
+    )

@@ -20,6 +20,9 @@ def create_app():
 
     app.config.setdefault('LATE_GT', 0)
     app.config.setdefault('EARLY_LT', 0)
+    # if diff minutes do not meet threshold, always show these delay codes
+    # list of strings
+    app.config.setdefault('ALWAYS_SHOW_DELAY_CODES', [])
 
     @app.context_processor
     def context_processor():
