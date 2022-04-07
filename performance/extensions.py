@@ -41,13 +41,8 @@ def init_assets():
         'sitecss',
         fa.Bundle(
             'css/site.css',
-            #'css/calendar.css',
-            #'css/flash.css',
-            #'css/form.css',
-            #'css/table.css',
-            #'css/external/flatpickr.min.css',
             filters = 'cssmin',
-            output = 'gen/screen.css',
+            output = 'gen/site.css',
         )
     )
     assets.register(
