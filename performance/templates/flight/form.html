@@ -18,7 +18,6 @@
 
 {% block head %}
 {{ super() }}
-{% assets 'flight_edit' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 {# javascript injection #}
 <script>
 {# date to open datepickers to #}
@@ -29,6 +28,7 @@ const destinationDelayCodesId = "{{ form.destination_delays.id }}";
 const isEdit = {{ is_edit|tojson }};
 {# communication to the backend for calculations and autofill #}
 </script>
+{% assets 'flighteditjs' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 {% endblock head %}
 
 

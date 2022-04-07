@@ -73,13 +73,11 @@ def init_assets():
         )
     )
     assets.register(
-        'flight_edit',
+        'flighteditjs',
         fa.Bundle(
-            'js/external/flatpickr.min.js',
-            'js/site.js',
             'js/flight-edit.js',
             filters = 'jsmin',
-            output = 'gen/site.js',
+            output = 'gen/flightedit.js',
         )
     )
 
