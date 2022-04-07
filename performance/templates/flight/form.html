@@ -18,7 +18,7 @@
 
 {% block head %}
 {{ super() }}
-{% assets filters='jsmin', output='gen/flight-edit.js', 'js/flight-edit.js' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+{% assets 'flight_edit' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 {# javascript injection #}
 <script>
 {# date to open datepickers to #}
