@@ -1,4 +1,4 @@
-a, a:link body, a:visited, body, input, td, textarea, th, th:not(.row) {
+a, a:link body, a:visited, body, input, td, textarea, th.row {
     background-color: White;
     color: Black;
 }
