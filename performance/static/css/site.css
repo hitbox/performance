@@ -1,60 +1,21 @@
+/* always applied styling */
+/* the way everything should alway look */
+
 :root {
-    --font-color: black;
-    --background-color: white;
-    --input-font-color: black;
-    --input-background-color: white;
-
-    --a-unvisited-color: DarkSlateGrey;
-    --a-visited-color: DarkSlateGrey;
-    --a-hover-color: Red;
-    --a-active-color: Plum;
-
-    /* select date for today */
-    --a-date-today-background-color: Bisque;
-
-    --data-href-hover-color: DarkOrange;
-    --data-href-hover-background-color: #333;
-
+    --color: black;
     --header-separation: 1.5rem;
-
+    /* tables */
+    --th-color: var(--color);
+    --table-border-color: #333;
     --head-padding: 4px 6px;
     --cell-padding: 3px 6px;
-
-    --flight-late-color: red;
-
-    --table-border-color: black;
-    --table-th-color: black;
-
-    --input-color: default;
-    --input-background: default;
+    /* calendar */
+    --a-date-today-background-color: Bisque;
+    --this-weekday-color: White;
+    --this-weekday-background-color: ForestGreen;
+    --day-border-color: #999;
 }
 
-[data-theme="dark"] {
-    --font-color: #ccc;
-    --background-color: #333;
-    --input-font-color: #ccc;
-    --input-background-color: #333;
-
-    --a-unvisited-color: Orange;
-    --a-visited-color: Orange;
-    --a-hover-color: White;
-    --a-active-color: Red;
-
-    --a-date-today-background-color: DarkOliveGreen;
-
-    --data-href-hover-background-color: #111;
-
-    --table-border-color: DarkGray;
-
-    --input-color: White;
-    --input-background: #222;
-}
-
-@media screen {
-    body {
-        padding-bottom: 100%;
-    }
-}
 
 body {
     display: flex;
@@ -70,6 +31,128 @@ main {
 h1, h2, h3, h4, h5, h6 {
     margin: var(--header-separation) 0;
 }
+
+/* table */
+
+table {
+    border-collapse: collapse;
+}
+
+table.expand {
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid var(--table-border-color);
+}
+
+th {
+    padding: var(--head-padding);
+    font-size: .8rem;
+    vertical-align: bottom;
+    color: var(--th-color);
+}
+
+th.row {
+    color: var(--color);
+}
+
+td {
+    padding: var(--cell-padding);
+    /* make non-.data tds a little smaller */
+    font-size: .925rem;
+    vertical-align: top;
+}
+
+td.data {
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+th.top {
+    text-align: center;
+    font-size: .9rem;
+}
+
+tbody > tr > th {
+    text-align: left;
+    font-size: .9rem;
+}
+
+/* flash messages */
+#flashes {
+    color: White;
+    width: 720px;
+    margin: 0 auto;
+}
+
+.flash {
+    /* single flash item */
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 15px;
+}
+
+.close {
+    /* flash close button */
+    font-size: 25px;
+}
+
+.flash.info {
+    background-color: CornflowerBlue;
+}
+
+.flash.success {
+    background-color: ForestGreen;
+}
+
+.flash.warning {
+    background-color: DarkOrange;
+}
+
+.flash.error {
+    background-color: Crimson;
+}
+
+/* error page */
+.error.code {
+    margin-right: 1rem;
+}
+
+/* navigation */
+
+nav {
+    /* horizontal navigation elements */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+nav > * {
+    margin: 0 2rem;
+}
+
+nav > *:first-child {
+    margin-left: 0;
+}
+
+nav > *:last-child {
+    margin-right: 0;
+}
+
+#calendar-nav,
+#report-nav,
+#flight-form-back {
+    width: 900px;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+
+/* TODO */
 
 .click:hover {
     cursor: pointer;
@@ -123,7 +206,7 @@ ul.buttons > li {
 }
 
 .print-button {
-    font-size: 1.5em;
+    font-size: 1.17em; /* default font-size: https://www.w3schools.com/cssref/css_default_values.asp */
     font-weight: bold;
     margin: .67em 0;
     display: block;
@@ -154,10 +237,12 @@ ul.buttons > li {
     padding: .2rem;
 }
 
+/* pagination */
+
 ol.pagination {
     list-style-type: none;
     padding: 0;
-    margin: 1rem auto;
+    margin: 1rem auto; /* space above, centered */
     width: fit-content;
     display: flex;
     justify-content: space-between;
@@ -174,6 +259,9 @@ ol.pagination li:first-child {
 ol.pagination li:last-child {
     margin-right: 0;
 }
+
+
+/* delay codes */
 
 ol.delay-codes {
     list-style-type: none;
@@ -194,13 +282,8 @@ ol.delay-codes {
     margin-right: 0;
 }
 
-.delay-code {
-    /*margin-right: .7rem;*/
-}
 
-.delay-code:last-child {
-    margin-right: 0rem;
-}
+
 
 #new-report-prompt {
     width: fit-content;
@@ -236,89 +319,217 @@ details:hover {
     padding: 2px 4px;
 }
 
-@media only screen {
-    nav {
-        /* horizontal navigation elements */
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: fit-content;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    nav > * {
-        margin: 0 2rem;
-    }
-
-    nav > *:first-child {
-        margin-left: 0;
-    }
-
-    nav > *:last-child {
-        margin-right: 0;
-    }
-
-    nav.title {
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    #calendar-nav,
-    #flight-form-back {
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    #calendar-nav {
-        width: 800px;
-    }
-
-    #report-nav {
-        width: 900px;
-    }
-
-    #flight-form-back {
-        /* want this link on the left side */
-        margin-left: 0;
-    }
-
-    /* links from data-href attribute */
-    [data-href]:hover {
-        background-color: #333;
-        color: Orange;
-        cursor: pointer;
-    }
+/* calendar (select date) */
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
 }
 
-@media (prefers-color-scheme: dark) {
-    body {
-        color: #ccc;
-        background-color: #222;
-    }
-
-    a:link {
-        color: Orange;
-    }
-
-    a:visited {
-        color: Orange;
-    }
-
-    a:hover, [data-href]:hover {
-        color: white;
-    }
-
-    [data-href]:hover {
-        background: #000;
-    }
-
-    a:active, [data-href]:active {
-        color: Red;
-    }
-
-    th:not(.row) {
-        color: DarkOrange;
-        background: inherit;
-    }
+.wd, .day {
+    text-align: center;
 }
+
+.wd {
+    /* weekday formatting */
+    padding: .1rem 1.5rem;
+    font-size: .75rem;
+    font-weight: bold;
+}
+
+.day {
+    /* cell in a calendar representing a day */
+    display: block;
+    font-size: 1.25rem;
+    padding: 48px;
+    border: 1px solid #aaa;
+}
+
+.legend {
+    margin-top: 2rem;
+}
+
+/* today's date link */
+.today {
+    background-color: var(--a-date-today-background-color);
+}
+
+/* this-weekday used on the import screen to highlight why this flight is included */
+.this-weekday {
+    background-color: var(--this-weekday-background-color);
+    color: var(--this-weekday-color);
+}
+
+.day {
+    border-color: var(--day-border-color);
+}
+
+
+/* forms */
+
+fieldset {
+    margin: 1rem 0;
+    padding: 1rem;
+}
+
+input, textarea, select {
+    color: inherit;
+    background-color: inherit;
+}
+
+input, select {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+}
+
+input[type=submit] {
+    min-width: 8rem;
+}
+
+label {
+    margin: 1rem .25rem;
+}
+
+textarea {
+    font-family: monospace;
+    font-size: 1rem;
+    padding: 4px 8px;
+}
+
+/* flight/form.html: makes things line up nicely */
+fieldset > label:nth-child(2) {
+    margin-left: 0;
+    min-width: 50px;
+    display: inline-block;
+}
+
+input ~ input {
+    margin-left: 0;
+}
+
+label:first-child {
+    margin-left: 0;
+}
+
+label:hover {
+    cursor: pointer; /* clickable label indication */
+    user-select: none; /* disable selecting text */
+}
+
+h3 > label {
+    margin-left: 0;
+}
+
+form > .buttons {
+    display: flex;
+    flex-direction: row;
+}
+
+form > .buttons > * {
+    margin: 0 1rem 0 0;
+}
+
+/* report form styling */
+
+input.narrowest {
+    width: 4rem;
+}
+
+/* flight form styling below */
+
+form #leg {
+    width: 2rem;
+}
+
+form #flight_number, form #tail_number {
+    width: 4rem;
+}
+
+form #weight {
+    width: 8rem;
+}
+
+form #origin_station,
+form #destination_station {
+    width: 3rem;
+}
+
+form #flight_type.scheduled,
+form #flight_number.scheduled,
+form #origin_station.scheduled,
+form #destination_station.scheduled,
+form #origin_departure_estimated_time.scheduled,
+form #destination_arrival_estimated_time.scheduled {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+form #origin_departure_estimated_date,
+form #origin_departure_actual_date,
+form #destination_arrival_estimated_date,
+form #destination_arrival_actual_date {
+    width: 6rem;
+}
+
+label[for="destination_arrival_estimated_time"],
+label[for="destination_arrival_actual_time"],
+label[for="origin_departure_estimated_time"],
+label[for="origin_departure_actual_time"] {
+    /* FIXME */
+    /*display: none;*/
+}
+
+form #origin_departure_estimated_time,
+form #origin_departure_actual_time,
+form #destination_arrival_estimated_time,
+form #destination_arrival_actual_time,
+/* javascript populated estimated/actual diff minutes */
+form #origin-diff-minutes,
+form #destination-diff-minutes {
+    width: 3rem;
+}
+
+/* late color if starts with dash and is not zero */
+/* (1) */ form #origin-diff-minutes:not([value^="-"]):not([value="0"]),
+form #destination-diff-minutes:not([value^="-"]):not([value="0"]) {
+    color: var(--flight-late-color);
+}
+/* (1) javascript populated estimated/actual diff minutes */
+
+form #origin_delays, form #destination_delays {
+    width: 40rem;
+}
+
+form .flight {
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+.date-entry {
+    margin-right: 0;
+}
+
+/* error message for form field */
+.field-error {
+    color: red;
+}
+
+/* a row inside a fieldset for the flight edit */
+.flight-form-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.scheduled-flight-form {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.scheduled-flight-form.buttons {
+    margin-top: 2rem;
+}
+
+.button {
+    border: 1px solid var(--color);
+    padding: 2px 8px;
+}
+

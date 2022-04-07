@@ -38,14 +38,22 @@ def init_assets():
     Register bundles for templates.
     """
     assets.register(
+        'sitecss',
+        fa.Bundle(
+            'css/site.css',
+            #'css/calendar.css',
+            #'css/flash.css',
+            #'css/form.css',
+            #'css/table.css',
+            #'css/external/flatpickr.min.css',
+            filters = 'cssmin',
+            output = 'gen/screen.css',
+        )
+    )
+    assets.register(
         'screencss',
         fa.Bundle(
-            'css/calendar.css',
-            'css/flash.css',
-            'css/form.css',
-            'css/table.css',
-            'css/site.css',
-            'css/external/flatpickr.min.css',
+            'css/screen.css',
             filters = 'cssmin',
             output = 'gen/screen.css',
         )

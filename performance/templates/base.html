@@ -12,8 +12,9 @@
         {% if config.PERFORMANCE_JAVASCRIPT_INJECTION %}{{ render_javascript_injection(config.PERFORMANCE_JAVASCRIPT_INJECTION) }}{% endif %}
         {# data injection for javascript from views #}
         {% if javascript_injection %}{{ render_javascript_injection(javascript_injection) }}{% endif %}
-        {% assets 'screencss' %}<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">{% endassets %}
-        {% assets 'printcss' %}<link rel="stylesheet" type="text/css" media="print" href="{{ ASSET_URL }}">{% endassets %}
+        {% assets 'sitecss' %}<link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">{% endassets %}
+        {% assets 'screencss' %}<link href="{{ ASSET_URL }}" media="screen" rel="stylesheet" type="text/css">{% endassets %}
+        {% assets 'printcss' %}<link href="{{ ASSET_URL }}" media="print" rel="stylesheet" type="text/css">{% endassets %}
         {% assets 'sitejs' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
     {% endblock head %}</head>
     <body>{% block body %}
@@ -26,12 +27,14 @@
             {% endif %}
             {{ render_nav_item('select_date.goto_today', 'Reports') }}
             {{ render_nav_item('user.profile', 'Profile') }}
-            {#
             <div>
-                <label for=theme-1>Dark Theme</label>
-                <input class=theme-toggler id=theme-1 type=checkbox>
+                <label for="select-theme" class="click button"></label>
+                <select id="select-theme">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                    <option value="os" title="Operating System or Browser preference">Theme</option>
+                </select>
             </div>
-            #}
         {% endblock topnav %}</nav>
         {% include "flash.html" %}
         <main>{% block main %}

@@ -1,0 +1,89 @@
+/* only for screen */
+
+:root {
+    /* body */
+    --background-color: default;
+    /* links */
+    --a-color: default;
+    --a-unvisited-color: default;
+    --a-visited-color: default;
+    --a-hover-color: default;
+    --a-active-color: default;
+    --a-focus-background-color: Coral;
+    --a-focus-color: default;
+    /* data-href links */
+    --data-href-hover-color: var(--a-color);
+    --data-href-hover-background-color: Orange;
+    /* table */
+    --table-border-color: black;
+    /* TODO */
+    --flight-late-color: red;
+    --input-color: default;
+}
+
+[data-theme="dark"] {
+    /* body */
+    --color: #ccc;
+    --background-color: #333;
+    /* links */
+    --a-color: Orange;
+    --a-unvisited-color: var(--a-color);
+    --a-visited-color: var(--a-unvisited-color);
+    --a-hover-color: White;
+    --a-active-color: Red;
+    --a-focus-color: White;
+    /* data-href links */
+    --data-href-hover-background-color: #111; /* darker than dark background */
+    /* calendar */
+    --a-date-today-background-color: DarkOliveGreen;
+    --table-border-color: DarkGray;
+    --input-color: White;
+    /* tables */
+    --th-color: #ccc;
+    --th-background-color: #555;
+}
+
+body {
+    color: var(--color);
+    background-color: var(--background-color);
+    padding-bottom: 100%; /* scroll past bottom */
+}
+
+a:link {
+    color: var(--a-color);
+}
+
+a:focus,
+a:focus:visited /* override a:visited */ {
+    color: var(--a-focus-color);
+    background: var(--a-focus-background-color);
+}
+
+a:visited {
+    color: var(--a-visited-color);
+}
+
+a:hover {
+    color: var(--a-hover-color);
+}
+
+#flight-form-back {
+    /* want this link on the left side */
+    margin-left: 0;
+}
+
+/* links from data-href attribute */
+[data-href]:hover {
+    background-color: #333;
+    color: Orange;
+    cursor: pointer;
+}
+
+
+
+/* table colors screen */
+
+/* those used as left side headers in tbody */
+th.row {
+    background: inherit;
+}

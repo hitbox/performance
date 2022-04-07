@@ -1,6 +1,22 @@
 a, a:link body, a:visited, body, input, td, textarea, th, th:not(.row) {
-    background-color: white;
-    color: black;
+    background-color: White;
+    color: Black;
+}
+
+/* report title */
+/* make report title align left-most */
+#report-nav {
+    margin: 0 0 1rem 0;
+}
+
+#report-title {
+    margin: 0;
+}
+
+
+.noprint {
+    display: none !important;
+    width: 0;
 }
 
 table, th, td, textarea {
@@ -16,10 +32,6 @@ a, [data-href] {
     text-decoration: none;
 }
 
-.noprint {
-    display: none !important;
-}
-
 body {
     padding-bottom: 0 !important;
 }
@@ -29,7 +41,7 @@ body {
 }
 
 .report-title, h3, pre, th.top {
-    font-size: 1rem;
+    /*font-size: 1rem;*/
 }
 
 h3 {
