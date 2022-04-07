@@ -40,6 +40,7 @@
 
 
 {% block comments %}
+<div class="performance-section">
     <h3 id="system-detail">System Detail</h3>
     {% set system_detail_form_name = 'system-detail-form' %}
     {% if not with_edit %}
@@ -56,6 +57,7 @@
         </div>
     </form>
     {% endif %}
+</div>
 {% endblock comments %}
 
 
