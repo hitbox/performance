@@ -74,9 +74,9 @@ a:hover {
 
 /* links from data-href attribute */
 [data-href]:hover {
-    background-color: #333;
-    color: Orange;
     cursor: pointer;
+    color: var(--data-href-hover-color);
+    background-color: var(--data-href-hover-background-color);
 }
 
 
