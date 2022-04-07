@@ -49,6 +49,7 @@ def init_assets():
         'screencss',
         fa.Bundle(
             'css/screen.css',
+            'css/external/flatpickr.min.css',
             filters = 'cssmin',
             output = 'gen/screen.css',
         )
