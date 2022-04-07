@@ -10,6 +10,6 @@ class ReportForm(BackLinkMixin, ModelForm, SubmitMixin):
         only = ['system_detail']
         field_args = {
             'system_detail': {
-                'render_kw': { 'cols': 120, 'rows': 15 },
+                'render_kw': { 'cols': 133, 'rows': 15 },
             },
         }
