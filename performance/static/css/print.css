@@ -40,10 +40,6 @@ body {
     page-break-inside: avoid;
 }
 
-.report-title, h3, pre, th.top {
-    /*font-size: 1rem;*/
-}
-
 h3 {
     margin: .5rem 0;
 }
