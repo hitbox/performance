@@ -62,6 +62,7 @@ def init_assets():
             output = 'gen/print.css',
         )
     )
+    # javascript
     assets.register(
         'sitejs',
         fa.Bundle(
