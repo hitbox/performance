@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Flask
 
 # ensure shared models defined
@@ -26,7 +28,9 @@ def create_app():
 
     @app.context_processor
     def context_processor():
-        import datetime
+        """
+        Application wide template injection.
+        """
         context = dict(
             datetime = datetime,
         )
