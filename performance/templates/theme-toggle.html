@@ -1,0 +1,43 @@
+<div>
+    {# <select> is hidden after javascript and label is the clickable thing #}
+    <label onclick="toggleLabelClick(this)" for="select-theme" class="click button"></label>
+    <select id="select-theme" style="display: none;">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+        <option value="default">Theme</option>
+    </select>
+    <script>
+    const themeSelect = document.getElementById("select-theme");
+
+    function updateDataTheme() {
+        let themeValue = localStorage.getItem(LOCALDATA_THEME_KEY);
+        if (!themeValue || themeValue === "default") {
+            themeSelect.value = "default";
+            let prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+            let fallback = prefersDark.matches ? "dark": "default";
+            document.documentElement.setAttribute("data-theme", fallback);
+        } else {
+            themeSelect.value = themeValue;
+            document.documentElement.setAttribute("data-theme", themeSelect.value);
+        }
+    }
+
+    function updateLabels() {
+        let innerHTML = themeSelect.options[themeSelect.selectedIndex].innerHTML;
+        for (let label of themeSelect.labels) {
+            label.innerHTML = innerHTML;
+        }
+    }
+
+    function toggleLabelClick(label) {
+        themeSelect.selectedIndex = (themeSelect.selectedIndex + 1) % themeSelect.options.length;
+        const option = themeSelect.options[themeSelect.selectedIndex];
+        localStorage.setItem(LOCALDATA_THEME_KEY, option.value);
+        updateDataTheme();
+        updateLabels();
+    }
+
+    updateDataTheme();
+    updateLabels();
+    </script>
+</div>

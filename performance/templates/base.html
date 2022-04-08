@@ -27,14 +27,7 @@
             {% endif %}
             {{ render_nav_item('select_date.goto_today', 'Reports') }}
             {{ render_nav_item('user.profile', 'Profile') }}
-            <div>
-                <label for="select-theme" class="click button"></label>
-                <select id="select-theme">
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
-                    <option value="os" title="Operating System or Browser preference">Theme</option>
-                </select>
-            </div>
+            {% include "theme-toggle.html" %}
         {% endblock topnav %}</nav>
         {% include "flash.html" %}
         <main>{% block main %}
