@@ -33,6 +33,12 @@
 {% endblock head %}
 
 
+{% block header %}
+<h1>Flight for Scheduled Report</h1>
+{{ super() }}
+{% endblock header %}
+
+
 {% block inside_form %}
     {{ form.hidden_tag() }}
     <div class="scheduled-flight-form">

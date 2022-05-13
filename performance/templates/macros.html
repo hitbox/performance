@@ -71,23 +71,27 @@
 {%- endmacro -%}
 
 
+{% macro render_field_simple1(field) %}
+{% if field.type == 'BooleanField' %}
+    {{ field }}{{ field.label }}
+{% elif field.type == 'TextAreaField' %}
+    <div>{{ field.label }}</div>
+    {{ field }}
+{% else %}
+    {{ field.label }}{{ field }}
+{% endif %}
+{% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+{% endmacro %}
+
+
 {% macro render_form_simple1(form) %}
 {{ form.hidden_tag() }}
 {# normal fields #}
 {% for field in form|rejectattr('type', 'in', ['CSRFTokenField', 'HiddenField', 'SubmitField']) %}
-<div>
-    {% if field.type == 'BooleanType' %}
-        {{ field }}{{ field.label }}
-    {% elif field.type == 'TextAreaField' %}
-        <div>{{ field.label }}</div>
-        {{ field }}
-    {% else %}
-        {{ field.label }}{{ field }}
-    {% endif %}
-</div>
+<div>{{ render_field_simple1(field) }}</div>
 {% endfor %}
 {# buttons #}
-<div>
+<div class="buttons">
 {% for field in form|selectattr('type', 'in', ['SubmitField']) %}
     {{ field }}
 {% endfor %}

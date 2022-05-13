@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% from "macros.html" import string %}
+{% from "macros.html" import time %}
+{% from "macros.html" import render_form_simple1 %}
+
+
+{% set backurl = url_for(request.endpoint, **request.view_args) %}
+
+
+{% block main %}
+<article>
+    {% if scheduled_report %}{# editing existing #}
+    <h1>Editing Scheduled Report "{{ scheduled_report.name }}"</h1>
+    <a href="{{ url_for('scheduled_report.list_for_edit_scheduled_report_flights', id=scheduled_report.id) }}">Back to scheduled flights</a>
+    {% else %}
+    <h1>New Scheduled Report</h1>
+    <a href="{{ url_for('scheduled_report.list') }}">Back to scheduled report list</a>
+    {% if schedules %}
+    <h3>Existing schedule display order</h3>
+    <ul class="flat">{% for scheduled_report in schedules %}
+        <li>{{ scheduled_report.display_order }}. {{ scheduled_report.name }}</li>{% endfor %}
+    </ul>
+    {% endif %}{# if schedules (has existing schedules for display order help #}
+    {% endif %}{# if scheduled_report (editing existing) #}
+
+    <form action="{{ url_for(request.endpoint, **request.view_args) }}" class="scheduled-report" method="post">
+    {{ render_form_simple1(form) }}
+    </form>
+</article>{% endblock main %}

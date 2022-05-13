@@ -7,9 +7,11 @@
 
 {% block main %}
 <h3>Users</h3>
+<h4><a href="{{ url_for('admin.new_user') }}">New User</a></h4>
 <table>
     <thead>
         <tr>
+            <th></th>
             <th>Username</th>
             <th>Email</th>
             <th{% if User.is_admin.doc %} title="{{ User.is_admin.doc }}"{% endif %}>Admin?</th>
@@ -21,6 +23,7 @@
     </thead>
     <tbody>{% for user in users.items %}
         <tr>
+            <td><a href="{{ url_for('admin.edit_user', id=user.id) }}">edit</a></td>
             <td>{{ user.username }}</td>
             <td><a href="mailto:{{ user.email }}">{{ user.email }}</td>
             <td>{{ yesno(user.is_admin) }}</td>

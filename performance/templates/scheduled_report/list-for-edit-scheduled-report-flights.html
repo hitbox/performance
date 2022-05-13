@@ -6,6 +6,7 @@
 
 {% set backurl = url_for(request.endpoint, **request.view_args) %}
 
+
 {% macro render_create_link(scheduled_flight, flight_type) %}
 <h4>
     <a href="{{ url_for('scheduled_flight.create', scheduled_report_id=scheduled_report.id, flight_type_id=flight_type.id, backurl=backurl) }}">Add {{ flight_type.name }} Flight</a>
@@ -59,7 +60,13 @@
 <article>
     {% if not config.SCHEDULED_REPORTS_ONLYONE %}
     <h1>Schedule "{{ scheduled_report.name }}"</h1>
-    {% endif %}
+    {% if current_user.is_admin %}
+    <h4>
+        <a href="{{ url_for('scheduled_report.edit_scheduled_report', id=scheduled_report.id) }}">Edit or delete this schedule</a>
+    </h4>
+    {% endif %}{# if admin user #}
+    {% endif %}{# if not only one scheduled report #}
+    <h2>Flights</h2>
     {% for flight_type in flight_types %}<section class="scheduled-report">
         {% set flights = scheduled_report.scheduled_flights|selectattr('flight_type.id', 'eq', flight_type.id)|sort(attribute='flight_number') %}
         {% if not flights %}

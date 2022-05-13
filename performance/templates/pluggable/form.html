@@ -10,7 +10,7 @@
 
 
 {% block header %}
-{% if 'backurl' in request.args %}<nav>{{ render_back_link() }}</nav>{% endif %}
+{% if 'backurl' in request.args %}{{ render_back_link() }}{% endif %}
 {% endblock header %}
 
 
