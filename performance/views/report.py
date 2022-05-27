@@ -37,22 +37,26 @@ def get_performance_from(reports):
     controllable_destination_delays_over15 = [
         delay
         for report in reports
-        for delay in report.controllable_destination_delays(over_minutes=15)
+        for delay
+        in report.controllable_destination_delays(over_minutes=15)
     ]
     controllable_destination_delays_over30 = [
         delay
         for report in reports
-        for delay in report.controllable_destination_delays(over_minutes=30)
+        for delay
+        in report.controllable_destination_delays(over_minutes=30)
     ]
     flights_with_controllable_destination_delays_over15 = [
         flight
         for report in reports
-        for flight in report.flights_with_controllable_destination_delays(over_minutes=15)
+        for flight
+        in report.flights_with_controllable_destination_delays(over_minutes=15)
     ]
     flights_with_controllable_destination_delays_over30 = [
         flight
         for report in reports
-        for flight in report.flights_with_controllable_destination_delays(over_minutes=30)
+        for flight
+        in report.flights_with_controllable_destination_delays(over_minutes=30)
     ]
     result = dict(
         lanes = lanes,
@@ -69,6 +73,7 @@ def get_performance_from(reports):
 
 def get_context(report):
     """
+    Context data for viewing report.
     """
     month_to_date_reports = Report.query.filter(
         sa.func.date_part('year', Report.date) == report.date.year,
@@ -82,6 +87,7 @@ def get_context(report):
         sa.func.date_part('year', Report.date) == report.date.year,
         Report.date_quarter == report.date_quarter,
     ).all()
+
     # quarter to date assumed bests objects
     assumed_bests_qtd = [
         AssumedBest.query.filter(
@@ -91,12 +97,14 @@ def get_context(report):
         for report in reports_quarter_to_date
     ]
     assumed_bests_qtd = filter(None, assumed_bests_qtd)
-    #
+
+    # quarter to date
     quarter_to_date = get_performance_from(reports_quarter_to_date)
     assumed_best = AssumedBest.query.filter(
         AssumedBest.year == report.date.year,
         AssumedBest.month == report.date.month,
     ).one_or_none()
+
     #
     context = dict(
         report = report,
@@ -126,6 +134,7 @@ def view_report_for_date(report_date):
     Redirect from report date to id.
     """
     report = Report.query.filter(Report.date == report_date).one_or_none()
+
     if report is None:
         # Alert and redirect to new report
         if 'DATEFMT' in current_app.config:
@@ -134,6 +143,7 @@ def view_report_for_date(report_date):
             date_str = str(report_date)
         flash(f'{date_str} not found.', 'info')
         return redirect(url_for('.prompt_new', report_date=report_date))
+
     return redirect(url_for('.view_report', id=report.id))
 
 @report_bp.route('/view/<int:id>', methods=['GET', 'POST'])
@@ -151,7 +161,13 @@ def view_report(id):
     if form.validate_on_submit():
         report.system_detail = form.system_detail.data
         db.session.commit()
-        return redirect(url_for(request.endpoint, _anchor='system-detail', **request.view_args))
+        return redirect(
+            url_for(
+                request.endpoint,
+                _anchor = 'system-detail',
+                **request.view_args
+            )
+        )
 
     context = get_context(report)
     context['prev_date'] = report.date - datetime.timedelta(days=1)
@@ -162,6 +178,9 @@ def view_report(id):
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @edit_check
 def edit_report(id):
+    """
+    Edit Report object.
+    """
     ReportForm = get_report_form_class()
     report = Report.query.get_or_404(id)
     form = ReportForm(obj=report)
@@ -191,6 +210,9 @@ def edit_report(id):
 @report_bp.route('/delete/<int:report_id>')
 @edit_check
 def delete_report(report_id):
+    """
+    Delete Report
+    """
     report = Report.query.get_or_404(report_id)
     db.session.delete(report)
     db.session.commit()
@@ -199,6 +221,9 @@ def delete_report(report_id):
 @report_bp.route('/create_from_schedule/<date:report_date>/<schedule_id>')
 @edit_check
 def create_report_from_schedule(report_date, schedule_id):
+    """
+    Create new report from scheduled report.
+    """
     scheduled_report = ScheduledReport.query.get_or_404(schedule_id)
     report = Report(
         date = report_date,
