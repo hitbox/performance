@@ -21,6 +21,10 @@
         <a href="{{ url_for('report.view_report_for_date', report_date=next_date) }}">{{ next_date.strftime(config.DATEFMT) }}</a>
     </h4>
 </nav>
+{% if config.EXPAND %}<nav>
+    {# development-only link to expand report context #}
+    <a class="devel" href="{{ url_for('report.view_report_expanded_performance', id=report.id) }}" title="Development Only">Expand report context</a>
+</nav>{% endif %}
 {% endblock header %}
 
 

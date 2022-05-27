@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<h1>Expanded Report Context</h1>
+<h2>daily.lanes</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Tail</th>
+            <th>Flight</th>
+            <th>Orig</th>
+            <th>ETD</th>
+            <th>ATD</th>
+            <th>Delays</th>
+            <th>Dest</th>
+            <th>ETA</th>
+            <th>ATA</th>
+            <th>Delay</th>
+            <th>Weight</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for flight in daily.lanes %}<tr>
+            <td>{{ flight.flight_type.name }}</td>
+            <td>{{ flight.tail_number }}</td>
+            <td>{{ flight.flight_number }}</td>
+            <td>{{ flight.origin_station }}</td>
+            <td>{{ flight.origin_departure_estimated_time }}</td>
+            <td>{{ flight.origin_departure_actual_time }}</td>
+            <td>{{ flight.origin_delays }}</td>
+            <td>{{ flight.destination_station }}</td>
+            <td>{{ flight.destination_arrival_estimated_time }}</td>
+            <td>{{ flight.destination_arrival_actual_time }}</td>
+            <td>{{ flight.destination_delays }}</td>
+            <td>{{ flight.weight }}</td>
+        </tr>{% endfor %}
+    </tbody>
+</table>
+{% endblock content %}
+

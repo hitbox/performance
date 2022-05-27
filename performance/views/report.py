@@ -3,6 +3,7 @@ import datetime
 import sqlalchemy as sa
 
 from flask import Blueprint
+from flask import abort
 from flask import current_app
 from flask import flash
 from flask import redirect
@@ -174,6 +175,19 @@ def view_report(id):
     context['next_date'] = report.date + datetime.timedelta(days=1)
 
     return render_template('report/print_with_edit.html', form=form, **context)
+
+@report_bp.route('/view/expand/<int:id>', methods=['GET'])
+@basic_check
+def view_report_expanded_performance(id):
+    """
+    Detailed view of the normal report.
+    """
+    if not current_app.config.get('EXPAND'):
+        abort(404)
+
+    report = Report.query.get_or_404(id)
+    context = get_context(report)
+    return render_template('report/expanded.html', **context)
 
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 @edit_check
