@@ -107,7 +107,10 @@ def get_context(report):
         AssumedBest.month == report.date.month,
     ).one_or_none()
 
-    contract = Contract.query.first()
+    contract = Contract.query.filter(
+        Contract.date_range_start <= report.date,
+        Contract.date_range_end >= report.date,
+    ).first()
 
     #
     context = dict(
