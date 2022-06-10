@@ -18,6 +18,7 @@ from ..models import AssumedBest
 from ..models import Flight
 from ..models import Report
 from ..models import ScheduledReport
+from ..models import Contract
 
 report_bp = Blueprint('report', __name__)
 
@@ -106,6 +107,8 @@ def get_context(report):
         AssumedBest.month == report.date.month,
     ).one_or_none()
 
+    contract = Contract.query.first()
+
     #
     context = dict(
         report = report,
@@ -124,6 +127,7 @@ def get_context(report):
         quarter_to_date = quarter_to_date,
         assumed_best = assumed_best,
         assumed_bests_qtd = assumed_bests_qtd,
+        contract = contract,
     )
     return context
 
@@ -166,9 +170,7 @@ def view_report(id):
             url_for(
                 request.endpoint,
                 _anchor = 'system-detail',
-                **request.view_args
-            )
-        )
+                **request.view_args))
 
     context = get_context(report)
     context['prev_date'] = report.date - datetime.timedelta(days=1)

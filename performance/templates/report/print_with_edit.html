@@ -1,6 +1,7 @@
 {% extends "report/base.html" %}
 
 
+{% from "macros.html" import render_arrival_performance_contract_tier_table %}
 {% from "macros.html" import render_previous_next_navigation with context %}
 
 
@@ -21,8 +22,7 @@
         <a href="{{ url_for('report.view_report_for_date', report_date=next_date) }}">{{ next_date.strftime(config.DATEFMT) }}</a>
     </h4>
 </nav>
-{% if config.EXPAND %}<nav>
-    {# development-only link to expand report context #}
+{# development-only link to expand report context #}{% if config.EXPAND %}<nav>
     <a class="devel" href="{{ url_for('report.view_report_expanded_performance', id=report.id) }}" title="Development Only">Expand report context</a>
 </nav>{% endif %}
 {% endblock header %}
@@ -32,7 +32,12 @@
 <div class="noprint">
     <a class="print-button" href="javascript:;" onclick="window.print(); return false">Print</a>
 </div>
-{% include "report/performance.html" %}
+<div id="performance-top">
+    {% include "report/performance.html" %}
+    {% if contract %}<div id="performance-contract-wrapper">
+        {{ render_arrival_performance_contract_tier_table(contract) }}
+    </div>{% endif %}
+</div>
 {% endblock report_main %}
 
 

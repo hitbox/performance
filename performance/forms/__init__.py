@@ -1,4 +1,6 @@
 from .assumed_best import AssumedBestForm
+from .contract import ContractForm
+from .contract import PerformanceTierForm
 from .flight import FlightForm
 from .report import ReportForm
 from .scheduled_flight import ScheduledFlightForm

@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 
 
+{% from "macros.html" import render_integer %}
+{% from "macros.html" import render_delays %}
+
+
 {% block content %}
-<h1>Expanded Report Context</h1>
-<h2>daily.lanes</h2>
+<h1>Development Only</h1>
+<h2>{{ report.date }}</h2>
+<h2>Report.flights</h2>
 <table>
     <thead>
         <tr>
+            <th>#</th>
             <th>Type</th>
             <th>Tail</th>
             <th>Flight</th>
@@ -19,22 +25,25 @@
             <th>ATA</th>
             <th>Delay</th>
             <th>Weight</th>
+            <th>Is Lane?</th>
         </tr>
     </thead>
     <tbody>
-        {% for flight in daily.lanes %}<tr>
-            <td>{{ flight.flight_type.name }}</td>
-            <td>{{ flight.tail_number }}</td>
-            <td>{{ flight.flight_number }}</td>
-            <td>{{ flight.origin_station }}</td>
-            <td>{{ flight.origin_departure_estimated_time }}</td>
-            <td>{{ flight.origin_departure_actual_time }}</td>
-            <td>{{ flight.origin_delays }}</td>
-            <td>{{ flight.destination_station }}</td>
-            <td>{{ flight.destination_arrival_estimated_time }}</td>
-            <td>{{ flight.destination_arrival_actual_time }}</td>
-            <td>{{ flight.destination_delays }}</td>
-            <td>{{ flight.weight }}</td>
+        {% for flight in report.flights %}<tr>
+            <td class="data">{{ loop.index }}</td>
+            <td class="data">{{ flight.flight_type.name }}</td>
+            <td class="data">{{ flight.tail_number }}</td>
+            <td class="data">{{ flight.flight_number }}</td>
+            <td class="data">{{ flight.origin_station }}</td>
+            <td class="data">{{ flight.origin_departure_estimated_time }}</td>
+            <td class="data">{{ flight.origin_departure_actual_time }}</td>
+            <td class="data">{{ render_delays(flight.origin_delays) }}</td>
+            <td class="data">{{ flight.destination_station }}</td>
+            <td class="data">{{ flight.destination_arrival_estimated_time }}</td>
+            <td class="data">{{ flight.destination_arrival_actual_time }}</td>
+            <td class="data">{{ render_delays(flight.destination_delays) }}</td>
+            <td class="data">{{ render_integer(flight.weight) }}</td>
+            <td class="data">{{ flight.is_lane }}</td>
         </tr>{% endfor %}
     </tbody>
 </table>

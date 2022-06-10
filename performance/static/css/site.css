@@ -183,8 +183,18 @@ nav > *:last-child {
     text-align: right;
 }
 
+.data.date {
+    text-align: center;
+}
+
 .data.late {
     color: red;
+}
+
+hr {
+    display: block;
+    margin-top: 2em;
+    margin-bottom: 2em;
 }
 
 ul.flat {
@@ -198,6 +208,7 @@ ul.flat > li {
 }
 
 ul.buttons > li {
+    /* XXX remove? */
     float: left;
     margin-right: 1.5rem;
 }
@@ -351,6 +362,10 @@ details:hover {
     margin-top: 2rem;
 }
 
+.date-wrap {
+    white-space: nowrap;
+}
+
 /* today's date link */
 .today {
     background-color: var(--a-date-today-background-color);
@@ -420,6 +435,11 @@ label:hover {
 
 h3 > label {
     margin-left: 0;
+}
+
+input[type=submit].danger {
+    background: #a03934;
+    color: white;
 }
 
 form > .buttons {
@@ -507,8 +527,22 @@ form.scheduled-report {
 }
 
 form.scheduled-report .buttons,
-form.user-admin .buttons {
-    margin-top: 4em;
+form.user-admin .buttons,
+.buttons-2 {
+    margin-top: 2em;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+/* performance stats at top of report */
+#performance-top {
+    display: flex;
+    justify-content: space-between;
+}
+
+#performance-contract-wrapper {
+    width: min-content;
 }
 
 form .flight {
@@ -549,6 +583,24 @@ form .flight {
     padding: 2px 8px;
 }
 
+.full-width {
+    width: 100%;
+}
+
+.min-width {
+    width: min-content;
+}
+
+.performance-contract-table td {
+    padding: 8px;
+}
+
+.performance-contract-table td.tier {
+    text-align: center;
+    vertical-align: middle;
+    min-width: 100px;
+}
+
 form.user-admin label {
     display: inline-block;
     width: 10em;
@@ -558,4 +610,9 @@ form.user-admin label {
     /* style as "development-only" */
     color: red !important;
     font-weight: bold;
+}
+
+.col-2 {
+    display: grid;
+    grid-template-columns: auto auto;
 }

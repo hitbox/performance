@@ -1,4 +1,6 @@
 from .assumed_best import AssumedBest
+from .contract import Contract
+from .contract import PerformanceTier
 from .flight import Flight
 from .flight import FlightBaseMixin
 from .flight import ReportFlightBaseMixin

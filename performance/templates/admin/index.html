@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+
+
+{% block main %}
+<h3>Administration</h3>
+<ul class="flat">
+    <li><a href="{{ url_for('admin.users') }}">User accounts</a></li>
+    <li><a href="{{ url_for('admin.list_contracts') }}">Performance Contracts</a></li>
+</ul>
+{% endblock main %}

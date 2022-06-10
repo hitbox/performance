@@ -16,11 +16,13 @@ class ListView(View):
         item_renderer = None,
         page_title = None,
         query = None,
+        context_processor = None,
     ):
         self.model = model
         self.template = template or self.template
         self.item_renderer = item_renderer or str
         self.page_title = page_title
+        self.context_processor = context_processor
         if query is None:
             query = self.model.query
         self.query = query
@@ -32,6 +34,10 @@ class ListView(View):
             item_renderer = self.item_renderer,
             page_title = self.page_title,
         )
+        if callable(self.context_processor):
+            extra = self.context_processor()
+            if extra:
+                context.update(extra)
         return render_template(self.template, **context)
 
 
@@ -151,6 +157,7 @@ class CreateView(BaseEditView):
 
     def dispatch_request(self, **kwargs):
         form = self.form_class()
+        instance = None
         if form.validate_on_submit():
             instance = self.model()
             db.session.add(instance)
@@ -163,5 +170,6 @@ class CreateView(BaseEditView):
             del form.delete
         context = self.get_context(
             form = form,
+            instance = instance,
         )
         return render_template(self.template, **context)

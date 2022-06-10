@@ -45,8 +45,21 @@ function initCloseButton() {
     }
 }
 
+function initDangerButtons() {
+    const select = "input[type=submit].danger";
+    const dangerButtons = document.querySelectorAll(select);
+    for (let button of dangerButtons) {
+        button.addEventListener("click", function(event) {
+            if (!confirm("Are you sure?")) {
+                event.preventDefault();
+            }
+        });
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function(event) {
     initDataHref();
     initCloseButton();
     initDatePickers();
+    initDangerButtons();
 });

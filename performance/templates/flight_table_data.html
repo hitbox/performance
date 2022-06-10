@@ -1,5 +1,5 @@
 {% from "macros.html" import diff_class %}
-{% from "macros.html" import integer %}
+{% from "macros.html" import render_integer %}
 {% from "macros.html" import render_delays %}
 {% from "macros.html" import string %}
 {% from "macros.html" import time %}
@@ -43,4 +43,4 @@
     {% endfor %}
 {% endif %}
 {#- weight -#}
-<td class="data numeric">{{ integer(flight.weight) }}</td>
+<td class="data numeric">{{ render_integer(flight.weight) }}</td>

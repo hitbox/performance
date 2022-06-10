@@ -1,6 +1,18 @@
+
+
+{% macro render_back_link() %}
+<h4><a href="{{ request.args.backurl }}">Back</a></h4>
+{% endmacro %}
+
+
 {%- macro render_nav_item(endpoint, text) %}<a class="nav{% if request.endpoint == endpoint %} active{% endif %}" href="{{ url_for(endpoint) }}">{{ text }}</a>{% endmacro -%}
 
+
 {%- macro nbsp(s) %}{% if s %}{{ s.replace(' ', '&nbsp;')|safe }}{% endif %}{% endmacro -%}
+
+
+{% macro render_number(value) %}{% if value is number %}{{ value }}{% endif %}{% endmacro %}
+
 
 {% set button_types = ['SubmitField', 'DeleteField'] %}
 
@@ -36,39 +48,12 @@
 {%- endmacro -%}
 
 
-{% macro render_date(value) %}{% if value %}{{ value.strftime(config.DATEFMT) }}{% endif %}{% endmacro %}
+{% macro render_date(value) %}{% if value %}<span class="date-wrap">{{ value.strftime(config.DATEFMT) }}</span>{% endif %}{% endmacro %}
 
 {% macro render_datetime(value) %}{% if value %}{{ value.strftime(config.DATETIMEFMT) }}{% endif %}{% endmacro %}
 
 {% macro render_time(value) %}{% if value %}{{ value.strftime(config.TIMEFMT) }}{% endif %}{% endmacro %}
 
-{%- macro render_field_group(field) -%}
-{%- if field.type not in ('HiddenField', 'CSRFTokenField') -%}
-<div class="form-group{% if field.errors %} has-error{% endif %} {{ kwargs.pop('class_', '') }}">
-    {{ render_field(field) }}
-</div>
-{%- endif -%}
-{%- endmacro -%}
-
-{%- macro render_form(form) -%}
-{{ form.hidden_tag() }}
-<fieldset class="inputs">
-    <ul class="flat">{% for field in form.get_non_button_inputs() %}
-        <li>
-            <label>
-                <span class="normal {% if field.type == 'TextAreaField' %} label-for-textarea{% endif %}">{{ field.label.text }}</span>
-                {{ field() }}{% if field.errors %}{% for error in field.errors %}
-                <span>{{ error }}</span>
-            {% endfor %}{% endif %}</label>
-        </li>{% endfor %}
-    </ul>
-</fieldset>
-<ul class="flat buttons">{% for field in form.get_buttons() %}
-    <li>
-        {{ field }}
-    </li>{% endfor %}
-</ul>
-{%- endmacro -%}
 
 
 {% macro render_field_simple1(field) %}
@@ -99,26 +84,7 @@
 {% endmacro %}
 
 
-{% macro render_pagination(pagination, endpoint) %}
-{% if pagination.pages > 1 %}<ol class="pagination rowwise centered">
-    {% for page in pagination.iter_pages() %}
-        <li>
-            {% if page %}
-                {% if page != pagination.page %}
-                    <a class="pill paginate" href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
-                {% else %}
-                    <strong class="pill paginate active">{{ page }}</strong>
-                {% endif %}
-            {% else %}
-                <span class="ellipsis pill paginate">…</span>
-            {% endif %}
-        </li>
-{% endfor %}
-</ol>{% endif %}{# pagination.pages > 1 #}
-{% endmacro %}
-
-
-{%- macro integer(v) %}{% if v is number %}{{ '{:,d}'.format(v) }}{% elif kwargs.or_zero %}0{% endif %}{% endmacro -%}
+{%- macro render_integer(v) %}{% if v is number %}{{ '{:,d}'.format(v) }}{% elif kwargs.or_zero %}0{% endif %}{% endmacro -%}
 
 
 {%- macro string(v) %}{% if v %}{{ v }}{% endif %}{% endmacro -%}
@@ -232,4 +198,93 @@
     {% endfor %}
 </div>
 {% endmacro %}
+
+
+{% macro render_field_simple2(field) %}
+{% if field.type == 'BooleanField' %}
+    {{ field }}{{ field.label }}
+{% elif field.type == 'FormField' %}
+    {{ render_form_simple2(field) }}
+{% else %}
+    {{ field.label }}{{ field }}
+{% endif %}
+{% endmacro %}
+
+
+
+{% macro render_form_simple2(form) %}
+
+{% if form.hidden_tag %}{{ form.hidden_tag() }}{% endif %}
+
+{# render simple field and label pairs #}
+{% set unwanted = ('CSRFTokenField', 'HiddenField', 'FieldList', 'FormField', 'SubmitField') %}
+<div class="col-2">{% for field in form|rejectattr('type', 'in', unwanted) %}
+    {{ render_field_simple2(field) }}
+{% endfor %}</div>
+
+{# expand FieldList and render #}
+<div class="col-2">{% for field_list in form|selectattr('type', 'in', ('FieldList',)) %}
+    {% for field in field_list %}
+        {{ render_field_simple2(field) }}
+    {% endfor %}
+{% endfor %}</div>
+
+{# render fields that are forms #}
+{% for form_field in form|selectattr('type', 'in', ('FormField',)) %}
+    <p>{{ form_field.label }}</p>
+    {{ render_form_simple2(form_field, _is_form_field=true) }}
+{% endfor %}
+
+{# render buttons #}
+{% if not kwargs.get('_is_form_field') %}
+<div class="buttons-2">
+{# ensure the button named "submit" is first for default button #}
+{% if form.submit %}{{ form.submit }}{% endif %}
+{% set buttons = form | selectattr('type', 'in', ('SubmitField',)) | rejectattr('name', 'eq', 'submit') %}
+{% for button_field in buttons %}
+    {{ button_field }}
+{% endfor %}</div>
+{% endif %}
+
+{% endmacro %}
+
+
+{% macro render_pagination(pagination, endpoint) %}
+{% if pagination.pages > 1 %}<ol class="pagination rowwise centered">
+    {% for page in pagination.iter_pages() %}
+        <li>
+            {% if page %}
+                {% if page != pagination.page %}
+                    <a class="pill paginate" href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+                {% else %}
+                    <strong class="pill paginate active">{{ page }}</strong>
+                {% endif %}
+            {% else %}
+                <span class="ellipsis pill paginate">…</span>
+            {% endif %}
+        </li>
+{% endfor %}
+</ol>{% endif %}{# pagination.pages > 1 #}
+{% endmacro %}
+
+
+{% macro render_arrival_performance_contract_tier_table(contract) %}
+{# Arrival Performance Contract Tier Table #}
+<table class="performance-contract-table min-width">
+    <thead>
+        <tr>
+            <th>Arrival Performance during Contract Year</th>
+            <th>Annual Cost Escalation Tier</th>
+        </tr>
+    </thead>
+    <tbody>{% for tier in  contract.tiers %}
+        <tr>
+            <td class="data">{{ nbsp(tier.human_performance_range()) }}</td>
+            <td class="tier">Tier {{ tier.tier }}</td>
+        </tr>{% endfor %}
+    </tbody>
+</table>
+<small>Contract year runs from {{ render_date(contract.date_range_start) }} through {{ render_date(contract.date_range_end) }}</small>
+{% endmacro %}
+
 

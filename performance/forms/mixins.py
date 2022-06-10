@@ -20,7 +20,18 @@ class BackLinkMixin:
 
 class DeleteMixin:
 
-    delete = SubmitField('Delete', render_kw=dict(class_='danger'))
+    delete = SubmitField(
+        'Delete',
+        render_kw = dict(
+            class_ = 'danger',
+            tabindex = '-1',
+        )
+    )
+
+
+class SubmitMixin:
+
+    submit = SubmitField('Create')
 
 
 class SearchCriteriaMixin:
@@ -34,11 +45,6 @@ class SearchCriteriaMixin:
             if field.type not in ('SubmitField', ):
                 criteria.append(getattr(model_class, field.name).ilike(f'{field.data}%'))
         return criteria
-
-
-class SubmitMixin:
-
-    submit = SubmitField('Create')
 
 
 class SubmitUpdateDeleteMixin(

@@ -1,12 +1,8 @@
 {% extends "base.html" %}
 
 
-{% from "macros.html" import render_form %}
-
-
-{% macro render_back_link() %}
-<h4><a href="{{ request.args.backurl }}">Back</a></h4>
-{% endmacro %}
+{% from "macros.html" import render_back_link %}
+{% from "macros.html" import render_form_simple2 %}
 
 
 {% block header %}
@@ -16,13 +12,14 @@
 
 {% block content %}
 <article>
+    {% if page_title %}<h1>{{ page_title }}</h1>{% endif %}
     <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
-        {% block inside_form %}{{ render_form(form) }}{% endblock %}
+        {% block inside_form %}{{ render_form_simple2(form) }}{% endblock %}
     </form>
 </article>
-{% if 'backurl' in request.args %}{{ render_back_link() }}{% endif %}
 {% endblock content %}
 
 
 {% block footer %}
+{% if 'backurl' in request.args %}{{ render_back_link() }}{% endif %}
 {% endblock %}

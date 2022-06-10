@@ -15,43 +15,16 @@ __all__ = ['ModelForm']
 
 class BaseForm(Form):
 
-    def __init__(self, *args, **kwargs):
-        """
-        Move SubmitField fields to the end. Add field ordering control. Define
-        either 'fields_order' or 'only' to activate ordering.
-        """
-        super().__init__(*args, **kwargs)
-        # move SubmitField types to the end
-        move2end = []
-        for key, field in self._fields.items():
-            if field.type == 'SubmitField':
-                move2end.append(key)
-        for key in move2end:
-            self._fields.move_to_end(key)
-        # field order from meta
-        ordering = getattr(self.meta, 'fields_order',
-                           getattr(self.meta, 'only', None))
-        if ordering:
-            def fields_order_key(item):
-                """
-                Return field's index in `fields_order` meta value or infinite.
-                """
-                key, value = item
-                try:
-                    return ordering.index(key)
-                except ValueError:
-                    return inf
-            self._fields = OrderedDict(sorted(self._fields.items(), key=fields_order_key))
-
-    def is_delete(self):
-        return hasattr(self, 'delete') and self.delete.data
-
     def get_buttons(self):
+        # XXX
+        # still used by old macro that renders forms
         return [
             field for field in self if isinstance(field.widget, SubmitInput)
         ]
 
     def get_non_button_inputs(self):
+        # XXX
+        # still used by old macro that renders forms
         return [
             field for field in self
             if not isinstance(field.widget, HiddenInput)

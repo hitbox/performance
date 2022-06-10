@@ -1,5 +1,5 @@
-{% from "macros.html" import integer %}
 {% from "macros.html" import percent %}
+{% from "macros.html" import render_integer %}
 
 
 {% macro OLD_render_assumed_best_td(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
@@ -59,21 +59,21 @@
     <tbody>
         <tr>
             <th class="row">Lanes</th>
-            <td class="data number">{{ integer(daily.lanes|length) }}</td>
-            <td class="data number">{{ integer(month_to_date.lanes|length) }}</td>
-            <td class="data number">{{ integer(quarter_to_date.lanes|length) }}</td>
+            <td class="data number">{{ render_integer(daily.lanes|length) }}</td>
+            <td class="data number">{{ render_integer(month_to_date.lanes|length) }}</td>
+            <td class="data number">{{ render_integer(quarter_to_date.lanes|length) }}</td>
         </tr>
         <tr>{% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
             <th class="row" title="{{ controllable_delays_note }}">Chargeable Delays</th>
-            <td class="data number">{{ integer(daily.flights_with_controllable_destination_delays_over15|length) }}</td>
-            <td class="data number">{{ integer(month_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
-            <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
+            <td class="data number">{{ render_integer(daily.flights_with_controllable_destination_delays_over15|length) }}</td>
+            <td class="data number">{{ render_integer(month_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
+            <td class="data number">{{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
         </tr>
         <tr>
             <th class="row" title="{{ controllable_delays_note }}">Delays &gt;30 Count</th>
-            <td class="data number">{{ integer(daily.flights_with_controllable_destination_delays_over30|length) }}</td>
-            <td class="data number">{{ integer(month_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
-            <td class="data number">{{ integer(quarter_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
+            <td class="data number">{{ render_integer(daily.flights_with_controllable_destination_delays_over30|length) }}</td>
+            <td class="data number">{{ render_integer(month_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
+            <td class="data number">{{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
         </tr>
         <tr>
             <th class="row" title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
