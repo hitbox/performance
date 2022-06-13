@@ -48,7 +48,7 @@
 {%- endmacro -%}
 
 
-{% macro render_date(value) %}{% if value %}<span class="date-wrap">{{ value.strftime(config.DATEFMT) }}</span>{% endif %}{% endmacro %}
+{% macro render_date(value) %}{% if value %}{% if not kwargs.get('bare') %}<span class="date-wrap">{% endif %}{{ value.strftime(config.DATEFMT) }}{% if not kwargs.get('bare') %}</span>{% endif %}{% endif %}{% endmacro %}
 
 {% macro render_datetime(value) %}{% if value %}{{ value.strftime(config.DATETIMEFMT) }}{% endif %}{% endmacro %}
 

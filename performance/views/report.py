@@ -11,14 +11,16 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
+from .. import business
 from ..authorization import basic_check
+from ..authorization import contracts_enabled
 from ..authorization import edit_check
 from ..extensions import db
 from ..models import AssumedBest
+from ..models import Contract
 from ..models import Flight
 from ..models import Report
 from ..models import ScheduledReport
-from ..models import Contract
 
 report_bp = Blueprint('report', __name__)
 
@@ -29,50 +31,6 @@ def get_report_form_class():
     from ..forms import ReportForm
     return ReportForm
 
-def get_performance_from(reports):
-    """
-    Return performance numbers (lanes, chargeable delays, and over-30 count).
-
-    :param reports: list of reports.
-    """
-    lanes = [flight for report in reports for flight in report.lane_flights()]
-    controllable_destination_delays_over15 = [
-        delay
-        for report in reports
-        for delay
-        in report.controllable_destination_delays(over_minutes=15)
-    ]
-    controllable_destination_delays_over30 = [
-        delay
-        for report in reports
-        for delay
-        in report.controllable_destination_delays(over_minutes=30)
-    ]
-    flights_with_controllable_destination_delays_over15 = [
-        flight
-        for report in reports
-        for flight
-        in report.flights_with_controllable_destination_delays(over_minutes=15)
-    ]
-    flights_with_controllable_destination_delays_over30 = [
-        flight
-        for report in reports
-        for flight
-        in report.flights_with_controllable_destination_delays(over_minutes=30)
-    ]
-    result = dict(
-        lanes = lanes,
-        controllable_destination_delays_over15
-            = controllable_destination_delays_over15,
-        controllable_destination_delays_over30
-            = controllable_destination_delays_over30,
-        flights_with_controllable_destination_delays_over15
-            = flights_with_controllable_destination_delays_over15,
-        flights_with_controllable_destination_delays_over30
-            = flights_with_controllable_destination_delays_over30,
-    )
-    return result
-
 def get_context(report):
     """
     Context data for viewing report.
@@ -82,7 +40,7 @@ def get_context(report):
         sa.func.date_part('month', Report.date) == report.date.month,
         Report.date <= report.date,
     ).all()
-    month_to_date = get_performance_from(month_to_date_reports)
+    month_to_date = business.performance_details(month_to_date_reports)
 
     reports_quarter_to_date = Report.query.filter(
         Report.date <= report.date,
@@ -101,18 +59,12 @@ def get_context(report):
     assumed_bests_qtd = filter(None, assumed_bests_qtd)
 
     # quarter to date
-    quarter_to_date = get_performance_from(reports_quarter_to_date)
+    quarter_to_date = business.performance_details(reports_quarter_to_date)
     assumed_best = AssumedBest.query.filter(
         AssumedBest.year == report.date.year,
         AssumedBest.month == report.date.month,
     ).one_or_none()
 
-    contract = Contract.query.filter(
-        Contract.date_range_start <= report.date,
-        Contract.date_range_end >= report.date,
-    ).first()
-
-    #
     context = dict(
         report = report,
         daily = dict(
@@ -130,8 +82,24 @@ def get_context(report):
         quarter_to_date = quarter_to_date,
         assumed_best = assumed_best,
         assumed_bests_qtd = assumed_bests_qtd,
-        contract = contract,
     )
+
+    if contracts_enabled():
+        contract = business.performance_contract_for_report(report)
+        context['contract'] = contract
+
+        # add a “Contractual Year to Date” calculation for the DHL CMI report
+        # that calculates OTP >15 from May 1, 2022 through April 30, 2023 to
+        # reflect changes made in the new CMI agreement
+        reports_for_contract_range = Report.query.filter(
+            Report.date.between(
+                contract.date_range_start,
+                contract.date_range_end,
+            )
+        )
+        contract_range = business.performance_details(reports_for_contract_range)
+        context['contract_range'] = contract_range
+
     return context
 
 
@@ -187,7 +155,7 @@ def view_report_expanded_performance(id):
     """
     Detailed view of the normal report.
     """
-    if not current_app.config.get('EXPAND'):
+    if not current_app.config.get('PERFORMANCE_EXPAND'):
         abort(404)
 
     report = Report.query.get_or_404(id)

@@ -1,51 +1,89 @@
 {% extends "base.html" %}
 
 
-{% from "macros.html" import render_integer %}
 {% from "macros.html" import render_delays %}
+{% from "macros.html" import render_integer %}
+{% from "macros.html" import render_time %}
+{% from "macros.html" import yesno %}
 
 
 {% block content %}
-<h1>Development Only</h1>
-<h2>{{ report.date }}</h2>
+<div style="width: min-content; margin: 0 auto;">
+    <h1>Development Only</h1>
+    <h2>{{ report.date }}</h2>
+    <h3>Configured Settings</h3>
+    <div class="setting">
+        <h3 class="data">PERFORMANCE_LANES_FLIGHTTYPES</h3>
+        <p>Flight type's that count as lanes.</p>
+        <ul class="horiz">{% for type_name in config.PERFORMANCE_LANES_FLIGHTTYPES %}
+            <li class="data">{{ type_name }}</li>{% endfor %}
+        </ul>
+    </div>
+    <div class="setting">
+        <h3 class="data">PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS</h3>
+        <p>Unless all cancelled delays for a flight are in this list, the flight is not a lane.</p>
+        <ul class="horiz">{% for delay_name in config.PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS %}
+            <li class="data">{{ delay_name }}</li>{% endfor %}
+        </ul>
+    </div>
+    <h3>Report Attributes</h3>
+    <dl class="col-2 min-width">
+        <dt class="data">report.date_quarter</dt>
+        <dd class="data">{{ report.date_quarter }}</dd>
+    </dl>
+</div>
+
 <h2>Report.flights</h2>
 <table>
     <thead>
         <tr>
-            <th>#</th>
-            <th>Type</th>
-            <th>Tail</th>
-            <th>Flight</th>
-            <th>Orig</th>
-            <th>ETD</th>
-            <th>ATD</th>
-            <th>Delays</th>
-            <th>Dest</th>
-            <th>ETA</th>
-            <th>ATA</th>
-            <th>Delay</th>
-            <th>Weight</th>
-            <th>Is Lane?</th>
+            <th rowspan="2">#</th>
+            <th rowspan="2">Type</th>
+            <th rowspan="2">Tail</th>
+            <th rowspan="2">Flight</th>
+            <th rowspan="2">Orig</th>
+            <th rowspan="2">ETD</th>
+            <th rowspan="2">ATD</th>
+            <th rowspan="2">Delays</th>
+            <th rowspan="2">Dest</th>
+            <th rowspan="2">ETA</th>
+            <th rowspan="2">ATA</th>
+            <th rowspan="2">Delay</th>
+            <th rowspan="2">Weight</th>
+            <th rowspan="2">Is Lane?</th>
+            <th colspan="2">Controllable Destination Delays</th>
+        </tr>
+        <tr>
+            <th>&gt; 15</th>
+            <th>&gt; 30</th>
         </tr>
     </thead>
     <tbody>
-        {% for flight in report.flights %}<tr>
+        {% for flight in report.flights | sort(attribute='origin_departure_estimated_time') | sort(attribute='flight_type') %}<tr>
             <td class="data">{{ loop.index }}</td>
             <td class="data">{{ flight.flight_type.name }}</td>
             <td class="data">{{ flight.tail_number }}</td>
             <td class="data">{{ flight.flight_number }}</td>
             <td class="data">{{ flight.origin_station }}</td>
-            <td class="data">{{ flight.origin_departure_estimated_time }}</td>
-            <td class="data">{{ flight.origin_departure_actual_time }}</td>
+            <td class="data">{{ render_time(flight.origin_departure_estimated_time) }}</td>
+            <td class="data">{{ render_time(flight.origin_departure_actual_time) }}</td>
             <td class="data">{{ render_delays(flight.origin_delays) }}</td>
             <td class="data">{{ flight.destination_station }}</td>
-            <td class="data">{{ flight.destination_arrival_estimated_time }}</td>
-            <td class="data">{{ flight.destination_arrival_actual_time }}</td>
+            <td class="data">{{ render_time(flight.destination_arrival_estimated_time) }}</td>
+            <td class="data">{{ render_time(flight.destination_arrival_actual_time) }}</td>
             <td class="data">{{ render_delays(flight.destination_delays) }}</td>
             <td class="data">{{ render_integer(flight.weight) }}</td>
-            <td class="data">{{ flight.is_lane }}</td>
+            <td class="data bool" data-value="{{ flight.is_lane }}">{{ yesno(flight.is_lane) }}</td>
+            <td class="data">{{ render_delays(flight.controllable_destination_delays(15)) }}</td>
+            <td class="data">{{ render_delays(flight.controllable_destination_delays(30)) }}</td>
         </tr>{% endfor %}
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="13"></td>
+            <td class="data number">{{ report.flights | selectattr('is_lane') | list | length }}</td>
+            <td colspan="2"></td>
+        </tr>
+    </tfoot>
 </table>
 {% endblock content %}
-

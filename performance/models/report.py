@@ -108,6 +108,9 @@ class Report(MetaMixin, db.Model):
         return grouped
 
     def lane_flights(self):
+        """
+        Flights in this report that are considered lanes.
+        """
         return [flight for flight in self.flights if flight.is_lane]
 
     def controllable_destination_delays(self, over_minutes):

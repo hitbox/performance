@@ -92,3 +92,9 @@ def edit_schedule_check(view):
     User is admin or can_edit_schedule flag is True.
     """
     return edit_schedule_required(basic_check(view))
+
+def contracts_enabled():
+    return bool(current_app.config.get('PERFORMANCE_CONTRACTS'))
+
+def contracts_disabled():
+    return not contracts_enabled()

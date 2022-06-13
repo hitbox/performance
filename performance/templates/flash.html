@@ -1,11 +1,13 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 <aside class="flash noprint">
-    <ul id=flashes class=flat>
+    <ul id="flashes" class="flat">
         {% for category, message in messages %}
         <li class="flash {{ category or 'info'  }}">
-            <div class="message">{{ message|safe }}</div>
-            <div class="click close">&times</div>
+            <div class="message">{% for line in message.splitlines() %}
+                <div>{{ line|safe }}</div>{% endfor %}
+            </div>
+            <div class="click close">&times;</div>
         </li>
         {% endfor %}
     </ul>

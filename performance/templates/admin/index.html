@@ -5,6 +5,6 @@
 <h3>Administration</h3>
 <ul class="flat">
     <li><a href="{{ url_for('admin.users') }}">User accounts</a></li>
-    <li><a href="{{ url_for('admin.list_contracts') }}">Performance Contracts</a></li>
+    {% if config.PERFORMANCE_CONTRACTS %}<li><a href="{{ url_for('admin.list_contracts') }}">Performance Contracts</a></li>{% endif %}
 </ul>
 {% endblock main %}

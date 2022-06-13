@@ -19,6 +19,7 @@
     {% endblock head %}</head>
     <body>{% block body %}
         {% block topnav %}<nav class="noprint">
+            {% if config.PERFORMANCE_DEBUG %}<a href="{{ url_for('debug.index') }}">Debug</a>{% endif %}
             {% if current_user.is_admin %}
                 {{ render_nav_item('admin.index', 'Admin') }}
             {% endif %}

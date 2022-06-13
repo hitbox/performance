@@ -22,9 +22,6 @@
         <a href="{{ url_for('report.view_report_for_date', report_date=next_date) }}">{{ next_date.strftime(config.DATEFMT) }}</a>
     </h4>
 </nav>
-{# development-only link to expand report context #}{% if config.EXPAND %}<nav>
-    <a class="devel" href="{{ url_for('report.view_report_expanded_performance', id=report.id) }}" title="Development Only">Expand report context</a>
-</nav>{% endif %}
 {% endblock header %}
 
 
@@ -38,6 +35,9 @@
         {{ render_arrival_performance_contract_tier_table(contract) }}
     </div>{% endif %}
 </div>
+{# development-only link to expand report context #}{% if config.PERFORMANCE_EXPAND %}<h1 class="noprint">
+    <a class="devel" href="{{ url_for('report.view_report_expanded_performance', id=report.id) }}" title="Development Only">Development-only detailed view</a>
+</h1>{% endif %}
 {% endblock report_main %}
 
 

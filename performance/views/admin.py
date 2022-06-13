@@ -1,22 +1,16 @@
-import datetime
-
 import click
 
 from flask import Blueprint
 from flask import abort
-from flask import current_app
 from flask import flash
 from flask import redirect
 from flask import render_template
-from flask import request
 from flask import url_for
 
 from ..authorization import admin_check
-from ..authorization import basic_check
-from ..authorization import edit_check
+from ..authorization import contracts_disabled
 from ..extensions import db
 from ..forms import UserForm
-from ..forms.user import available_username
 from ..models import Contract
 from ..models import PerformanceTier
 from ..models import User
@@ -46,6 +40,7 @@ def new_tier_form():
 
 def new_contract_form():
     """
+    Return a form for new performance contracts.
     """
     form_class = contract_form_class()
     form = form_class()
@@ -112,7 +107,6 @@ def edit_user(id):
 
     # allow existing username
     del form.username
-    #form.username.validators.remove(available_username)
 
     if form.validate_on_submit():
         form.populate_obj(user)
@@ -131,6 +125,8 @@ def contract_add_tier(contract_id):
     """
     Add performance tier to a contract.
     """
+    if contracts_disabled():
+        abort(404)
     contract = Contract.query.get_or_404(contract_id)
     PerformanceTierForm = tier_form_class()
     form = PerformanceTierForm()
@@ -148,62 +144,62 @@ def contract_add_tier(contract_id):
 # list contracts
 admin_bp.add_url_rule(
     '/contracts/list',
-    view_func = basic_check(
-        ListView.as_view(
-            'list_contracts',
-            Contract,
-            template = 'contract/list.html',
-            context_processor = lambda: dict(
-                new_contract_form = new_contract_form(),
-            ),
-        )))
+    view_func = ListView.as_view(
+        'list_contracts',
+        Contract,
+        template = 'contract/list.html',
+        context_processor = lambda: dict(
+            new_contract_form = new_contract_form(),
+        ),
+        disabled = contracts_disabled,
+    ))
 
 # create contract
 admin_bp.add_url_rule(
     '/contracts/create',
-    view_func = edit_check(
-        CreateView.as_view(
-            'create_contract',
-            contract_form_class,
-            template = 'contract/contract-form.html',
-            context_processor = lambda: dict(
-                new_tier_form = new_tier_form(),
-            ),
-        )))
+    view_func = CreateView.as_view(
+        'create_contract',
+        contract_form_class,
+        template = 'contract/contract-form.html',
+        context_processor = lambda: dict(
+            new_tier_form = new_tier_form(),
+        ),
+        disabled = contracts_disabled,
+    ))
 
 # edit contract
 admin_bp.add_url_rule(
     '/contracts/edit/<int:id>',
-    view_func = edit_check(
-        UpdateDeleteView.as_view(
-            'edit_contract',
-            contract_form_class,
-            template = 'contract/contract-form.html',
-            context_processor = lambda: dict(
-                new_tier_form = new_tier_form(),
-            ),
-        )))
+    view_func = UpdateDeleteView.as_view(
+        'edit_contract',
+        contract_form_class,
+        template = 'contract/contract-form.html',
+        context_processor = lambda: dict(
+            new_tier_form = new_tier_form(),
+        ),
+        disabled = contracts_disabled,
+    ))
 
 # create (performance) tier
 admin_bp.add_url_rule(
     '/tier/create',
-    view_func = edit_check(
-        CreateView.as_view(
-            'create_tier',
-            tier_form_class,
-        )))
+    view_func = CreateView.as_view(
+        'create_tier',
+        tier_form_class,
+        disabled = contracts_disabled,
+    ))
 
 # edit (performance) tier
 admin_bp.add_url_rule(
     '/tier/edit/<int:id>',
-    view_func = edit_check(
-        UpdateDeleteView.as_view(
-            'edit_tier',
-            tier_form_class,
-            context_processor = lambda: dict(
-                page_title = 'Edit Contract',
-            ),
-        )))
+    view_func = UpdateDeleteView.as_view(
+        'edit_tier',
+        tier_form_class,
+        context_processor = lambda: dict(
+            page_title = 'Edit Contract',
+        ),
+        disabled = contracts_disabled,
+    ))
 
 # CLI #
 

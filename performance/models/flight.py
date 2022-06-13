@@ -19,6 +19,12 @@ def configured_performance_lanes_flighttypes():
     flight_types = FlightType.query.filter(FlightType.name.in_(flight_types_names)).all()
     return flight_types
 
+def configured_include_cancelled_delays():
+    """
+    The required, configured delay codes to include in counting lanes.
+    """
+    return current_app.config['PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS']
+
 class FlightBaseMixin:
     """
     Columns shared by flights and scheduled flights.
@@ -168,8 +174,7 @@ class ReportFlightBaseMixin(FlightBaseMixin):
         Flight is a configured FlightType and its only delays are configured
         delays that are cancelled.
         """
-        key = 'PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS'
-        include_cancelled_delays = current_app.config[key]
+        include_cancelled_delays = configured_include_cancelled_delays()
         flight_types = configured_performance_lanes_flighttypes()
         delays = self.destination_delays
         return (

@@ -67,11 +67,6 @@ td {
     vertical-align: top;
 }
 
-td.data {
-    font-family: monospace;
-    font-size: 1rem;
-}
-
 th.top {
     text-align: center;
     font-size: .9rem;
@@ -191,6 +186,10 @@ nav > *:last-child {
     color: red;
 }
 
+.data.bool[data-value="False"] {
+    color: red;
+}
+
 hr {
     display: block;
     margin-top: 2em;
@@ -207,16 +206,27 @@ ul.flat > li {
     margin: 1rem 0;
 }
 
-ul.buttons > li {
-    /* XXX remove? */
-    float: left;
-    margin-right: 1.5rem;
+ul.horiz {
+    /* mainly for the debugging report/expanded.html template (1) */
+    margin: 0;
+    padding: 0;
+    display: flex;
 }
 
-.flex {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+ul.horiz > li {
+    /* (1) */
+    margin-left: 2rem;
+}
+
+ul.horiz > li:first-child {
+    /* (1) */
+    margin-left: 1rem;
+}
+
+.setting {
+    /* (1) */
+    /* want some space after the configuration settings list */
+    margin-bottom: 2.5rem;
 }
 
 .print-button {

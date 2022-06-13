@@ -1,3 +1,4 @@
+from flask import abort
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -17,7 +18,26 @@ class ListView(View):
         page_title = None,
         query = None,
         context_processor = None,
+        disabled = None,
     ):
+        """
+        :param model:
+            database model to list.
+        :param template:
+            template to render for requests.
+        :param item_renderer:
+            callable that the template can use to render items.
+        :param page_title:
+            something the template can render for a title.
+        :param query:
+            object with `.paginate` attribute; a callable that is called and
+            passed to the template as `pagination`.
+        :param context_processor:
+            an optional callable that return extra data to pass on to the template.
+        :param disabled:
+            an optional callable or bool, that decides if this view should
+            throw 404.
+        """
         self.model = model
         self.template = template or self.template
         self.item_renderer = item_renderer or str
@@ -26,8 +46,13 @@ class ListView(View):
         if query is None:
             query = self.model.query
         self.query = query
+        self.disabled = disabled
 
     def dispatch_request(self):
+        """
+        """
+        if callable(self.disabled) and self.disabled():
+            abort(404)
         pagination = self.query.paginate()
         context = dict(
             pagination = pagination,
@@ -38,62 +63,6 @@ class ListView(View):
             extra = self.context_processor()
             if extra:
                 context.update(extra)
-        return render_template(self.template, **context)
-
-
-class GroupbyView(View):
-    methods = ['GET']
-    template = 'pluggable/groupby.html'
-
-    def __init__(self, query, attribute, title=None, template=None):
-        """
-        :param query: callable returning items to list.
-        :param attribute: attribute of items to group by.
-        :param title: page title.
-        :param template: html template.
-        """
-        self.query = query
-        self.attribute = attribute
-        self.title = title
-        self.template = template or self.template
-
-    def dispatch_request(self):
-        context = dict(
-            items = self.query(),
-            attribute = self.attribute,
-            title = self.title,
-        )
-        return render_template(self.template, **context)
-
-
-class ModelView(View):
-    """
-    Simple pluggable view to render and instance of a db model with a template.
-    """
-    methods = ['GET']
-
-    def __init__(self, model, template, instance_name=None,
-                 context_processors=None):
-        """
-        :param model: db model class.
-        :param template: template name.
-        :param instance_name: template context name for the instance of model.
-        :param context_processors: list of functions that receive the context
-                                   dict before handing to template.
-        """
-        self.model = model
-        self.template = template
-        self.instance_name = instance_name
-        self.context_processors = context_processors
-
-    def dispatch_request(self, **ident):
-        instance_name = self.instance_name or 'instance'
-        context = {
-            instance_name: self.model.query.get_or_404(ident)
-        }
-        if self.context_processors:
-            for context_processor in self.context_processors:
-                context_processor(context)
         return render_template(self.template, **context)
 
 
@@ -109,9 +78,24 @@ class BaseEditView(View):
         instance_name=None,
         form_render_kw=None,
         context_processor = None,
+        disabled = None,
     ):
         """
-        :param form_class: form class or callable.
+        :param form_class:
+            form class or callable.
+        :param model:
+            database model to lookup instance to edit.
+        :param template:
+            template to render for requests.
+        :param instance_name:
+            name for template context of instance being edited.
+        :param form_render_kw:
+            extra context for template.
+        :param context_processor:
+            an optional callable that return extra data to pass on to the template.
+        :param disabled:
+            an optional callable or bool, that decides if this view should
+            throw 404.
         """
         if callable(form_class):
             form_class = form_class()
@@ -121,6 +105,7 @@ class BaseEditView(View):
         self.instance_name = instance_name
         self.form_render_kw = form_render_kw
         self.context_processor = context_processor
+        self.disabled = disabled
 
     def get_context(self, **context):
         if callable(self.context_processor):
@@ -135,6 +120,8 @@ class BaseEditView(View):
 class UpdateDeleteView(BaseEditView):
 
     def dispatch_request(self, **ident):
+        if callable(self.disabled) and self.disabled():
+            abort(404)
         instance = self.model.query.get_or_404(ident)
         form = self.form_class(obj=instance)
         form.submit.label.text = 'Update'
@@ -156,6 +143,8 @@ class UpdateDeleteView(BaseEditView):
 class CreateView(BaseEditView):
 
     def dispatch_request(self, **kwargs):
+        if callable(self.disabled) and self.disabled():
+            abort(404)
         form = self.form_class()
         instance = None
         if form.validate_on_submit():
