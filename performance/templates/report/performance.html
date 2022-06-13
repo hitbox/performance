@@ -55,7 +55,7 @@
             <th class="top">Daily</th>
             <th class="top" title="Month To Date">MTD</th>
             <th class="top" title="Quarter To Date">QTD</th>
-            <th class="top" title="Performance Contract Date Range: {{ render_date(contract.date_range_start, bare=true) }} to {{ render_date(contract.date_range_end, bare=true) }}">Contract</th>
+            {% if config.PERFORMANCE_CONTRACTS %}<th class="top" title="Performance Contract Date Range: {{ render_date(contract.date_range_start, bare=true) }} to {{ render_date(contract.date_range_end, bare=true) }}">Contract</th>{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -64,35 +64,35 @@
             <td class="data number">{{ render_integer(daily.lanes|length) }}</td>
             <td class="data number">{{ render_integer(month_to_date.lanes|length) }}</td>
             <td class="data number">{{ render_integer(quarter_to_date.lanes|length) }}</td>
-            <td></td>
+            {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
         </tr>
         <tr>{% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
             <th class="row" title="{{ controllable_delays_note }}">Chargeable Delays</th>
             <td class="data number">{{ render_integer(daily.flights_with_controllable_destination_delays_over15|length) }}</td>
             <td class="data number">{{ render_integer(month_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
             <td class="data number">{{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over15|length) }}</td>
-            <td></td>
+            {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
         </tr>
         <tr>
             <th class="row" title="{{ controllable_delays_note }}">Delays &gt;30 Count</th>
             <td class="data number">{{ render_integer(daily.flights_with_controllable_destination_delays_over30|length) }}</td>
             <td class="data number">{{ render_integer(month_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
             <td class="data number">{{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over30|length) }}</td>
-            <td></td>
+            {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
         </tr>
         <tr>
             <th class="row" title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
             {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over15|length, daily.lanes|length) }}
             {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over15|length, month_to_date.lanes|length) }}
             {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over15|length, quarter_to_date.lanes|length) }}
-            {{ render_assumed_best_td('contract range', 'Contract', true, contract_range.flights_with_controllable_destination_delays_over15|length, contract_range.lanes|length) }}
+            {% if config.PERFORMANCE_CONTRACTS %}{{ render_assumed_best_td('contract range', 'Contract', true, contract_range.flights_with_controllable_destination_delays_over15|length, contract_range.lanes|length) }}{% endif %}
         </tr>
         <tr>
             <th class="row" title="On-time Performance greater than 30 minutes">On-time Performance &gt; 30</th>
             {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over30|length, daily.lanes|length) }}
             {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over30|length, month_to_date.lanes|length) }}
             {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over30|length, quarter_to_date.lanes|length) }}
-            <td class="data number"></td>
+            {% if config.PERFORMANCE_CONTRACTS %}<td class="data number"></td>{% endif %}
         </tr>
         <tr>
             <th class="row">
@@ -103,7 +103,7 @@
             {% set can_calculate = assumed_best and assumed_best.lanes > 0 %}
             {% set ndelays = month_to_date.controllable_destination_delays_over15|length %}
             {% if assumed_best %}{{ render_assumed_best_td('monthly', 'MTD', can_calculate, ndelays, assumed_best.lanes) }}{% else %}<td></td>{% endif %}
-            <td></td>
+            {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
         </tr>
     </tbody>
 </table>
