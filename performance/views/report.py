@@ -86,19 +86,17 @@ def get_context(report):
 
     if contracts_enabled():
         contract = business.performance_contract_for_report(report)
-        context['contract'] = contract
+        if contract:
+            context['contract'] = contract
 
-        # add a “Contractual Year to Date” calculation for the DHL CMI report
-        # that calculates OTP >15 from May 1, 2022 through April 30, 2023 to
-        # reflect changes made in the new CMI agreement
-        reports_for_contract_range = Report.query.filter(
-            Report.date.between(
-                contract.date_range_start,
-                contract.date_range_end,
+            reports_for_contract_range = Report.query.filter(
+                Report.date.between(
+                    contract.date_range_start,
+                    contract.date_range_end,
+                )
             )
-        )
-        contract_range = business.performance_details(reports_for_contract_range)
-        context['contract_range'] = contract_range
+            contract_range = business.performance_details(reports_for_contract_range)
+            context['contract_range'] = contract_range
 
     return context
 

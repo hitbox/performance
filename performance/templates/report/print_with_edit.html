@@ -31,8 +31,16 @@
 </div>
 <div id="performance-top">
     {% include "report/performance.html" %}
-    {% if contract %}<div id="performance-contract-wrapper">
+    {% if config.PERFORMANCE_CONTRACTS and contract %}<div id="performance-contract-wrapper">
         {{ render_arrival_performance_contract_tier_table(contract) }}
+    {% else %}
+        <div>
+        {% if current_user.is_admin %}
+            <a class="noprint" href="{{ url_for('admin.list_contracts') }}">Add performance contract</a>
+        {% else %}
+            <p>No performance contract</p>
+        {% endif %}
+        </div>
     </div>{% endif %}
 </div>
 {# development-only link to expand report context #}{% if config.PERFORMANCE_EXPAND %}<h1 class="noprint">
