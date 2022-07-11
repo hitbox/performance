@@ -6,16 +6,15 @@ import sqlalchemy as sa
 from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from performance.extensions import db
-from performance.exceptions import AppError
-from performance.models import FlightType
-from performance.models.mixin import MetaMixin
-
-from .util import grouped_flights
+from ..extensions import db
+from ..exceptions import PerformanceError
+from ..models import FlightType
+from ..models.mixin import MetaMixin
+from ..utils import quarter_of_date
 
 FLIGHTS_BY_TYPE_SORT = attrgetter('origin_departure_estimated_time')
 
-class ReportError(AppError):
+class ReportError(PerformanceError):
     pass
 
 
@@ -42,6 +41,7 @@ def controllable_destination_delays(report, over_minutes):
     include_types = flight_types_for_controllable_delays()
     if not include_types:
         raise ReportError('List of flight types to include is empty')
+
     result = [
         (flight, delay)
         for flight in report.flights
@@ -76,7 +76,7 @@ class Report(MetaMixin, db.Model):
         """
         The quarter part of the date.
         """
-        return (self.date.month - 1) // 3 + 1
+        return quarter_of_date(self.date)
 
     @date_quarter.expression
     def date_quarter(cls):
@@ -92,9 +92,6 @@ class Report(MetaMixin, db.Model):
                 sa.Integer),
             3) + 1
         return quarter
-
-    def grouped_flights(self):
-        return grouped_flights(self.flights)
 
     def flights_by_type(self):
         # [(flight_type, flight of that type), ...]

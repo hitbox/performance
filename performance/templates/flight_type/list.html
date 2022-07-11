@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+
+{% from "macros.html" import yes %}
+
+
+{% block content %}
+<h1>Flight Types</h1>
+<table>{% set flight_types = items %}
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Order on report</th>
+            <th>Lane?</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for flight_type in flight_types %}<tr>
+            <td>{{ flight_type.name }}</td>
+            <td>{{ flight_type.report_order }}</td>
+            <td>{{ yes(flight_type.is_lane) }}</td>
+        </tr>{% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

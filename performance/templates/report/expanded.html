@@ -36,31 +36,37 @@
 <h2>Report.flights</h2>
 <table>
     <thead>
-        <tr>
-            <th rowspan="2">#</th>
-            <th rowspan="2">Type</th>
-            <th rowspan="2">Tail</th>
-            <th rowspan="2">Flight</th>
-            <th rowspan="2">Orig</th>
-            <th rowspan="2">ETD</th>
-            <th rowspan="2">ATD</th>
-            <th rowspan="2">Delays</th>
-            <th rowspan="2">Dest</th>
-            <th rowspan="2">ETA</th>
-            <th rowspan="2">ATA</th>
-            <th rowspan="2">Delay</th>
-            <th rowspan="2">Weight</th>
-            <th rowspan="2">Is Lane?</th>
+        <tr>{% set rowspan = 1 %}
+            <th rowspan="{{ rowspan }}">#</th>
+            <th rowspan="{{ rowspan }}">flight.id</th>
+            <th rowspan="{{ rowspan }}">Type</th>
+            <th rowspan="{{ rowspan }}">Tail</th>
+            <th rowspan="{{ rowspan }}">Flight</th>
+            <th rowspan="{{ rowspan }}">Orig</th>
+            <th rowspan="{{ rowspan }}">ETD</th>
+            <th rowspan="{{ rowspan }}">ATD</th>
+            <th rowspan="{{ rowspan }}">Delays</th>
+            <th rowspan="{{ rowspan }}">Dest</th>
+            <th rowspan="{{ rowspan }}">ETA</th>
+            <th rowspan="{{ rowspan }}">ATA</th>
+            <th rowspan="{{ rowspan }}">Delay</th>
+            <th rowspan="{{ rowspan }}">Weight</th>
+            <th rowspan="{{ rowspan }}">Is Lane?</th>
+            {#
             <th colspan="2">Controllable Destination Delays</th>
+            #}
         </tr>
+        {#
         <tr>
             <th>&gt; 15</th>
             <th>&gt; 30</th>
         </tr>
+        #}
     </thead>
     <tbody>
         {% for flight in report.flights | sort(attribute='origin_departure_estimated_time') | sort(attribute='flight_type') %}<tr>
             <td class="data">{{ loop.index }}</td>
+            <td class="data">{{ flight.id }}</td>
             <td class="data">{{ flight.flight_type.name }}</td>
             <td class="data">{{ flight.tail_number }}</td>
             <td class="data">{{ flight.flight_number }}</td>
@@ -74,15 +80,17 @@
             <td class="data">{{ render_delays(flight.destination_delays) }}</td>
             <td class="data">{{ render_integer(flight.weight) }}</td>
             <td class="data bool" data-value="{{ flight.is_lane }}">{{ yesno(flight.is_lane) }}</td>
-            <td class="data">{{ render_delays(flight.controllable_destination_delays(15)) }}</td>
-            <td class="data">{{ render_delays(flight.controllable_destination_delays(30)) }}</td>
+            {#
+            <td class="data">{{ render_delays(flight.destination_delays) }}</td>
+            <td class="data">{{ render_delays(flight.destination_delays) }}</td>
+            #}
         </tr>{% endfor %}
     </tbody>
     <tfoot>
         <tr>
             <td colspan="13"></td>
             <td class="data number">{{ report.flights | selectattr('is_lane') | list | length }}</td>
-            <td colspan="2"></td>
+            {#<td colspan="2"></td>#}
         </tr>
     </tfoot>
 </table>

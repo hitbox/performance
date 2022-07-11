@@ -12,6 +12,7 @@ marshmallow-sqlalchemy
 openpyxl
 passlib
 psycopg2
+pytest
 pywin32; sys_platform == 'win32'
 sqlalchemy
 sqlalchemy-utils

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<article>
+    <h3>Debugging</h3>
+    <p>This page serves, mainly to flash messages for now. It is only available in the development environment.</p>
+    <p>The flashed messages should be closeable with the X on the right.</p>
+    <h3><a href="{{ url_for('debug.debugform.index') }}">Form</a></h3>
+    <hr>
+    <h3>Normal Links</h3>
+    <a href="javascript:;">simple link with no classes</a>
+    <h3>&lt;a&gt; Buttons</h3>
+    <a class="button" href="javascript:;">No Category Button</a>
+    <a class="button info" href="javascript:;">Info Button</a>
+    <a class="button action" href="javascript:;">Action Button</a>
+    <a class="button warning" href="javascript:;">Warning Button</a>
+    <a class="button danger" href="javascript:;">Danger Button</a>
+    <h3>&lt;a&gt; tag with expand class</h3>
+    <p><span class="note">NOTE</span>these is placed inside a smaller container</p>
+    <ul class="flat" style="display: block; width: 50%; margin: 0 auto">
+        <li>
+            <a class="expand" href="javascript:;">just expand class Link</a>
+        </li>
+        <li>
+            <p>with button class</p>
+            <a class="expand button" href="javascript:;">Expand Link</a>
+        </li>
+        <li>
+            <p>with button and info class</p>
+            <a class="expand button info" href="javascript:;">Expand Link Info</a>
+        </li>
+    </ul>
+    <h3>Lorem Ipsum</h3>
+    <p>Some text to check appearance.</p>
+    <p>"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</p>
+    <p>"There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain..."</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lorem quam, mollis quis ipsum quis, pharetra scelerisque lorem. Nullam eu elit molestie nisi lacinia ornare condimentum a libero. Mauris auctor, tortor sed varius pretium, mi ante hendrerit dolor, quis maximus diam lorem in elit. Mauris iaculis mi nibh, id egestas velit hendrerit nec. Quisque eget arcu purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam ut est leo. Phasellus sit amet luctus purus. Suspendisse potenti. Quisque et lacus vulputate, luctus dolor vitae, tincidunt massa.</p>
+    <p>Quisque congue gravida sollicitudin. Nulla dictum semper massa, vitae porta neque euismod in. Donec orci metus, consequat eu congue non, ultricies cursus sapien. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur diam metus, lacinia vitae lorem lacinia, iaculis elementum dolor. Duis magna mauris, convallis at viverra ac, porttitor a sem. Aenean semper sed nisi at posuere.</p>
+    <p>Nullam ut malesuada metus. Cras pharetra cursus justo sed consequat. Proin sit amet magna vitae magna fringilla venenatis ac non turpis. In sit amet lobortis magna. Vivamus non finibus lectus, bibendum facilisis tortor. Fusce at tellus porta, venenatis dui eu, tincidunt orci. Mauris posuere elementum dui eget porttitor. Duis dui turpis, venenatis in fermentum id, hendrerit sit amet magna. Nulla facilisi. Donec suscipit, mauris scelerisque viverra semper, enim urna vulputate elit, vel condimentum nibh elit sit amet ligula. Praesent at libero nulla. Etiam finibus, tellus ultrices mattis suscipit, ante arcu euismod augue, non scelerisque neque urna ac ante. Etiam scelerisque molestie ullamcorper. Quisque egestas, turpis sed ornare vehicula, neque libero placerat libero, suscipit elementum est neque in ex.</p>
+    <p>Donec tempor nibh ac arcu sodales, eget convallis urna pharetra. Fusce vulputate, enim quis interdum molestie, urna sem aliquet orci, id congue leo mauris id magna. Proin sit amet nisl eu diam rutrum egestas at sit amet velit. Donec congue tristique bibendum. Mauris fermentum vel turpis id eleifend. Aliquam maximus rutrum erat id pulvinar. Praesent aliquet vulputate ante, vitae luctus erat commodo at.</p>
+    <p>Vestibulum laoreet erat quis tellus eleifend, posuere tempus neque facilisis. Integer efficitur, mi vel imperdiet luctus, enim velit molestie felis, at accumsan purus neque eget orci. Sed bibendum elit eu diam posuere, et molestie lacus vehicula. Praesent vestibulum posuere turpis nec dictum. Pellentesque nec nisi tristique, pulvinar ipsum ut, condimentum quam. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur sit amet mauris elementum, bibendum diam vulputate, facilisis massa. Duis vel turpis tempus, interdum risus scelerisque, dapibus nibh. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Maecenas velit libero, rhoncus eget porta eu, laoreet id enim. Mauris tristique, tortor nec rutrum pulvinar, mauris odio gravida ex, quis placerat nulla nisl quis lectus. Integer ornare ipsum erat, et pharetra lorem placerat ac.</p>
+</article>{% endblock content %}

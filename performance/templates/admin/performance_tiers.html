@@ -1,0 +1,53 @@
+{% extends "admin/base_list_view.html" %}
+
+
+{% from "macros.html" import render_form_buttons %}
+{% from "macros.html" import render_form_fields_part %}
+{% from "macros.html" import render_pagination %}
+
+
+{% from "performance_contract/macros.html" import render_performance_contracts_table %}
+{% from "performance_tier/macros.html" import render_performance_tiers_table %}
+
+
+{% set singular = "Performance Contract Tier" %}
+{% set plural = "Performance Contract Tiers" %}
+
+{% if instance %}
+    {% set tier = instance %}
+    {% set contract = tier.contract %}
+{% elif contract %}
+    {# this template is being used to edit a new instance of tier for a contract #}
+    {% set tier = none %}
+{% endif %}
+
+
+{% block top %}
+{# this is usually a linke to new object #}
+{% endblock %}
+
+
+{% block listing %}
+<h3 class="page">Performance Contracts{# should match performance_contracts.html:plural #}</h3>
+{{ render_performance_contracts_table(pagination.items, instance_endpoint='admin.performance_contract.list', numbered=true) }}
+{{ render_pagination(pagination, endpoint=request.endpoint) }}
+{% endblock listing %}
+
+
+{% block form %}
+<h4><a href="{{ url_for('admin.performance_contract.list', id=contract.id) }}">Back to contract</a></h4>
+<h2>{% if tier %}Tier {{ tier.tier }}{% else %}New Tier{% endif %} for Contract "{{ contract.name }}"</h2>
+{% if tier %}
+    <h3>Editing {{ singular }} "{{ tier.tier }}" of contract "{{ contract.name }}"</h3>
+{% else %}
+    <h3>New {{ singular }}</h3>
+{% endif %}
+<form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+    {{ render_form_fields_part(form) }}
+    <h4>Tiers</h4>
+    <table class="expand performance-tiers">
+        {{ render_performance_tiers_table(contract.tiers, instance_endpoint='admin.performance_tier.edit', new_tier_endpoint='admin.performance_tier.new', new_tier_args=dict(contract_id=contract.id)) }}
+    </table>
+    {{ render_form_buttons(form) }}
+</form>
+{% endblock %}

@@ -22,8 +22,8 @@
 <script>
 {# date to open datepickers to #}
 const fallbackDate = "{{ fallbackDate }}";
-const originDelayCodesId = "{{ form.origin_delays.id }}";
-const destinationDelayCodesId = "{{ form.destination_delays.id }}";
+const originDelayCodesId = "{{ form.origin_delays_string.id }}";
+const destinationDelayCodesId = "{{ form.destination_delays_string.id }}";
 {% set is_edit = request.endpoint.endswith('.edit') %}
 const isEdit = {{ is_edit|tojson }};
 {# communication to the backend for calculations and autofill #}
@@ -34,7 +34,7 @@ const isEdit = {{ is_edit|tojson }};
 
 {% block header %}
 <nav id="flight-form-back">
-    <h3>Back to <a href="{{ request.args.backurl }}">{{ report.date.strftime(config.DATEFMT) }}</a></h3>
+    <h3>Back to <a href="{{ url_for('report.view_report', id=report.id) }}">{{ report.date.strftime(config.DATEFMT) }}</a></h3>
 </nav>
 {% endblock header %}
 
@@ -77,7 +77,7 @@ const isEdit = {{ is_edit|tojson }};
             {{ render_diff_minutes_field("origin-diff-minutes") }}
         </div>
     </div>
-    <div>{{ render_input_group(form.origin_delays) }}</div>
+    <div class="delays">{{ render_input_group(form.origin_delays_string) }}</div>
 </fieldset>
 <fieldset>
     <legend>Destination</legend>
@@ -97,13 +97,13 @@ const isEdit = {{ is_edit|tojson }};
             {{ render_diff_minutes_field("destination-diff-minutes") }}
         </div>
     </div>
-    <div>{{ render_input_group(form.destination_delays) }}</div>
+    <div class="delays">{{ render_input_group(form.destination_delays_string) }}</div>
 </fieldset>
 <fieldset>
     <legend>Comment</legend>
     <div>{{ form.comment }}</div>
 </fieldset>
-<div>
+<div class="buttons">
     {% if form.submit %}{{ form.submit }}{% endif %}
     {% if form.delete %}{{ form.delete }}{% endif %}
 </div>

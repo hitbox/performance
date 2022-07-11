@@ -1,2 +1,2 @@
-class AppError(Exception):
+class PerformanceError(Exception):
     "Performance web app error."

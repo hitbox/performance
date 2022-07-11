@@ -1,58 +1,71 @@
-{% extends "report/base.html" %}
+{% extends "base.html" %}
 
 
 {% from "macros.html" import render_arrival_performance_contract_tier_table %}
 {% from "macros.html" import render_previous_next_navigation with context %}
 
 
-{% set thisurl = url_for(request.endpoint, **request.view_args) %}
-{% set with_edit = current_user.is_editor %}
-
-
-{% block header %}
+{% block content %}
+{# nagivation #}
 <nav id="report-nav">
     {# NOTE: this structure should mimic calendar.html's header nav #}
     <h4 class="noprint">
-        <a href="{{ url_for('report.view_report_for_date', report_date=prev_date) }}">{{ prev_date.strftime(config.DATEFMT) }}</a>
+        <a href="{{ url_for('report.view_report_for_date', report_date=prev_date) }}" title="{{ prev_date }}">{{ prev_date.strftime(config.DATEFMT) }}</a>
     </h4>
-    <h3 id="report-title">
+    <h3 id="report-title" title="{{ report.date }}">
         {{ config.PERFORMANCE_REPORT_TITLE }}: {{ report.date.strftime(config.DATEFMT) }}
     </h3>
     <h4 class="noprint">
-        <a href="{{ url_for('report.view_report_for_date', report_date=next_date) }}">{{ next_date.strftime(config.DATEFMT) }}</a>
+        <a href="{{ url_for('report.view_report_for_date', report_date=next_date) }}" title="{{ next_date }}">{{ next_date.strftime(config.DATEFMT) }}</a>
     </h4>
 </nav>
-{% endblock header %}
 
-
-{% block report_main %}
+{# print button #}
 <div class="noprint">
     <a class="print-button" href="javascript:;" onclick="window.print(); return false">Print</a>
 </div>
+
+{# performance numbers #}
 <div id="performance-top">
     {% include "report/performance.html" %}
+
+    {# this should probably only be for developers #}
+    {% if config.PERFORMANCE_FLIGHT_DETAILS %}<div class="noprint">
+        <h3>Details</h3>
+        <ul class="flat">
+            <li><a href="{{ url_for('flight.detail_daily', date=report.date) }}">Daily</a></li>
+            <li><a href="{{ url_for('flight.detail_mtd', date=report.date) }}">Month to date</a></li>
+            <li><a href="{{ url_for('flight.detail_qtd', date=report.date) }}">Quarter to date</a></li>
+            {% if config.PERFORMANCE_CONTRACTS and contract %}
+            <li><a href="{{ url_for('flight.detail_qtd', date=report.date) }}">Contract range</a></li>
+            {% endif %}
+        </ul>
+    </div>{% endif %}
+
     {% if contract %}<div id="performance-contract-wrapper">
         {{ render_arrival_performance_contract_tier_table(contract) }}
+        {% if current_user.is_admin %}<a class="noprint" href="{{ url_for('admin.performance_contract.list', id=contract.id) }}">Edit performance contract</a>{% endif %}
+    </div>{% else %}
+        <div>
+        {% if current_user.is_admin %}
+            <a class="noprint" href="{{ url_for('admin.list_contracts') }}">Add performance contract</a>
+        {% else %}
+            <p>No performance contract</p>
+        {% endif %}
+        </div>
     </div>{% endif %}
 </div>
-{# development-only link to expand report context #}{% if config.PERFORMANCE_EXPAND %}<h1 class="noprint">
-    <a class="devel" href="{{ url_for('report.view_report_expanded_performance', id=report.id) }}" title="Development Only">Development-only detailed view</a>
-</h1>{% endif %}
-{% endblock report_main %}
 
-
-{% block flights %}
+{# flights tables by type #}
 {% for flight_type, flights in report.flights_by_type() %}
 {% include "report/flight_table.html" %}
 {% endfor %}
-{% endblock flights %}
 
-
-{% block comments %}
+{# comments / system detail #}
 <div class="performance-section">
     <h3 id="system-detail">System Detail</h3>
     {% set system_detail_form_name = 'system-detail-form' %}
-    {% if not with_edit %}
+    {% if not current_user.is_editor %}
     <pre id="system-detail-text">{{ form.system_detail.data }}</pre>
     {% else %}
     {# system detail editor #}
@@ -67,11 +80,10 @@
     </form>
     {% endif %}
 </div>
-{% endblock comments %}
 
-
-{% block report_footer %}
+{# delete button #}
 <h4 class="noprint delete-report">
     <a href="{{ url_for('report.delete_report', report_id=report.id) }}" onclick="return confirm('Delete report?');">Delete Report</a>
 </h4>
-{% endblock report_footer %}
+
+{% endblock content %}

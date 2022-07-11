@@ -1,5 +1,6 @@
+import math
+
 from collections import OrderedDict
-from math import inf
 
 from flask_wtf import FlaskForm
 from wtforms import Form
@@ -15,21 +16,32 @@ __all__ = ['ModelForm']
 
 class BaseForm(Form):
 
-    def get_buttons(self):
-        # XXX
-        # still used by old macro that renders forms
-        return [
-            field for field in self if isinstance(field.widget, SubmitInput)
-        ]
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._update_fields_order()
 
-    def get_non_button_inputs(self):
-        # XXX
-        # still used by old macro that renders forms
-        return [
-            field for field in self
-            if not isinstance(field.widget, HiddenInput)
-            and not isinstance(field.widget, SubmitInput)
-        ]
+    def _update_fields_order(self):
+        if hasattr(self.Meta, 'fields_order'):
+            fields_order = self.Meta.fields_order
+
+            if isinstance(fields_order, dict):
+
+                def sortkey(item):
+                    name, field = item
+                    return fields_order.get(name, math.inf)
+
+            elif isinstance(fields_order, list):
+
+                def sortkey(item):
+                    name, field = item
+                    if name in fields_order:
+                        return fields_order.index(name)
+                    else:
+                        return math.inf
+
+            self._fields = OrderedDict(
+                sorted(self._fields.items(), key=sortkey)
+            )
 
 
 class BaseFlaskForm(BaseForm, FlaskForm):

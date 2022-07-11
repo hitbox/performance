@@ -1,193 +1,88 @@
-import datetime as dt
 import string
 
 from flask import current_app
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.orderinglist import ordering_list
 
 from .. import parse
 from ..extensions import db
-from ..types import DelayCodesType
+from ..utils import diff_minutes
 
+from .delay import Delay
+from .flight_delay import DestinationDelay
+from .flight_delay import OriginDelay
+from .flight_mixin import FlightMixin
+from .flight_type import FlightType
 from .flight_type import FlightTypeRelationshipMixin
 from .mixin import MetaMixin
 
-def configured_performance_lanes_flighttypes():
+class Flight(
+    FlightMixin,
+    FlightTypeRelationshipMixin,
+    MetaMixin,
+    db.Model,
+):
     """
-    The FlightType's that count for lanes.
-    """
-    from .flight_type import FlightType
-    flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
-    flight_types = FlightType.query.filter(FlightType.name.in_(flight_types_names)).all()
-    return flight_types
-
-def configured_include_cancelled_delays():
-    """
-    The required, configured delay codes to include in counting lanes.
-    """
-    return current_app.config['PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS']
-
-class FlightBaseMixin:
-    """
-    Columns shared by flights and scheduled flights.
+    A flight appearing on a report. Mainly adds actual date/times and delay codes.
     """
 
-    flight_number = db.Column(
-        db.String,
-        info = dict(
-            label = 'Flight',
-        ),
-    )
+    id = db.Column(db.Integer, primary_key=True)
+    report_id = db.Column(db.ForeignKey('report.id'))
 
-    @property
-    def flight_number_as_int(self):
-        if self.flight_number:
-            s = ''.join(c for c in self.flight_number if c in string.digits)
-            if s:
-                return int(s)
-
-    leg = db.Column(
-        db.Integer,
-        server_default = db.text('1'),
-        info = dict(
-            label = 'Leg',
-        ),
-    )
-
-    tail_number = db.Column(
-        db.String,
-        info = dict(
-            label = 'Tail',
-        ),
-    )
-
-    weight = db.Column(
-        db.Integer,
-        info = dict(
-            label = 'Weight',
-        ),
-    )
-
-    comment = db.Column(
-        db.Text,
-        info = dict(
-            label = 'Comment',
-            render_kw = dict(
-                cols = 80,
-                rows = 8,
-            ),
-        ),
-    )
-
-    origin_station = db.Column(
-        db.String,
-        index = True,
-        info = dict(
-            label = 'Orig. Station',
-        ),
-    )
-    origin_departure_estimated_date = db.Column(
-        db.Date,
-        info = dict(
-            label = 'ETD',
-            render_kw = dict(
-                class_ = 'date-entry',
-                placeholder = 'optional date',
-            ),
-        ),
-    )
-    origin_departure_estimated_time = db.Column(
-        db.Time,
-        info = dict(
-            label = '',
-            render_kw = dict(
-                class_ = 'time-entry',
-            ),
-        ),
-    )
-
-    destination_station = db.Column(
-        db.String,
-        index = True,
-        info = dict(
-            label = 'Dest. Station',
-        ),
-    )
-    destination_arrival_estimated_date = db.Column(
-        db.Date,
-        info = dict(
-            label = 'ETA',
-            render_kw = dict(
-                class_ = 'date-entry',
-            ),
-        ),
-    )
-    destination_arrival_estimated_time = db.Column(
-        db.Time,
-        info = dict(
-            label = '',
-            render_kw = dict(
-                class_ = 'time-entry',
-            ),
-        ),
-    )
-
-    @db.validates('tail_number', 'origin_station', 'destination_station')
-    def uppercase(self, key, value):
-        if isinstance(value, str):
-            return value.upper()
-
-    def first_truthy(self):
-        """
-        Hacky function to return first truthy attribute name for use in making
-        the edit link. Maybe this should be a template macro?
-        """
-        for attr in ['tail_number', 'flight_number']:
-            if getattr(self, attr):
-                return attr
-
-
-class ReportFlightBaseMixin(FlightBaseMixin):
-    """
-    Flights that appear on reports. Adds actual date/times and delays fields.
-    """
+    legacy_origin_delays = db.Column(db.String)
+    legacy_destination_delays = db.Column(db.String)
 
     origin_departure_actual_date = db.Column(db.Date)
     origin_departure_actual_time = db.Column(db.Time)
     destination_arrival_actual_date = db.Column(db.Date)
     destination_arrival_actual_time = db.Column(db.Time)
 
-    origin_delays = db.Column(DelayCodesType)
-    destination_delays = db.Column(DelayCodesType)
+    # origin_delays #
 
-    def controllable_destination_delays(self, over_minutes):
+    @db.declared_attr
+    def origin_delays(cls):
         """
-        Controllable delays over some number of minutes.
-        Return 2-tuple list of controllable delay codes > `minutes`.
-        XXX: comment is wrong.
+        Origin delay objects.
         """
-        return [delay
-                for delay in self.destination_delays
-                if delay.is_controllable(over_minutes)]
-
-    @property
-    def is_lane(self):
-        """
-        Flight is a configured FlightType and its only delays are configured
-        delays that are cancelled.
-        """
-        include_cancelled_delays = configured_include_cancelled_delays()
-        flight_types = configured_performance_lanes_flighttypes()
-        delays = self.destination_delays
-        return (
-            # the only delay is in the include list and is cancelled
-            all(delay.code in include_cancelled_delays
-                for delay in delays
-                if delay.cancelled)
-            and self.flight_type in flight_types
+        return db.relationship(
+            'OriginDelay',
+            cascade = 'all, delete-orphan',
+            collection_class = ordering_list('position'),
+            order_by = 'OriginDelay.position',
         )
+
+    @hybrid_property
+    def origin_delays_string(self):
+        """
+        Return this flights origin delays as formatted string.
+        """
+        return ' '.join(origin_delay.formatted for origin_delay in self.origin_delays)
+
+    @origin_delays_string.setter
+    def origin_delays_string(self, delay_codes_string):
+        """
+        Convert/parse delay codes string into a list of OriginDelay objects and
+        set origin_delays attribute.
+        """
+        delays_setter(
+            db.session,
+            delay_codes_string,
+            self.origin_delays,
+            OriginDelay,
+            self.id,
+        )
+
+    @origin_delays_string.expression
+    def origin_delays_string(cls):
+        """
+        SQL side of origin_delays_string
+        """
+        return sql_delays_string(cls, OriginDelay)
 
     def origin_diff_minutes(self):
         """
-        Destination diff est./act. minutes; possibly None.
+        Origin departure time difference between estimated and actual in
+        absolute minutes; possibly None.
         """
         minutes = diff_minutes(
             self.origin_departure_estimated_date or self.report.date,
@@ -211,6 +106,48 @@ class ReportFlightBaseMixin(FlightBaseMixin):
             self.origin_diff_minutes_value(),
             self.origin_delays
         )
+
+    # destination_delays #
+
+    @db.declared_attr
+    def destination_delays(cls):
+        """
+        Destination delay objects.
+        """
+        return db.relationship(
+            'DestinationDelay',
+            cascade = 'all, delete-orphan',
+            collection_class = ordering_list('position'),
+            order_by = 'DestinationDelay.position',
+        )
+
+    @hybrid_property
+    def destination_delays_string(self):
+        """
+        Return this flights destination delays as formatted string.
+        """
+        return ' '.join(delay.formatted for delay in self.destination_delays)
+
+    @destination_delays_string.setter
+    def destination_delays_string(self, delay_codes_string):
+        """
+        Convert/parse delay codes string into a list of DestinationDelay
+        objects and set destination_delays attribute.
+        """
+        delays_setter(
+            db.session,
+            delay_codes_string,
+            self.destination_delays,
+            DestinationDelay,
+            self.id,
+        )
+
+    @destination_delays_string.expression
+    def destination_delays_string(cls):
+        """
+        SQL side of destination_delays_string
+        """
+        return sql_delays_string(cls, DestinationDelay)
 
     def destination_diff_minutes(self):
         """
@@ -239,34 +176,105 @@ class ReportFlightBaseMixin(FlightBaseMixin):
             self.destination_delays
         )
 
+    @hybrid_property
+    def controllable_destination_delays_minutes(self):
+        """
+        Total controllable destination delays' minutes.
+        """
+        return sum(
+            destination_delay.minutes
+            for destination_delay in self.destination_delays
+            if destination_delay.minutes is not None
+            and destination_delay.delay_object.is_controllable
+        )
 
-class Flight(
-    FlightTypeRelationshipMixin,
-    MetaMixin,
-    ReportFlightBaseMixin,
-    db.Model,
-):
-    """
-    A flight appearing on a report.
-    """
+    @controllable_destination_delays_minutes.expression
+    def controllable_destination_delays_minutes(self):
+        """
+        Total controllable destination delays' minutes as subquery.
+        """
+        return (DestinationDelay
+            .query
+            .join(Delay)
+            .with_entities(
+                db.func.sum(DestinationDelay.minutes),
+            ).filter(
+                Flight.id == DestinationDelay.flight_id,
+                Delay.is_controllable,
+            ).scalar_subquery())
 
-    id = db.Column(db.Integer, primary_key=True)
-    report_id = db.Column(db.Integer, db.ForeignKey('report.id'))
+    # other #
+
+    @hybrid_property
+    def is_lane(self):
+        """
+        Does this flight count as lane?
+        """
+        return (
+            self.flight_type.is_lane
+            # all cancelled delays are permitted by flag on delay object
+            and all(
+                destination_delay.delay_object.is_cancelled_lane
+                for destination_delay in self.destination_delays
+                if destination_delay.is_cancelled
+            ))
+
+    @is_lane.expression
+    def is_lane(cls):
+        """
+        SQL side, does this flight count as lane?
+        """
+        return db.and_(
+            # our FlightType is counted as lanes
+            # (equals true is required by the association proxy, I think)
+            cls.flight_type_is_lane == True,
+            # we DO NOT have...
+            db.not_(
+                # ...a destination delay...
+                DestinationDelay
+                .query
+                .filter(
+                    DestinationDelay.flight_id == cls.id,
+                    # ...that is cancelled
+                    DestinationDelay.is_cancelled,
+                    # and not counted as a lane when cancelled
+                    DestinationDelay.is_cancelled_lane == False,
+                ).exists()
+            ))
 
 
-def diff_minutes(est_date, est_time, act_date, act_time):
+def configured_performance_lanes_flighttype_names():
+    # TODO: move stuff like this to config.py?
+    flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
+    return flight_types_names
+
+_configured_performance_lanes_flighttypes = None
+
+def configured_performance_lanes_flighttypes():
     """
-    If all truthy, calculate the difference in minute between estimated and
-    actual dates and times.
+    The FlightType's that count for lanes.
     """
-    if all([est_date, est_time, act_date, act_time]):
-        est_dt = dt.datetime.combine(est_date, est_time)
-        act_dt = dt.datetime.combine(act_date, act_time)
-        a, b = sorted([est_dt, act_dt])
-        minutes = int((b - a).total_seconds()) // 60
-        if est_dt > act_dt:
-            minutes *= -1
-        return minutes
+    global _configured_performance_lanes_flighttypes
+    if _configured_performance_lanes_flighttypes is not None:
+        return _configured_performance_lanes_flighttypes
+    from .flight_type import FlightType
+    flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
+    flight_types = FlightType.query.filter(FlightType.name.in_(flight_types_names)).all()
+    _configured_performance_lanes_flighttypes = flight_types
+    return _configured_performance_lanes_flighttypes
+
+_configured_include_cancelled_delays = None
+
+def configured_include_cancelled_delays():
+    """
+    The required, configured delay codes to include in counting lanes.
+    """
+    global _configured_include_cancelled_delays
+    if _configured_include_cancelled_delays is not None:
+        return _configured_include_cancelled_delays
+    key = 'PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS'
+    _configured_include_cancelled_delays = current_app.config[key]
+    return _configured_include_cancelled_delays
 
 def should_show_delays(diff_minutes, delays):
     """
@@ -276,5 +284,54 @@ def should_show_delays(diff_minutes, delays):
     always_show_delay_cods = current_app.config['ALWAYS_SHOW_DELAY_CODES']
     return (
         diff_minutes > late_gt
-        or any(delay.cancelled or delay.code in always_show_delay_cods for delay in delays)
+        or any(
+            delay.is_cancelled or delay.code in always_show_delay_cods
+            for delay in delays
+        )
     )
+
+def delays_setter(
+    session,
+    delays_string,
+    delays_list,
+    flight_delay_class,
+    flight_id
+):
+    """
+    Generic function to clear and update the flight delays list.
+    """
+    delays_data = parse.delaystring(delays_string)
+    delays_list.clear()
+    for position, delay_data in enumerate(delays_data):
+        # see flask_sqlalchemy.SQLAlchemy(session_options=...)
+        # not sure why this should happen anyway but the unique object pattern
+        # from (actual) SQLAlchemy do not seem compatible on this.
+        delay_code = Delay.as_unique(session, code=delay_data['code'])
+        if delay_code.id is None:
+            # new
+            flight_delay = flight_delay_class(
+                flight_id = flight_id,
+                delay_object = delay_code,
+                position = position,
+            )
+        else:
+            # lookup from cache or database, or create
+            flight_delay = flight_delay_class.as_unique(
+                session,
+                flight_id = flight_id,
+                delay_id = delay_code.id,
+                position = position,
+            )
+        flight_delay.minutes = delay_data['minutes']
+        delays_list.append(flight_delay)
+
+def sql_delays_string(cls, flight_delay_class):
+    if db.engine.dialect.name != 'postgresql':
+        raise NotImplementedError
+    query = cls.query.join(
+        flight_delay_class
+    ).with_entities(
+        # postgres way of joining rows on a separator
+        db.func.string_agg(flight_delay_class.formatted, ' ')
+    ).scalar_subquery()
+    return query

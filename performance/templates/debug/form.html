@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+
+{% from "macros.html" import render_form %}
+
+
+{% block content %}
+<a href="{{ url_for('debug.index') }}">Back to debug index</a>
+<div class="row">
+    <h3>Form</h3>
+    <p>This is a debugging form that should always show errors</p>
+    <p>The delete button should be red and require confirmation when clicked.</p>
+    <p>the submit button should be the default button and appear on the right-hand side.</p>
+    <form action="" method="GET" style="min-width: 500px;">
+        {{ render_form(form) }}
+    </form>
+</div>
+{% endblock %}

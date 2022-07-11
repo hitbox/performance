@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block main %}
+    {% block top %}{% endblock %}
+    <div class="formlist">
+        <div>
+            {% block listing %}{% endblock listing %}
+        </div>
+        <div>
+            {% block form %}{% endblock form %}
+        </div>
+    </div>
+{% endblock main %}

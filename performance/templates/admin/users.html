@@ -1,36 +1,34 @@
-{% extends "admin/base.html" %}
+{% extends "admin/base_list_view.html" %}
 
 
+{% from "macros.html" import render_form %}
 {% from "macros.html" import render_pagination %}
-{% from "macros.html" import yesno %}
 
 
-{% block main %}
-<h3>Users</h3>
-<h4><a href="{{ url_for('admin.new_user') }}">New User</a></h4>
-<table>
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th{% if User.is_admin.doc %} title="{{ User.is_admin.doc }}"{% endif %}>Admin?</th>
-            <th{% if User.is_editor.doc %} title="{{ User.is_editor.doc }}"{% endif %}>Editor?</th>
-            <th{% if User.is_active.doc %} title="{{ User.is_active.doc }}"{% endif %}>Active?</th>
-            <th{% if User.reset_password.doc %} title="{{ User.reset_password.doc }}"{% endif %}>Reset Password?</th>
-            <th{% if User.can_edit_schedule.doc %} title="{{ User.can_edit_schedule.doc }}"{% endif %}>Schedule Edit?</th>
-        </tr>
-    </thead>
-    <tbody>{% for user in users.items %}
-        <tr data-href="{{ url_for('admin.edit_user', id=user.id) }}">
-            <td>{{ user.username }}</td>
-            <td><a href="mailto:{{ user.email }}">{{ user.email }}</td>
-            <td>{{ yesno(user.is_admin) }}</td>
-            <td>{{ yesno(user.is_editor) }}</td>
-            <td>{{ yesno(user.is_active) }}</td>
-            <td>{{ yesno(user.reset_password) }}</td>
-            <td>{{ yesno(user.can_edit_schedule) }}</td>
-        </tr>{% endfor %}
-    </tbody>
-</table>
-{{ render_pagination(users) }}
-{% endblock main %}
+{% from "user/macros.html" import render_user_table with context %}
+
+
+{% block top %}
+{% if instance %}
+<h4 class="page"><a href="{{ url_for(request.endpoint, explicit_new=1, page=request.args.page) }}">New user</a></h4>
+{% endif %}
+{% endblock top %}
+
+
+{% block listing %}
+<h3 class="page">User Accounts</h3>
+{{ render_user_table(pagination.items) }}
+{{ render_pagination(pagination, endpoint=request.endpoint) }}
+{% endblock listing %}
+
+
+{% block form %}
+{% if instance %}
+<h3>Editing user "{{ instance.username }}"</h3>
+{% else %}
+<h3>New User Account</h3>
+{% endif %}
+<form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+    {{ render_form(form) }}
+</form>
+{% endblock form %}

@@ -1,9 +1,9 @@
-{%- extends "base.html" -%}
+{% extends "base.html" %}
 
 
 {% macro render_month_link(month_data) %}
 {# abbreviated month name showing year if different than this page #}
-<a href="{{ url_for('.index', year=month_data.year, month=month_data.month) }}">{{ month_data.abbr }}.{% if month_data.year != request.view_args.year %}&nbsp;{{ month_data.year }}{% endif %}</a>
+<a href="{{ url_for('.calendar', year=month_data.year, month=month_data.month) }}">{{ month_data.abbr }}.{% if month_data.year != request.view_args.year %}&nbsp;{{ month_data.year }}{% endif %}</a>
 {% endmacro %}
 
 
@@ -33,7 +33,7 @@
 {% block content %}
 <section>
     <div class="calendar">
-        {# weekdays #}{% for wd in month.weekdays %}<div class="wd">{{ wd.abbr }}</div>{% endfor %}{% for day in month.days %}{{ render_day(day) }}{% endfor %}
+        {# weekdays #}{% for weekday in month.weekdays %}<div class="wd">{{ weekday.abbr }}</div>{% endfor %}{% for day in month.days %}{{ render_day(day) }}{% endfor %}
     </div>
 </section>{% endblock content %}
 

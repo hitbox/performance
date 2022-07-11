@@ -3,10 +3,11 @@ from flask import request
 from flask import render_template
 from flask import redirect
 
-from ..authorization import edit_schedule_check
 from ..authorization import edit_check
+from ..authorization import edit_schedule_check
 from ..extensions import db
 from ..models import FlightType
+from ..models import ScheduledFlight
 
 from .pluggable import CreateView
 from .pluggable import UpdateDeleteView
@@ -52,4 +53,5 @@ scheduled_flight_bp.add_url_rule(
             'edit',
             get_scheduled_flight_form_class,
             template = 'scheduled_flight_edit.html',
+            instance_query = lambda id: ScheduledFlight.query.get_or_404(id)
         )))

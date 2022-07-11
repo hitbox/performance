@@ -29,7 +29,15 @@ class PrefixMiddleware:
 
 
 assets = fa.Environment()
-db = SQLAlchemy()
+db = SQLAlchemy(
+    session_options = dict(
+        # added because creating Delay objects during flight editing causes
+        # detached instances and we get an error when trying to access their
+        # attributes.
+        # https://gist.github.com/krak3n/9fa1268ee0a92a67f71a
+        expire_on_commit = False,
+    ),
+)
 htmlmin = HTMLMIN()
 login_manager = LoginManager()
 

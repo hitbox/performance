@@ -11,11 +11,12 @@ from flask import url_for
 from ..authorization import admin_required
 from ..authorization import edit_schedule_check
 from ..extensions import db
-from ..forms import ScheduledReportForm
 from ..models import FlightType
 from ..models import ScheduledReport
 
-from .pluggable import ListView
+def scheduled_report_form_class():
+    from performance.forms import ScheduledReportForm
+    return ScheduledReportForm
 
 scheduled_report_bp = Blueprint('scheduled_report', __name__)
 
@@ -50,7 +51,8 @@ def add_scheduled_report():
     """
     Add new scheduled report.
     """
-    form = ScheduledReportForm()
+    form_class = scheduled_report_form_class()
+    form = form_class()
     del form.delete
 
     if form.validate_on_submit():
@@ -107,8 +109,9 @@ def edit_scheduled_report(id):
     """
     Edit the direct attributes of a scheduled report.
     """
+    form_class = scheduled_report_form_class()
     scheduled_report = ScheduledReport.query.get_or_404(id)
-    form = ScheduledReportForm(obj=scheduled_report)
+    form = form_class(obj=scheduled_report)
 
     if form.validate_on_submit():
         if form.delete.data:
@@ -133,8 +136,9 @@ def edit_scheduled_report_delete(id):
     """
     Confirm deleting report.
     """
+    form_class = scheduled_report_form_class()
     scheduled_report = ScheduledReport.query.get_or_404(id)
-    form = ScheduledReportForm(obj=scheduled_report)
+    form = form_class(obj=scheduled_report)
     del form.name
     del form.display_order
     del form.update
@@ -164,7 +168,7 @@ def edit_scheduled_report_delete(id):
     template = 'scheduled_report/edit-scheduled-report.html'
     return render_template(template, **context)
 
-## commands ##
+# CLI #
 
 @scheduled_report_bp.cli.command('add', help='Add scheduled report.')
 @click.option('--name', prompt=True)

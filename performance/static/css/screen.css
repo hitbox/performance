@@ -46,7 +46,7 @@
 body {
     color: var(--color);
     background-color: var(--background-color);
-    padding-bottom: 100%; /* scroll past bottom */
+    padding-bottom: 50vh; /* scroll past bottom */
 }
 
 a:link {
@@ -78,8 +78,6 @@ a:hover {
     color: var(--data-href-hover-color);
     background-color: var(--data-href-hover-background-color);
 }
-
-
 
 /* table colors screen */
 

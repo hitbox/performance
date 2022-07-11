@@ -1,8 +1,6 @@
 from performance.extensions import db
 from performance.models.mixin import MetaMixin
 
-from .util import grouped_flights
-
 class ScheduledReport(
     MetaMixin,
     db.Model,
@@ -16,7 +14,7 @@ class ScheduledReport(
     name = db.Column(db.String, unique=True)
     display_order = db.Column(db.Integer)
 
-    scheduled_flights = db.relationship('ScheduledFlight', backref='scheduled_report')
-
-    def grouped_flights(self):
-        return grouped_flights(self.scheduled_flights)
+    scheduled_flights = db.relationship(
+        'ScheduledFlight',
+        back_populates = 'scheduled_report',
+    )

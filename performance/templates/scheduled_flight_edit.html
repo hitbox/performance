@@ -2,6 +2,7 @@
 
 
 {% from "macros.html" import render_field_errors %}
+{% from "macros.html" import render_form %}
 
 
 {% macro render_input_group(field) %}
@@ -40,6 +41,8 @@
 
 
 {% block inside_form %}
+    {{ render_form(form) }}
+    {#
     {{ form.hidden_tag() }}
     <div class="scheduled-flight-form">
         {{ render_input_group(form.flight_type) }}
@@ -53,4 +56,5 @@
         {% if form.submit %}{{ form.submit }}{% endif %}
         {% if form.delete %}{{ form.delete }}{% endif %}
     </div>
+    #}
 {% endblock inside_form %}

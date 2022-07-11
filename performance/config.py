@@ -1,9 +1,9 @@
-from .exceptions import AppError
+from .exceptions import PerformanceError
 
 _required_registry = {}
 _development_registry = {}
 
-class ConfigError(Exception):
+class ConfigError(PerformanceError):
     pass
 
 

@@ -1,10 +1,11 @@
-from performance.extensions import db
-from performance.models import FlightBaseMixin
-from performance.models import FlightTypeRelationshipMixin
-from performance.models import MetaMixin
+from ..extensions import db
+
+from .flight_mixin import FlightMixin
+from .flight_type import FlightTypeRelationshipMixin
+from .mixin import MetaMixin
 
 class ScheduledFlight(
-    FlightBaseMixin,
+    FlightMixin,
     FlightTypeRelationshipMixin,
     MetaMixin,
     db.Model,
@@ -27,4 +28,13 @@ class ScheduledFlight(
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    scheduled_report_id = db.Column(db.Integer, db.ForeignKey('scheduled_report.id'))
+
+    scheduled_report_id = db.Column(
+        db.Integer,
+        db.ForeignKey('scheduled_report.id'),
+    )
+
+    scheduled_report = db.relationship(
+        'ScheduledReport',
+        back_populates = 'scheduled_flights',
+    )

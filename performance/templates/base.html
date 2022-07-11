@@ -1,5 +1,4 @@
 {% from "macros.html" import render_javascript_injection -%}
-{% from "macros.html" import render_nav_item -%}
 
 
 <!doctype html>
@@ -18,18 +17,7 @@
         {% assets 'sitejs' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
     {% endblock head %}</head>
     <body>{% block body %}
-        {% block topnav %}<nav class="noprint">
-            {% if config.PERFORMANCE_DEBUG %}<a href="{{ url_for('debug.index') }}">Debug</a>{% endif %}
-            {% if current_user.is_admin %}
-                {{ render_nav_item('admin.index', 'Admin') }}
-            {% endif %}
-            {% if current_user.is_admin or current_user.can_edit_schedule %}
-                {{ render_nav_item('scheduled_report.list', 'Schedule') }}
-            {% endif %}
-            {{ render_nav_item('select_date.goto_today', 'Reports') }}
-            {{ render_nav_item('user.profile', 'Profile') }}
-            {% include "theme-toggle.html" %}
-        {% endblock topnav %}</nav>
+        {% include "topnav.html" %}
         {% include "flash.html" %}
         <main>{% block main %}
             {% block header %}{% endblock header %}

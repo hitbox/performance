@@ -15,33 +15,7 @@ from ..models import User
 from .base import BaseFlaskForm
 from .base import ModelForm
 
-class LoginForm(BaseFlaskForm):
-    """
-    Login form.
-    """
-    username = StringField('Username')
-    password = PasswordField('Password')
-    submit = SubmitField('Login')
-
-
-class UserModelForm(ModelForm):
-    """
-    Form for manipulating actual User objects.
-    """
-    class Meta:
-        model = User
-
-
-class ResetPasswordForm(BaseFlaskForm):
-    """
-    Reset password form
-    """
-    password = PasswordField('password')
-    confirm = PasswordField('reset', validators=[EqualTo('password')])
-    submit = SubmitField('Reset')
-
-
-def available_username(form, field):
+def validate_available_username(form, field):
     """
     Raise for already existing username.
     """
@@ -51,41 +25,43 @@ def available_username(form, field):
     if user:
         raise ValidationError('Username is taken')
 
-class UserForm(FlaskForm):
+class LoginForm(BaseFlaskForm):
     """
-    Edit user account.
+    Login form.
     """
+    username = StringField('Username')
+    password = PasswordField('Password')
+    submit = SubmitField('Login')
 
-    username = StringField(
-        label = 'username',
-        validators = [
-            InputRequired(),
-            available_username,
-        ],
-    )
+
+class ResetPasswordForm(BaseFlaskForm):
+    """
+    Reset password form
+    """
+    password = PasswordField('Password')
+    confirm = PasswordField('Confirm', validators=[EqualTo('password')])
+    submit = SubmitField('Reset')
+
+
+class UserFormMixin:
+    """
+    Common fields for new and edit user forms.
+    """
+    class Meta:
+        # any fields the subclasses define that should sort before the ones here.
+        fields_order = [
+            'username',
+            'email',
+            'password',
+            'password_confirm',
+        ]
+
+
     email = StringField(
-        label = 'email',
+        label = 'Email',
         validators = [
             InputRequired(),
         ],
-    )
-    password = PasswordField(
-        label = 'password',
-        validators = [
-            InputRequired(),
-        ],
-        render_kw = dict(
-            autocomplete = 'off',
-        )
-    )
-    password_confirm = PasswordField(
-        label = 'confirm password',
-        validators = [
-            InputRequired(),
-        ],
-        render_kw = dict(
-            autocomplete = 'off',
-        )
     )
 
     is_active = BooleanField('Active?', default=True)
@@ -107,5 +83,64 @@ class UserForm(FlaskForm):
         """
         Raise for password confirmation.
         """
-        if field.data != form.password.data:
+        if (
+            form.password.data
+            and field.data != form.password.data
+        ):
             raise ValidationError('Password confirmation does not match.')
+
+
+class NewUserForm(UserFormMixin, BaseFlaskForm):
+    """
+    New user account.
+    """
+    username = StringField(
+        label = 'Username',
+        validators = [
+            InputRequired(),
+            validate_available_username,
+        ],
+    )
+
+    password = PasswordField(
+        label = 'Password',
+        validators = [
+            InputRequired(),
+        ],
+        render_kw = dict(
+            autocomplete = 'off',
+        )
+    )
+
+    password_confirm = PasswordField(
+        label = 'Confirm password',
+        validators = [
+            InputRequired(),
+        ],
+        render_kw = dict(
+            autocomplete = 'off',
+        )
+    )
+
+
+class EditUserForm(UserFormMixin, BaseFlaskForm):
+    """
+    Edit user form.
+    """
+    # does not require unique
+    username = StringField(label='Username', validators = [InputRequired()])
+
+    password = PasswordField(
+        label = 'Password',
+        render_kw = dict(
+            autocomplete = 'off',
+        )
+    )
+
+    password_confirm = PasswordField(
+        label = 'Confirm password',
+        render_kw = dict(
+            autocomplete = 'off',
+        )
+    )
+

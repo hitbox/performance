@@ -1,56 +1,44 @@
-from .models import Contract
+from . import queries
 
-def performance_contract_for_report(report):
+def performance_contract_for_date(date):
     """
-    The first contract object where the report date is between the contract's
-    date range.
+    Return the performance contract for a (report) date.
     """
-    contract = Contract.query.filter(
-        Contract.date_range_start <= report.date,
-        Contract.date_range_end >= report.date,
-    ).first()
+    query = queries.performance_contract(date)
+    contract = query.first()
     return contract
 
-def performance_details(reports):
+def performance_details(date, contract=None):
     """
-    Return performance numbers (lanes, chargeable delays, and over-30 count).
+    Return performance numbers.
 
     :param reports: list of reports.
     """
-    lanes = [flight for report in reports for flight in report.lane_flights()]
-    controllable_destination_delays_over15 = [
-        delay
-        for report in reports
-        for delay
-        in report.controllable_destination_delays(over_minutes=15)
-    ]
-    controllable_destination_delays_over30 = [
-        delay
-        for report in reports
-        for delay
-        in report.controllable_destination_delays(over_minutes=30)
-    ]
-    flights_with_controllable_destination_delays_over15 = [
-        flight
-        for report in reports
-        for flight
-        in report.flights_with_controllable_destination_delays(over_minutes=15)
-    ]
-    flights_with_controllable_destination_delays_over30 = [
-        flight
-        for report in reports
-        for flight
-        in report.flights_with_controllable_destination_delays(over_minutes=30)
-    ]
-    result = dict(
-        lanes = lanes,
-        controllable_destination_delays_over15
-            = controllable_destination_delays_over15,
-        controllable_destination_delays_over30
-            = controllable_destination_delays_over30,
-        flights_with_controllable_destination_delays_over15
-            = flights_with_controllable_destination_delays_over15,
-        flights_with_controllable_destination_delays_over30
-            = flights_with_controllable_destination_delays_over30,
-    )
+    daily_criteria = queries.date_criteria(date)
+    mtd_criteria = queries.month_to_date_criteria(date)
+    qtd_criteria = queries.quarter_to_date_criteria(date)
+
+    result = dict()
+    keys = ['daily', 'month_to_date', 'quarter_to_date']
+    criterias = [daily_criteria, mtd_criteria, qtd_criteria]
+    for key, criteria in zip(keys, criterias):
+        result[key] = dict(
+            lanes = queries.lanes(criteria).count(),
+            flights_with_controllable_destination_delays_over15
+                = queries.flights_with_controllable_destination_delays(
+                    criteria, 15).count(),
+            flights_with_controllable_destination_delays_over30
+                = queries.flights_with_controllable_destination_delays(
+                    criteria, 30).count(),
+        )
+
+    if contract:
+        criteria = queries.contract_range_criteria(contract)
+        result['contract_range'] = dict(
+            lanes = queries.lanes(criteria).count(),
+            flights_with_controllable_destination_delays_over15
+                = queries.flights_with_controllable_destination_delays(
+                    criteria, 15).count(),
+        )
+
     return result

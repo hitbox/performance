@@ -1,8 +1,5 @@
 import datetime as dt
-import inspect
 import re
-
-from pprint import pprint
 
 def camelcase(s):
     """
@@ -28,3 +25,23 @@ def massage_time(string):
     value = int(''.join(c for c in string if c.isdigit()))
     value = f'{value:04d}'
     return value
+
+def quarter_of_date(date):
+    """
+    Return the quarter part of `date`.
+    """
+    return (date.month - 1) // 3 + 1
+
+def diff_minutes(est_date, est_time, act_date, act_time):
+    """
+    If all truthy, calculate the difference in minute between estimated and
+    actual dates and times.
+    """
+    if all([est_date, est_time, act_date, act_time]):
+        est_dt = dt.datetime.combine(est_date, est_time)
+        act_dt = dt.datetime.combine(act_date, act_time)
+        a, b = sorted([est_dt, act_dt])
+        minutes = int((b - a).total_seconds()) // 60
+        if est_dt > act_dt:
+            minutes *= -1
+        return minutes

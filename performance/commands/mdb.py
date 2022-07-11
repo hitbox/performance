@@ -3,9 +3,9 @@ import click
 from flask import current_app
 from flask.cli import AppGroup
 
-from ..datamigration import Migrator
-from ..extensions import db
-from ..mdbreader import mdbreader
+from performance.extensions import db
+from performance.legacy.datamigration import Migrator
+from performance.legacy.mdbreader import mdbreader
 
 mdb_cli = AppGroup('mdb', help='Data commands')
 

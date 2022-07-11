@@ -2,7 +2,7 @@
 
 {% from "macros.html" import string %}
 {% from "macros.html" import time %}
-{% from "macros.html" import render_form_simple1 %}
+{% from "macros.html" import render_form %}
 
 
 {% set backurl = url_for(request.endpoint, **request.view_args) %}
@@ -25,6 +25,6 @@
     {% endif %}{# if scheduled_report (editing existing) #}
 
     <form action="{{ url_for(request.endpoint, **request.view_args) }}" class="scheduled-report" method="post">
-    {{ render_form_simple1(form) }}
+    {{ render_form(form) }}
     </form>
 </article>{% endblock main %}

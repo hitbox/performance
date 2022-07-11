@@ -17,8 +17,7 @@
 {% macro render_table(scheduled_report, flight_type, scheduled_flights) %}
 <table class="expand">
     <thead>
-        <tr>{% set ncols = 6 %}
-            <th></th>
+        <tr>{% set ncols = 5 %}
             <th>Flight</th>
             <th>Orig</th>
             <th>ETD</th>
@@ -34,10 +33,7 @@
         </tr>
         {% else %}
             {% for flight in scheduled_flights %}
-        <tr>
-            <td class="data">
-                <a href="{{ url_for('scheduled_flight.edit', id=flight.id, backurl=backurl) }}">edit</a>
-            </td>
+        <tr data-href="{{ url_for('scheduled_flight.edit', id=flight.id, backurl=backurl) }}">
             <td class="data">{{ string(flight.flight_number) }}</td>
             <td class="data">{{ string(flight.origin_station) }}</td>
             <td class="data">{{ time(flight.origin_departure_estimated_time) }}</td>

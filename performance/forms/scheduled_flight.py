@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 
 from wtforms import HiddenField
+from wtforms import SubmitField
 from wtforms_alchemy import ClassMap
 from wtforms_alchemy import QuerySelectField
 
@@ -16,7 +17,6 @@ from .mixins import SubmitUpdateDeleteMixin
 class ScheduledFlightForm(
     BackLinkMixin,
     ModelForm,
-    SubmitUpdateDeleteMixin,
 ):
     class Meta:
         model = ScheduledFlight
@@ -72,6 +72,9 @@ class ScheduledFlightForm(
         get_label = 'name',
         query_factory = lambda: FlightType.query.order_by(FlightType.report_order).all(),
         render_kw = {
-            'class': 'flight',
+            'class': 'scheduled flight',
         },
     )
+
+    submit = SubmitField('Submit')
+    delete = SubmitField('Delete', render_kw={'class': 'danger', 'tabindex': '-1'})

@@ -13,6 +13,17 @@ def root_context():
     from .extensions import db
     from .extensions import htmlmin
     from .extensions import login_manager
+    from .forms import AssumedBestForm
+    from .forms import ContractForm
+    from .forms import EditUserForm
+    from .forms import FlightForm
+    from .forms import LoginForm
+    from .forms import NewUserForm
+    from .forms import PerformanceTierForm
+    from .forms import ReportForm
+    from .forms import ResetPasswordForm
+    from .forms import ScheduledFlightForm
+    from .forms import ScheduledReportForm
 
     # NOTE: not importing forms because some are dependent on request context
     #       and this should be fixed.

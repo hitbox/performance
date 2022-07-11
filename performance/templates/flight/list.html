@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+
+{% from "macros.html" import percent %}
+{% from "macros.html" import render_delays %}
+{% from "macros.html" import render_delays_expanded %}
+{% from "macros.html" import render_integer %}
+{% from "macros.html" import render_time %}
+{% from "macros.html" import render_date %}
+{% from "macros.html" import yes %}
+{% from "macros.html" import yesno %}
+
+
+{# must match render_delay* macros #}
+{% set delay_colspan = 6 %}
+
+
+{% macro render_part1_tds(rowspan, index, flight) %}
+<td class="data" rowspan="{{ rowspan }}">{{ index }}</td>
+{#<td class="data" rowspan="{{ rowspan }}">{{ flight.id }}</td>#}
+{% if not hide_date %}<td class="data" rowspan="{{ rowspan }}" title="{{ flight.report.date }}">{{ render_date(flight.report.date) }}</td>{% endif %}
+<td class="data" rowspan="{{ rowspan }}">{{ flight.flight_type.name }}</td>
+<td class="data" rowspan="{{ rowspan }}">{{ flight.tail_number }}</td>
+<td class="data" rowspan="{{ rowspan }}">{{ flight.flight_number }}</td>
+<td class="data" rowspan="{{ rowspan }}">{{ flight.origin_station }}</td>
+<td class="data" rowspan="{{ rowspan }}">{{ render_time(flight.origin_departure_estimated_time) }}</td>
+<td class="data" rowspan="{{ rowspan }}">{{ render_time(flight.origin_departure_actual_time) }}</td>
+{% endmacro %}
+
+
+{% macro render_part2_tds(rowspan, flight) %}
+<td class="data" rowspan="{{ rowspan }}">{{ flight.destination_station }}</td>
+<td class="data" rowspan="{{ rowspan }}">{{ render_time(flight.destination_arrival_estimated_time) }}</td>
+<td class="data" rowspan="{{ rowspan }}">{{ render_time(flight.destination_arrival_actual_time) }}</td>
+{% endmacro %}
+
+
+{% macro render_part3_tds(rowspan, flight) %}
+<td class="data number" rowspan="{{ rowspan }}">{{ render_integer(flight.weight) }}</td>
+<td class="data bool" rowspan="{{ rowspan }}" data-value="{{ flight.is_lane }}">{{ yesno(flight.is_lane) }}</td>
+{% endmacro %}
+
+
+{% macro render_delay_tds(delay) %}
+<td class="data" title="Code">{{ delay.code }}</td>
+<td class="data number" title="Minutes">{{ render_integer(delay.minutes) }}</td>
+<td class="data" title="Cancelled?">{{ yes(delay.is_cancelled, abbr=true) }}</td>
+<td class="data" title="Controllable/Chargeable?">{{ yes(delay.is_controllable, abbr=true) }}</td>
+<td class="data" title="Always Lane?">{{ yes(delay.is_cancelled_lane, abbr=true) }}</td>
+<td class="data" title="Always Show?">{{ yes(delay.is_always_show, abbr=true) }}</td>
+{% endmacro %}
+
+
+{% macro render_delay_summary_tds(delays) %}
+<td></td>
+<td class="data number" title="Sum of minutes">{{ render_integer(delays | selectattr('minutes') | sum(attribute='minutes')) }}</td>
+<td class="data number" title="Sum of cancelled minutes">{{ render_integer(delays | selectattr('is_cancelled') | selectattr('minutes') | sum(attribute='minutes')) }}</td>
+<td class="data number" title="Sum of controllable minutes">{{ render_integer(delays | selectattr('minutes') | selectattr('is_controllable') | sum(attribute='minutes')) }}</td>
+<td></td>
+<td></td>
+{% endmacro %}
+
+
+{% block content %}
+<a href="{{ url_for('report.view_report_for_date', report_date=request.view_args.date) }}">Back to report</a>
+<h1>Flights</h1>
+<h2>{{ title }}</h2>
+{% set flights = items %}
+<h3>{{ render_integer( flights | length) }} total</h3>
+<h3>Definitions</h3>
+<dl class="explain">
+    <dt>Flight is lane?</dt>
+    <dd>
+        <span>A flight is counted as a lane if </span>
+        <ol>{% set is_admin = current_user.is_admin %}
+            <li>its {% if is_admin %}<a href="{{ url_for('flight_type.list') }}">{% endif %}type{% if is_admin %}</a>{% endif %} is counted as a lane</li>
+            <li><em>and</em>
+                <ol>
+                    <li>it is not <em>cancelled</em></li>
+                    <li><em>or</em> it is cancelled by a controllable destination {% if is_admin %}<a href="{{ url_for('delay.list') }}">{% endif %}delay{% if is_admin %}</a>{% endif %}</li>
+                </ol>
+            </li>
+        </ol>
+    </dd>
+</dl>
+<h3>Note</h3>
+<p>Delays are shown, expanded with all their attributes.</p>
+<table>
+    <thead>
+        <tr>
+            {% set part1_ncols = 8 - (1 if hide_date else 0) %}
+            {% set rowspan_for_head = 2 %}
+            <th rowspan="{{ rowspan_for_head }}">#</th>
+            {#<th rowspan="{{ rowspan_for_head }}">flight.id</th>#}
+            {% if not hide_date %}<th rowspan="{{ rowspan_for_head }}">Date</th>{% endif %}
+            <th rowspan="{{ rowspan_for_head }}">Type</th>
+            <th rowspan="{{ rowspan_for_head }}">Tail</th>
+            <th rowspan="{{ rowspan_for_head }}">Flight</th>
+            <th rowspan="{{ rowspan_for_head }}">Orig</th>
+            <th rowspan="{{ rowspan_for_head }}">ETD</th>
+            <th rowspan="{{ rowspan_for_head }}">ATD</th>
+            <th colspan="{{ delay_colspan }}">Delays</th>
+            <th rowspan="{{ rowspan_for_head }}">Dest</th>
+            <th rowspan="{{ rowspan_for_head }}">ETA</th>
+            <th rowspan="{{ rowspan_for_head }}">ATA</th>
+            <th colspan="{{ delay_colspan }}">Delays</th>
+            <th rowspan="{{ rowspan_for_head }}">Weight</th>
+            <th rowspan="{{ rowspan_for_head }}">Is Lane?</th>
+        </tr>
+        <tr>
+            {% for _ in range(2) %}
+            <th>Code</th>
+            <th title="Minutes">Min.</th>
+            <th title="Code cancelled flight?">XLD</th>
+            <th title="Is Controllable?">Ctrl</th>
+            <th title="Always Lane?">Lane?</th>
+            <th title="Always Show?">Show?</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% set origin_delays = [] %}
+        {% set destination_delays = [] %}
+        {% for flight in flights %}
+            {% if origin_delays.extend(flight.origin_delays) or destination_delays.extend(flight.destination_delays) %}{# abusing if statement #}{% endif %}
+            {% set flight_loop = loop %}{# save for possible inner loop for delays #}
+            {% if not (flight.origin_delays or flight.destination_delays) %}
+            {# no delays #}
+            <tr>
+                {{ render_part1_tds(rowspan_for_delays, loop.index, flight) }}
+                <td colspan="{{ delay_colspan }}"></td>
+                {{ render_part2_tds(rowspan_for_delays, flight) }}
+                <td colspan="{{ delay_colspan }}"></td>
+                {{ render_part3_tds(rowspan_for_delays, flight) }}
+            </tr>
+            {% else %}
+            {# has delays #}
+            {% set rowspan_for_delays = [ flight.origin_delays | length, flight.destination_delays | length ] | max %}
+            {# plus one for summary sub-row #}
+
+            {% set delay_items = zip_longest(flight.origin_delays, flight.destination_delays) %}
+            {% for origin_delay, destination_delay in delay_items %}
+            <tr>
+                {% if loop.first %}
+                {{ render_part1_tds(rowspan_for_delays, flight_loop.index, flight) }}
+                {% endif %}
+
+                {% if origin_delay %}
+                {{ render_delay_tds(origin_delay) }}
+                {% else %}
+                <td colspan="{{ delay_colspan }}"></td>
+                {% endif %}
+
+                {% if loop.first %}
+                {{ render_part2_tds(rowspan_for_delays, flight) }}
+                {% endif %}
+
+                {% if destination_delay %}
+                {{ render_delay_tds(destination_delay) }}
+                {% else %}
+                <td colspan="{{ delay_colspan }}"></td>
+                {% endif %}
+
+                {% if loop.first %}
+                {{ render_part3_tds(rowspan_for_delays, flight) }}
+                {% endif %}
+            </tr>{% endfor %}
+            {% endif %}
+
+            {# summary row for delays #}
+            {% if flight.origin_delays | length > 1 or flight.destination_delays | length > 1 %}<tr>
+                <th colspan="{{ part1_ncols }}" class="summary-row-title">Flight {{ flight.flight_number }} Subtotal</th>
+
+                {# checks to align columns nicely avoiding lots of blank cells #}
+                {% if flight.origin_delays and not flight.destination_delays %}
+                    {{ render_delay_summary_tds(flight.origin_delays) }}
+                    <td colspan="{{ 3 + delay_colspan + 2 }}"></td>
+                {% elif flight.destination_delays and not flight.origin_delays %}
+                    <td colspan="{{ delay_colspan + 3 }}"></td>
+                    {{ render_delay_summary_tds(flight.destination_delays) }}
+                    <td colspan="2"></td>
+                {% else %}{# has origin and destination delays #}
+                    {{ render_delay_summary_tds(flight.origin_delays) }}
+                    <td colspan="3"></td>
+                    {{ render_delay_summary_tds(flight.destination_delays) }}
+                    <td colspan="2"></td>
+                {% endif %}
+            </tr>
+            {% endif %}
+
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        {% set num_lanes = flights | selectattr('is_lane') | list | length %}
+        <tr>
+            <th colspan="{{ part1_ncols }}" class="summary-row-title">Grand Total</th>
+            {{ render_delay_summary_tds(origin_delays) }}
+            <td colspan="3"></td>
+            {{ render_delay_summary_tds(destination_delays) }}
+            <td class="data number" title="Sum of weights">{{ render_integer(flights | selectattr('weight') | sum(attribute='weight')) }}</td>
+            <td class="data number" title="Lane count">{{ num_lanes }}</td>
+        </tr>
+        <tr>
+            <th colspan="{{ part1_ncols }}" class="summary-row-title">Ratios</th>
+            <td class="data number" colspan="{{ delay_colspan }}">{{ percent((num_lanes - origin_delays | selectattr('is_cancelled') | list | length) / num_lanes) }}</td>
+            <td colspan="3"></td>
+            <td class="data number" colspan="{{ delay_colspan }}">{{ percent((num_lanes - destination_delays | selectattr('is_cancelled') | list | length) / num_lanes) }}</td>
+            <td colspan="2"></td>
+        </tr>
+    </tfoot>
+</table>
+{% endblock content %}

@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from flask import current_app
 
-class Delay(namedtuple('Delay', ['code', 'minutes', 'cancelled'])):
+class LegacyDelay(namedtuple('Delay', ['code', 'minutes', 'is_cancelled'])):
     """
     A flight delay code, the minutes and if the code is cancelled.
     """
@@ -20,7 +20,7 @@ class Delay(namedtuple('Delay', ['code', 'minutes', 'cancelled'])):
             self.code in controllable_codes
             and (
                 # is cancelled
-                self.cancelled
+                self.is_cancelled
                 # or has minutes and they're over
                 or (self.minutes and self.minutes > over_minutes))
         )
@@ -33,7 +33,7 @@ class Delay(namedtuple('Delay', ['code', 'minutes', 'cancelled'])):
         from .parse import CANCELLED
 
         strings = []
-        if self.cancelled and self.code != CANCELLED:
+        if self.is_cancelled and self.code != CANCELLED:
             strings.append(CANCELLED)
         if self.code:
             strings.append(self.code)

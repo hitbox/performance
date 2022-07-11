@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+
+
+{% from "macros.html" import render_form %}
+{% from "macros.html" import render_pagination %}
+
+
+{% from "delay/macros.html" import render_delays_table %}
+
+
+{# examine this and contract/list.html for similarities and possibly combine #}
+
+
+{% block content %}
+<h1>Delay Codes</h1>
+
+{# check because this could be used to just list the delays #}
+{% if new_delay_form and current_user.is_admin %}
+<h2>New delay code</h2>
+<form action="{{ url_for('admin.delay.create') }}" method="POST">
+    {{ render_form(new_delay_form) }}
+</form>
+<hr>
+{% endif %}
+
+{% if pagination %}
+    {% set delays = pagination.items %}
+{% else %}
+    {% set delays = items %}
+{% endif %}
+
+{{ render_delays_table(delays, editing=true) }}
+
+{% if pagination %}{{ render_pagination(pagination, endpoint=request.endpoint) }}{% endif %}
+
+{% endblock content %}

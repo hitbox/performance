@@ -2,6 +2,7 @@ import sqlalchemy as sa
 
 from flask import request
 from wtforms import HiddenField
+from wtforms import StringField
 from wtforms_alchemy import ClassMap
 from wtforms_alchemy import QuerySelectField
 
@@ -50,13 +51,13 @@ class FlightForm(
             'origin_departure_estimated_time',
             'origin_departure_actual_date',
             'origin_departure_actual_time',
-            'origin_delays',
+            #'origin_delays',
             'destination_station',
             'destination_arrival_estimated_date',
             'destination_arrival_estimated_time',
             'destination_arrival_actual_date',
             'destination_arrival_actual_time',
-            'destination_delays',
+            #'destination_delays',
             'comment',
         ]
         fields_order = [
@@ -70,13 +71,13 @@ class FlightForm(
             'origin_departure_estimated_time',
             'origin_departure_actual_date',
             'origin_departure_actual_time',
-            'origin_delays',
+            #'origin_delays',
             'destination_station',
             'destination_arrival_estimated_date',
             'destination_arrival_estimated_time',
             'destination_arrival_actual_date',
             'destination_arrival_actual_time',
-            'destination_delays',
+            #'destination_delays',
             'comment',
             'submit',
             'delete',
@@ -142,14 +143,14 @@ class FlightForm(
                     'placeholder': 'ATD',
                 },
             },
-            'origin_delays': {
-                'label': 'Delays',
-                'render_kw': {
-                    'autocomplete': 'off',
-                    'class': 'flight delay',
-                    'style': 'width: 45rem',
-                },
-            },
+            #'origin_delays': {
+            #    'label': 'Delays',
+            #    'render_kw': {
+            #        'autocomplete': 'off',
+            #        'class': 'flight delay',
+            #        'style': 'width: 45rem',
+            #    },
+            #},
             'destination_station': {
                 'label': 'Station',
                 'render_kw': {
@@ -186,14 +187,14 @@ class FlightForm(
                     'placeholder': 'ATA',
                 },
             },
-            'destination_delays': {
-                'label': 'Delays',
-                'render_kw': {
-                    'autocomplete': 'off',
-                    'class': 'flight delay',
-                    'style': 'width: 45rem',
-                },
-            },
+            #'destination_delays': {
+            #    'label': 'Delays',
+            #    'render_kw': {
+            #        'autocomplete': 'off',
+            #        'class': 'flight delay',
+            #        'style': 'width: 45rem',
+            #    },
+            #},
             'comment': {
                 'label': 'Comment',
                 'render_kw': {
@@ -216,6 +217,9 @@ class FlightForm(
             'autofocus': True,
         }
     )
+
+    origin_delays_string = StringField('Delays')
+    destination_delays_string = StringField('Delays')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

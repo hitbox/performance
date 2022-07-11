@@ -25,4 +25,4 @@ class ScheduledReportForm(
     display_order = IntegerField('Order')
 
     update = SubmitField('Update')
-    delete = SubmitField('Delete')
+    delete = SubmitField('Delete', render_kw={'class': 'danger'})

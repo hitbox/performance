@@ -1,75 +1,100 @@
 import unittest
 
-from performance.delay import Delay
 from performance.parse import delaystring
 from performance.parse import formatdelays
 
-class TestParseDelay(unittest.TestCase):
+def test_parse_empty():
+    assert delaystring('') == []
+    assert delaystring('     ') == []
+    # must be three characters
+    assert delaystring('   X Y   ') == []
+    assert delaystring('   XX YY      ') == []
 
-    def check(self, text, expect):
-        self.assertListEqual(delaystring(text), expect)
+def test_parse_no_minutes():
+    assert delaystring('AAA') == [
+            dict(code='AAA', minutes=None, is_cancelled=False)
+        ]
+    assert delaystring('AAA    ') == [
+            dict(code='AAA', minutes=None, is_cancelled=False)
+        ]
+    assert delaystring('AAA BBB') == [
+            dict(code='AAA', minutes=None, is_cancelled=False),
+            dict(code='BBB', minutes=None, is_cancelled=False),
+        ]
 
-    def test_parse_empty(self):
-        self.check('', [])
-        self.check('     ', [])
-        # must be three characters
-        self.check('   X Y   ', [])
-        self.check('   XX YY      ', [])
+def test_parse_code_and_minutes():
+    assert delaystring('AAA1') == [dict(code='AAA', minutes=1, is_cancelled=False)]
+    assert delaystring('AAA(1)') == [dict(code='AAA', minutes=1, is_cancelled=False)]
+    # parse handles many kinds of user input
+    expected = [dict(code='BBB', minutes=123, is_cancelled=False)]
+    assert delaystring('BBB123') == expected
+    assert delaystring('BBB(123)') == expected
+    assert delaystring('BBB(123') == expected
+    assert delaystring('BBB123)') == expected
+    # two delay codes and minutes
+    expected = [
+        dict(code='AAA', minutes=123, is_cancelled=False),
+        dict(code='BBB', minutes=456, is_cancelled=False),
+    ]
+    assert delaystring('AAA123BBB456') == expected
+    assert delaystring('AAA(123)BBB(456)') == expected
+    assert delaystring('AAA(123) BBB(456)') == expected
+    assert delaystring('AAA(123)    BBB(456)') == expected
+    # three delay codes and minutes
+    expected = [
+        dict(code='AAA', minutes=123, is_cancelled=False),
+        dict(code='BBB', minutes=456, is_cancelled=False),
+        dict(code='CCC', minutes=789, is_cancelled=False),
+    ]
+    assert delaystring('AAA123BBB456CCC789') == expected
+    assert delaystring('AAA(123)BBB(456)CCC(789)') == expected
+    assert delaystring('AAA(123) BBB(456) CCC(789)') == expected
+    assert delaystring('    AAA(123)    BBB(456)   CCC(789)') == expected
+    assert delaystring('AAA(123)    BBB  (456)   CCC     (789)') == expected
+    assert delaystring('AAA(123) BBB ( 456  ) CCC(  789    )') == expected
+    # mixed with and without minutes
+    assert delaystring('AAA BBB123 CCC') == [
+            dict(code='AAA', minutes=None, is_cancelled=False),
+            dict(code='BBB', minutes=123, is_cancelled=False),
+            dict(code='CCC', minutes=None, is_cancelled=False)
+        ]
+    assert delaystring('AAA BBB(123 CCC') == [
+            dict(code='AAA', minutes=None, is_cancelled=False),
+            dict(code='BBB', minutes=123, is_cancelled=False),
+            dict(code='CCC', minutes=None, is_cancelled=False),
+        ]
+    assert delaystring('AAA BBB123) CCC') == [
+            dict(code='AAA', minutes=None, is_cancelled=False),
+            dict(code='BBB', minutes=123, is_cancelled=False),
+            dict(code='CCC', minutes=None, is_cancelled=False)
+        ]
+    assert delaystring('AAA() BBB123 CCC') == [
+            dict(code='AAA', minutes=None, is_cancelled=False),
+            dict(code='BBB', minutes=123, is_cancelled=False),
+            dict(code='CCC', minutes=None, is_cancelled=False)
+        ]
+    #
+    assert delaystring('AAA(123456)') == [
+            dict(code='AAA', minutes=123456, is_cancelled=False)
+        ]
 
-    def test_parse_no_minutes(self):
-        self.check('AAA', [Delay('AAA', None, False)])
-        self.check('AAA    ', [Delay('AAA', None, False)])
-        self.check('AAA BBB', [Delay('AAA', None, False), Delay('BBB', None, False)])
+def test_parse_cancelled():
+    assert delaystring('XLD AAA') == [
+            dict(code='AAA', minutes=None, is_cancelled=True)
+        ]
+    assert delaystring('XLD BBB12') == [
+            dict(code='BBB', minutes=12, is_cancelled=True)
+        ]
+    assert delaystring('XLD') == [
+            dict(code='XLD', minutes=None, is_cancelled=True)
+        ]
+    assert delaystring('XLD XLD') == [
+            dict(code='XLD', minutes=None, is_cancelled=True)
+        ]
 
-    def test_parse_code_and_minutes(self):
-        self.check('AAA1', [Delay('AAA', 1, False)])
-        self.check('AAA(1)', [Delay('AAA', 1, False)])
-        # parse handles many kinds of user input
-        expected = [Delay('BBB', 123, False)]
-        self.check('BBB123', expected)
-        self.check('BBB(123)', expected)
-        self.check('BBB(123', expected)
-        self.check('BBB123)', expected)
-        # two delay codes and minutes
-        expected = [Delay('AAA', 123, False), Delay('BBB', 456, False)]
-        self.check('AAA123BBB456', expected)
-        self.check('AAA(123)BBB(456)', expected)
-        self.check('AAA(123) BBB(456)', expected)
-        self.check('AAA(123)    BBB(456)', expected)
-        # three delay codes and minutes
-        expected = [Delay('AAA', 123, False), Delay('BBB', 456, False),
-                    Delay('CCC', 789, False)]
-        self.check('AAA123BBB456CCC789', expected)
-        self.check('AAA(123)BBB(456)CCC(789)', expected)
-        self.check('AAA(123) BBB(456) CCC(789)', expected)
-        self.check('    AAA(123)    BBB(456)   CCC(789)', expected)
-        self.check('AAA(123)    BBB  (456)   CCC     (789)', expected)
-        self.check('AAA(123) BBB ( 456  ) CCC(  789    )', expected)
-        # mixed with and without minutes
-        self.check('AAA BBB123 CCC',
-                [Delay('AAA', None, False), Delay('BBB', 123, False),
-                 Delay('CCC', None, False)])
-        self.check('AAA BBB(123 CCC',
-                [Delay('AAA', None, False), Delay('BBB', 123, False),
-                 Delay('CCC', None, False)])
-        self.check('AAA BBB123) CCC',
-                [Delay('AAA', None, False), Delay('BBB', 123, False),
-                 Delay('CCC', None, False)])
-        self.check('AAA() BBB123 CCC',
-                [Delay('AAA', None, False), Delay('BBB', 123, False),
-                 Delay('CCC', None, False)])
-        #
-        self.check('AAA(123456)', [Delay('AAA', 123456, False)])
-
-    def test_parse_cancelled(self):
-        self.check('XLD AAA', [Delay('AAA', None, True)])
-        self.check('XLD BBB12', [Delay('BBB', 12, True)])
-        self.check('XLD', [Delay('XLD', None, True)])
-        self.check('XLD XLD', [Delay('XLD', None, True)])
-
-    def test_formatdelays(self):
-        self.assertEqual(formatdelays(delaystring('AAA1 BBB2 CCC')), 'AAA(1) BBB(2) CCC')
-        self.assertEqual(formatdelays(delaystring('AAA1 XLD BBB2 CCC')), 'AAA(1) XLD BBB(2) CCC')
+def test_formatdelays():
+    assert formatdelays(delaystring('AAA1 BBB2 CCC')) == 'AAA(1) BBB(2) CCC'
+    assert formatdelays(delaystring('AAA1 XLD BBB2 CCC')) == 'AAA(1) XLD BBB(2) CCC'
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 
 from ..extensions import db
@@ -10,6 +11,12 @@ class FlightType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     report_order = db.Column(db.Integer, default=0)
+    is_lane = db.Column(
+        db.Boolean,
+        nullable = False,
+        server_default = 'false',
+        doc = 'Count flights of this type as lanes.'
+    )
 
     def __lt__(self, other):
         if not isinstance(other, self.__class__):
@@ -38,4 +45,8 @@ class FlightTypeRelationshipMixin:
 
     @declared_attr
     def flight_type(cls):
-        return db.relationship(FlightType)
+        return db.relationship(FlightType, uselist=False)
+
+    @declared_attr
+    def flight_type_is_lane(cls):
+        return association_proxy('flight_type', 'is_lane')

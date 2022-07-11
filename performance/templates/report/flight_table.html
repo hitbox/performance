@@ -4,6 +4,8 @@
 {% set ncols = 15 %}
 {% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
 {% set include_controllable_columns = flight_type.name == 'Scheduled' %}
+{% set with_edit = current_user.is_editor or current_user.is_admin %}
+{% set backurl = url_for(request.endpoint, **request.view_args) %}
 
 
 {% macro render_flight_type_th(colspan, text) %}
@@ -43,8 +45,8 @@
             </tr>
         </thead>
         <tbody>{% if flights %}
-            {% for flight in flights %}<tr{% if with_edit %} data-href="{{ url_for('flight.edit', id=flight.id, backurl=thisurl) }}"{% endif %}>
-                {% include "flight_table_data.html" with context %}
+            {% for flight in flights %}<tr{% if with_edit %} data-href="{{ url_for('flight.edit', id=flight.id, backurl=backurl) }}"{% endif %}>
+                {% include "report/flight_table_data.html" with context %}
             </tr>{% endfor %}
             {%- else -%}
             <tr>
@@ -61,7 +63,7 @@
             {% if with_edit %}<tr class="noprint">
                 <td colspan="{{ ncols }}">
                     <h4>
-                        <a href="{{ url_for('flight.create', report_id=report.id, flight_type_id=flight_type.id, backurl=thisurl) }}">Add {{ flight_type.name }} flight</a>
+                        <a href="{{ url_for('flight.create', report_id=report.id, flight_type_id=flight_type.id, backurl=backurl) }}">Add {{ flight_type.name }} flight</a>
                     </h4>
                 </td>
             </tr>{% endif %}

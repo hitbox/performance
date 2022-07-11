@@ -4,7 +4,8 @@
 {% block main %}
 <h3>Administration</h3>
 <ul class="flat">
-    <li><a href="{{ url_for('admin.users') }}">User accounts</a></li>
-    {% if config.PERFORMANCE_CONTRACTS %}<li><a href="{{ url_for('admin.list_contracts') }}">Performance Contracts</a></li>{% endif %}
+    <li><a href="{{ url_for('admin.user.list') }}">User accounts</a></li>
+    {% if config.PERFORMANCE_CONTRACTS %}<li><a href="{{ url_for('admin.performance_contract.list') }}">Performance Contracts</a></li>{% endif %}
+    <li><a href="{{ url_for('admin.delay.list') }}">Delay codes</a></li>
 </ul>
 {% endblock main %}

@@ -17,6 +17,9 @@
     --day-border-color: #999;
 }
 
+* {
+    box-sizing: border-box;
+}
 
 body {
     display: flex;
@@ -31,6 +34,22 @@ main {
 
 h1, h2, h3, h4, h5, h6 {
     margin: var(--header-separation) 0;
+}
+
+a.pill,
+strong.pill {
+    display: inline-block;
+    padding: 8px 4px;
+}
+
+dl.explain {
+    display: flex;
+}
+
+em {
+    background-color: DarkSlateGrey;
+    color: White;
+    padding: 2px 8px 2px 4px;
 }
 
 /* table */
@@ -56,8 +75,12 @@ th {
 }
 
 th.row {
+    /* table header element (th) used as a row's header */
     color: var(--color);
     background-color: var(--background-color);
+    white-space: nowrap;
+    text-align: left;
+    font-size: .9rem;
 }
 
 td {
@@ -69,11 +92,6 @@ td {
 
 th.top {
     text-align: center;
-    font-size: .9rem;
-}
-
-tbody > tr > th {
-    text-align: left;
     font-size: .9rem;
 }
 
@@ -149,9 +167,6 @@ nav > *:last-child {
     margin-bottom: 2rem;
 }
 
-
-/* TODO */
-
 .click:hover {
     cursor: pointer;
 }
@@ -171,10 +186,6 @@ nav > *:last-child {
 }
 
 .data.number {
-    text-align: right;
-}
-
-.data.numeric {
     text-align: right;
 }
 
@@ -261,6 +272,14 @@ ul.horiz > li:first-child {
     padding: .2rem;
 }
 
+ol {
+    margin-top: 1rem;
+}
+
+ol > li {
+    margin: 1rem 0;
+}
+
 /* pagination */
 
 ol.pagination {
@@ -305,9 +324,6 @@ ol.delay-codes {
 .delay-codes > *:last-child {
     margin-right: 0;
 }
-
-
-
 
 #new-report-prompt {
     width: fit-content;
@@ -366,6 +382,9 @@ details:hover {
     font-size: 1.25rem;
     padding: 48px;
     border: 1px solid #aaa;
+    border-color: var(--day-border-color);
+    min-width: 145px;
+    min-height: 100px;
 }
 
 .legend {
@@ -387,10 +406,6 @@ details:hover {
     color: var(--this-weekday-color);
 }
 
-.day {
-    border-color: var(--day-border-color);
-}
-
 
 /* forms */
 
@@ -399,14 +414,26 @@ fieldset {
     padding: 1rem;
 }
 
-input, textarea, select {
+input, select, textarea {
     color: inherit;
     background-color: inherit;
+    font-family: monospace;
+    font-size: 1rem;
 }
 
-input, select {
-    margin: 0.5rem 0;
-    padding: 0.5rem;
+input, label, select {
+    margin: .3rem 0;
+    padding: .3rem;
+    min-height: 1rem;
+}
+
+input:not([type=submit]), select {
+    width: 100%;
+}
+
+input[type=checkbox] {
+    /* makes the checkboxes line up with their labels in the next column */
+    min-height: 35px;
 }
 
 input[type=submit] {
@@ -414,7 +441,7 @@ input[type=submit] {
 }
 
 label {
-    margin: 1rem .25rem;
+    display: inline-block;
 }
 
 textarea {
@@ -455,10 +482,7 @@ input[type=submit].danger {
 form > .buttons {
     display: flex;
     flex-direction: row;
-}
-
-form > .buttons > * {
-    margin: 0 1rem 0 0;
+    justify-content: space-between;
 }
 
 /* report form styling */
@@ -468,24 +492,51 @@ input.narrowest {
 }
 
 /* flight form styling below */
+form #flight_type {
+    width: 14rem;
+}
 
 form #leg {
-    width: 2rem;
+    width: 5rem;
 }
 
-form #flight_number, form #tail_number {
-    width: 4rem;
-}
-
+form #flight_number,
+form #tail_number,
 form #weight {
     width: 8rem;
 }
 
 form #origin_station,
 form #destination_station {
-    width: 3rem;
+    width: 6rem;
 }
 
+form #origin_departure_estimated_date,
+form #origin_departure_actual_date,
+form #destination_arrival_estimated_date,
+form #destination_arrival_actual_date {
+    width: 8rem;
+}
+
+/* hide labels that would look like duplicates */
+label[for="destination_arrival_estimated_time"],
+label[for="destination_arrival_actual_time"],
+label[for="origin_departure_estimated_time"],
+label[for="origin_departure_actual_time"] {
+    display: none;
+}
+
+form #origin_departure_estimated_time,
+form #origin_departure_actual_time,
+form #destination_arrival_estimated_time,
+form #destination_arrival_actual_time,
+/* javascript populated estimated/actual diff minutes */
+form #origin-diff-minutes,
+form #destination-diff-minutes {
+    width: 6rem;
+}
+
+/* scheduled flight editor */
 form #flight_type.scheduled,
 form #flight_number.scheduled,
 form #origin_station.scheduled,
@@ -496,31 +547,6 @@ form #destination_arrival_estimated_time.scheduled {
     width: 100%;
 }
 
-form #origin_departure_estimated_date,
-form #origin_departure_actual_date,
-form #destination_arrival_estimated_date,
-form #destination_arrival_actual_date {
-    width: 6rem;
-}
-
-label[for="destination_arrival_estimated_time"],
-label[for="destination_arrival_actual_time"],
-label[for="origin_departure_estimated_time"],
-label[for="origin_departure_actual_time"] {
-    /* FIXME */
-    /*display: none;*/
-}
-
-form #origin_departure_estimated_time,
-form #origin_departure_actual_time,
-form #destination_arrival_estimated_time,
-form #destination_arrival_actual_time,
-/* javascript populated estimated/actual diff minutes */
-form #origin-diff-minutes,
-form #destination-diff-minutes {
-    width: 3rem;
-}
-
 /* late color if starts with dash and is not zero */
 /* (1) */ form #origin-diff-minutes:not([value^="-"]):not([value="0"]),
 form #destination-diff-minutes:not([value^="-"]):not([value="0"]) {
@@ -528,8 +554,15 @@ form #destination-diff-minutes:not([value^="-"]):not([value="0"]) {
 }
 /* (1) javascript populated estimated/actual diff minutes */
 
-form #origin_delays, form #destination_delays {
+/*
+form #origin_delays,
+form #destination_delays {
     width: 40rem;
+}
+*/
+
+form div.delays {
+    display: flex;
 }
 
 form.scheduled-report {
@@ -549,10 +582,21 @@ form.user-admin .buttons,
 #performance-top {
     display: flex;
     justify-content: space-between;
+    flex-direction: row;
+}
+
+#performance-table {
+    margin-right: 1rem;
+}
+
+#performance-table td,
+#performance-table th.row {
+    vertical-align: middle;
 }
 
 #performance-contract-wrapper {
     width: min-content;
+    margin-left: 1rem;
 }
 
 form .flight {
@@ -601,6 +645,27 @@ form .flight {
     width: min-content;
 }
 
+.summary-row-title {
+    text-align: right;
+}
+
+/* performance contract table for report */
+
+/* fixed layout seems to be the only way to set the width of columns */
+/* wanted to set the width so that the header field of the last column wraps
+ * its text exactly like the request showed */
+.performance-contract-table {
+    table-layout: fixed;
+}
+
+.performance-contract-table colgroup col:first-child {
+    width: 180px;
+}
+
+.performance-contract-table colgroup col:last-child {
+    width: 150px;
+}
+
 .performance-contract-table td {
     padding: 8px;
 }
@@ -616,6 +681,10 @@ form.user-admin label {
     width: 10em;
 }
 
+form .performance-tiers {
+    margin: 1rem 0;
+}
+
 .devel {
     /* style as "development-only" */
     color: red !important;
@@ -625,4 +694,37 @@ form.user-admin label {
 .col-2 {
     display: grid;
     grid-template-columns: auto auto;
+}
+
+.col-2.fields {
+    grid-column-gap: 1rem;
+}
+
+.col-2 .item.first {
+    justify-self: right;
+}
+
+.row {
+    width: min-content;
+    margin: 0 auto;
+}
+
+.page {
+    text-align: center;
+}
+
+.formlist {
+    display: flex;
+}
+
+.formlist > * {
+    margin: 0 1rem;
+}
+
+.formlist > *:first-child {
+    margin-left: 0;
+}
+
+.formlist > *:last-child {
+    margin-right: 0;
 }

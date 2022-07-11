@@ -1,5 +1,6 @@
 import datetime
 
+import click
 import sqlalchemy as sa
 
 from flask import Blueprint
@@ -18,6 +19,7 @@ from ..authorization import edit_check
 from ..extensions import db
 from ..models import AssumedBest
 from ..models import Contract
+from ..models import Delay
 from ..models import Flight
 from ..models import Report
 from ..models import ScheduledReport
@@ -35,73 +37,19 @@ def get_context(report):
     """
     Context data for viewing report.
     """
-    month_to_date_reports = Report.query.filter(
-        sa.func.date_part('year', Report.date) == report.date.year,
-        sa.func.date_part('month', Report.date) == report.date.month,
-        Report.date <= report.date,
-    ).all()
-    month_to_date = business.performance_details(month_to_date_reports)
+    context = dict(report=report)
 
-    reports_quarter_to_date = Report.query.filter(
-        Report.date <= report.date,
-        sa.func.date_part('year', Report.date) == report.date.year,
-        Report.date_quarter == report.date_quarter,
+    contract = business.performance_contract_for_date(report.date)
+    context['contract'] = contract
+
+    context['controllable_delay_codes'] = Delay.query.filter(
+        Delay.is_controllable,
+    ).order_by(
+        Delay.code,
     ).all()
 
-    # quarter to date assumed bests objects
-    assumed_bests_qtd = [
-        AssumedBest.query.filter(
-            AssumedBest.year == report.date.year,
-            AssumedBest.month == report.date.month,
-        ).one_or_none()
-        for report in reports_quarter_to_date
-    ]
-    assumed_bests_qtd = filter(None, assumed_bests_qtd)
-
-    # quarter to date
-    quarter_to_date = business.performance_details(reports_quarter_to_date)
-    assumed_best = AssumedBest.query.filter(
-        AssumedBest.year == report.date.year,
-        AssumedBest.month == report.date.month,
-    ).one_or_none()
-
-    context = dict(
-        report = report,
-        daily = dict(
-            lanes = report.lane_flights(),
-            controllable_destination_delays_over15
-                = report.controllable_destination_delays(15),
-            controllable_destination_delays_over30
-                = report.controllable_destination_delays(30),
-            flights_with_controllable_destination_delays_over15
-                = report.flights_with_controllable_destination_delays(15),
-            flights_with_controllable_destination_delays_over30
-                = report.flights_with_controllable_destination_delays(30),
-        ),
-        month_to_date = month_to_date,
-        quarter_to_date = quarter_to_date,
-        assumed_best = assumed_best,
-        assumed_bests_qtd = assumed_bests_qtd,
-    )
-
-    if contracts_enabled():
-        contract = business.performance_contract_for_report(report)
-        context['contract'] = contract
-
-        # add a “Contractual Year to Date” calculation for the DHL CMI report
-        # that calculates OTP >15 from May 1, 2022 through April 30, 2023 to
-        # reflect changes made in the new CMI agreement
-        reports_for_contract_range = Report.query.filter(
-            Report.date.between(
-                contract.date_range_start,
-                contract.date_range_end,
-            )
-        )
-        contract_range = business.performance_details(reports_for_contract_range)
-        context['contract_range'] = contract_range
-
+    context.update(business.performance_details(report.date, contract))
     return context
-
 
 @report_bp.route('/view/<date:report_date>')
 @basic_check
@@ -117,7 +65,7 @@ def view_report_for_date(report_date):
             date_str = report_date.strftime(current_app.config['DATEFMT'])
         else:
             date_str = str(report_date)
-        flash(f'{date_str} not found.', 'info')
+        flash(f'Report for {date_str} not found.', 'info')
         return redirect(url_for('.prompt_new', report_date=report_date))
 
     return redirect(url_for('.view_report', id=report.id))
@@ -159,7 +107,10 @@ def view_report_expanded_performance(id):
         abort(404)
 
     report = Report.query.get_or_404(id)
-    context = get_context(report)
+    #context = get_context(report)
+    context = dict(
+        report = report,
+    )
     return render_template('report/expanded.html', **context)
 
 @report_bp.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -269,3 +220,13 @@ def prompt_new(report_date):
             scheduled_reports = scheduled_reports,
         )
     return render_template(template, **context)
+
+@report_bp.cli.command('performance_summary')
+@click.argument('start', type=click.DateTime(['%Y-%m-%d']))
+@click.argument('end', type=click.DateTime(['%Y-%m-%d']))
+def performance_summary(start, end):
+    start = start.date()
+    end = end.date()
+    date_criteria = Report.date.between(start, end)
+    lanes = business.performance_summary(date_criteria, '')
+    print(lanes)

@@ -33,6 +33,14 @@ class PerformanceTierForm(
             'performance_range_start',
             'performance_range_end',
         ]
+        fields_order = [
+            'order',
+            'tier',
+            'performance_range_start',
+            'performance_range_end',
+            'submit',
+            'delete',
+        ]
 
 
 class ContractForm(
@@ -49,4 +57,11 @@ class ContractForm(
             'name',
             'date_range_start',
             'date_range_end',
+        ]
+        fields_order = [
+            'name',
+            'date_range_start',
+            'date_range_end',
+            'submit',
+            'delete',
         ]

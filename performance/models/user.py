@@ -32,3 +32,9 @@ class User(UserMixin, db.Model):
         db.Boolean,
         default=False,
         doc="User can edit the scheduled reports and flights.")
+
+    @db.validates('username', 'password')
+    def validate_username(self, key, value):
+        if value == '':
+            raise ValueError(f'{key} cannot be an empty string')
+        return value

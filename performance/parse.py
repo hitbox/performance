@@ -1,61 +1,91 @@
 import re
 
-from .delay import Delay
+from collections import namedtuple
+from operator import attrgetter
+from operator import itemgetter
 
 CANCELLED = 'XLD'
 PLACEHOLDER_CODE = 'XXX'
 
 _delaystring_re = re.compile(
-    r'(?P<code>[a-zA-Z]{3})'
+    r'(?P<code>[a-zA-Z]{3})' # three letter codes, allowing lowercase in
     r'\s*' # whitespace
     r'\(?' # optional left parenthesis
     r'\s*' # whitespace
     r'(?P<minutes>[0-9]*)?' # optional number of minutes
     r'\s*' # whitespace
     r'\)?' # optional right parenthesis
-    )
+)
+
+def int_or_none(string):
+    if string:
+        return int(string)
+
+def marshal(code, minutes):
+    return (code.upper(), int_or_none(minutes))
 
 def delaystring(text):
     """
     Parse human data entry into a list of pairs of strings and minutes.
     """
+    matches = _delaystring_re.findall(text)
+    matches = (marshal(code, minutes) for code, minutes in matches)
+    # interpret and convert into Delay objects.
     delays = []
-    if text is not None:
-        matches = iter(
-                (code, int(minutes) if minutes else None)
-                for code, minutes in _delaystring_re.findall(text))
-
-        # interpret and convert into Delay objects.
-        for code, minutes in matches:
-            code = code.upper()
-            if code == CANCELLED:
-                # consume next match making cancelled=True
-                for code, minutes in matches:
-                    delay = Delay(code, minutes, True)
-                    delays.append(delay)
-                    break
-                else:
-                    delay = Delay(code, None, True)
-                    delays.append(delay)
-                # what if cancelled is the last code?
+    for code, minutes in matches:
+        if code != CANCELLED:
+            # take as non-cancelled code
+            data = dict(code=code, is_cancelled=False, minutes=minutes)
+            delays.append(data)
+        else:
+            # consume next match making it cancelled
+            for code, minutes in matches:
+                data = dict(code=code, minutes=minutes, is_cancelled=True)
+                delays.append(data)
+                break
             else:
-                # take as non-cancelled code
-                delay = Delay(code, minutes, False)
-                delays.append(delay)
-
+                # no next match, keep code with no minutes
+                data = dict(code=code, minutes=None, is_cancelled=True)
+                delays.append(data)
+            # what if cancelled is the last code?
     return delays
 
+def string_for_cancelled(is_cancelled):
+    if is_cancelled:
+        # NOTE: space after
+        return f'{CANCELLED} '
+    else:
+        return ''
+
+def string_for_minutes(minutes):
+    if minutes is not None:
+        return f'({minutes})'
+    else:
+        return ''
+
+def format_delay(code, minutes, is_cancelled):
+    """
+    Format a single flight delay from attributes.
+    """
+    s = string_for_cancelled(is_cancelled)
+    s += code.upper()
+    s += string_for_minutes(minutes)
+    return s
+
+def get_delay_tuple(delay):
+    code = getattr(delay, 'code', delay['code'])
+    minutes = getattr(delay, 'minutes', delay['minutes'])
+    is_cancelled = getattr(delay, 'is_cancelled', delay['is_cancelled'])
+    return (code, minutes, is_cancelled)
+
 def formatdelays(delays):
+    """
+    Format delays as human readable string
+    """
     # similar: macros.html:render_delay
     # used by forms to populate inputs
     parts = []
-    for code, minutes, cancelled in delays:
-        if cancelled:
-            s = f'{CANCELLED} '
-        else:
-            s = ''
-        s += code.upper()
-        if minutes:
-            s += f'({minutes})'
+    for delay in delays:
+        s = format_delay(*get_delay_tuple(delay))
         parts.append(s)
     return ' '.join(parts)
