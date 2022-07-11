@@ -59,7 +59,7 @@
             <th class="top">Daily</th>
             <th class="top" title="Month To Date">MTD</th>
             <th class="top" title="Quarter To Date">QTD</th>
-            {% if config.PERFORMANCE_CONTRACTS %}<th class="top" title="Performance Contract Date Range">Contract</th>{% endif %}
+            {% if config.PERFORMANCE_CONTRACTS and contract %}<th class="top" title="Performance Contract Date Range: {{ render_date(contract.date_range_start, bare=true) }} to {{ render_date(contract.date_range_end, bare=true) }}">Contract</th>{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -107,7 +107,7 @@
             {% set can_calculate = assumed_best and assumed_best.lanes > 0 %}
             {% set ndelays = month_to_date.controllable_destination_delays_over15 %}
             {% if assumed_best %}{{ render_assumed_best_td('monthly', 'MTD', can_calculate, ndelays, assumed_best.lanes) }}{% else %}<td></td>{% endif %}
-            {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
+            {% if config.PERFORMANCE_CONTRACTS and contract %}<td></td>{% endif %}
         </tr>
     </tbody>
 </table>
