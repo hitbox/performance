@@ -17,8 +17,14 @@
     --day-border-color: #999;
 }
 
-* {
+/* https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
+/* use inheritance to avoid breaking things that are not using border-box */
+html {
     box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
 }
 
 body {
