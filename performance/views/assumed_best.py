@@ -1,55 +1,33 @@
 import calendar
 
 from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import url_for
 
 from performance.authorization import edit_check
-from performance.extensions import db
+from performance.forms import AssumedBestForm
+from performance.models import AssumedBest
+from performance.pluggable.simpler import EditView
 
-from ..models import AssumedBest
+assumed_best_bp = Blueprint('assumed_best', __name__)
 
-assumed_best_bp = Blueprint('assumed_best', __name__, template_folder='../templates')
+@edit_check
+@assumed_best_bp.before_request
+def before_request():
+    """
+    Enforce user is_edit.
+    """
 
 @assumed_best_bp.context_processor
 def context_processor():
     return dict(calendar=calendar)
 
-@assumed_best_bp.route('/edit/',
-    defaults={'year': None, 'month': None},
-    methods=['GET', 'POST'])
-@assumed_best_bp.route('/edit/<int:year>/<int:month>', methods=['GET', 'POST'])
-@edit_check
-def edit(year, month):
-    # NOTE: wtforms-alchemy is too aggressive
-    from ..forms import AssumedBestForm
+view_func = EditView.as_view(
+    'edit',
+    template = 'assumed-best/edit.html',
+    instance_getter = AssumedBest.noapp_get_or_404,
+    form_getter = AssumedBestForm,
+    form_submitter = AssumedBestForm.standard_submit,
+)
 
-    if year is None or month is None:
-        assumed_best = None
-    else:
-        assumed_best = AssumedBest.query.filter(
-            AssumedBest.year == year,
-            AssumedBest.month == month,
-        ).one_or_none()
-    form = AssumedBestForm(obj=assumed_best)
+assumed_best_bp.add_url_rule('/edit', view_func=view_func)
 
-    if form.validate_on_submit():
-        # add if None
-        if assumed_best is None:
-            assumed_best = AssumedBest()
-            db.session.add(assumed_best)
-        # update
-        assumed_best.year = year
-        assumed_best.month = month
-        form.populate_obj(assumed_best)
-        db.session.commit()
-        if hasattr(form, 'backurl') and form.backurl.data:
-            return redirect(form.backurl.data)
-        else:
-            return redirect(url_for('select_date.goto_today'))
-
-    context = dict(
-        form = form,
-    )
-    return render_template('assumed_best/edit.html', **context)
+assumed_best_bp.add_url_rule('/edit/<int:id>', view_func=view_func)

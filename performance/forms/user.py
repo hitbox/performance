@@ -1,11 +1,9 @@
 import sqlalchemy as sa
 
-from flask_wtf import FlaskForm
 from wtforms import BooleanField
 from wtforms import PasswordField
 from wtforms import StringField
 from wtforms import SubmitField
-from wtforms import TextAreaField
 from wtforms import ValidationError
 from wtforms.validators import EqualTo
 from wtforms.validators import InputRequired
@@ -13,7 +11,6 @@ from wtforms.validators import InputRequired
 from ..models import User
 
 from .base import BaseFlaskForm
-from .base import ModelForm
 
 def validate_available_username(form, field):
     """
@@ -43,32 +40,63 @@ class ResetPasswordForm(BaseFlaskForm):
     submit = SubmitField('Reset')
 
 
-class UserFormMixin:
+class EditUserForm(
+    BaseFlaskForm,
+):
     """
-    Common fields for new and edit user forms.
+    Edit user account form for administration.
     """
     class Meta:
-        # any fields the subclasses define that should sort before the ones here.
-        fields_order = [
-            'username',
-            'email',
-            'password',
-            'password_confirm',
-        ]
+        # super class picks up Meta.model for new instances
+        model = User
+        # relabling
+        presentation = True
 
+    # requires unique in __init__
+    username = StringField(
+        label = 'Username',
+        validators = [
+            InputRequired(),
+        ],
+        render_kw = dict(
+            placeholder = 'username',
+        ),
+    )
 
     email = StringField(
         label = 'Email',
         validators = [
             InputRequired(),
         ],
+        render_kw = dict(
+            placeholder = 'email',
+        ),
+    )
+
+    password = PasswordField(
+        label = 'Password',
+        render_kw = dict(
+            autocomplete = 'new-password',
+            placeholder = 'password',
+        )
+    )
+
+    password_confirm = PasswordField(
+        label = 'Confirm',
+        render_kw = dict(
+            autocomplete = 'off',
+            placeholder = 'password',
+        )
     )
 
     is_active = BooleanField('Active?', default=True)
+
     reset_password = BooleanField('Reset password?', default=True)
 
     is_admin = BooleanField('Admin?', default=False)
+
     is_editor = BooleanField('Editor?', default=True)
+
     can_edit_schedule = BooleanField(
         'Edit schedules?',
         default = False,
@@ -78,6 +106,12 @@ class UserFormMixin:
     )
 
     submit = SubmitField()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not kwargs.get('obj', None):
+            # new user so add username validator
+            self.username.validators.append(validate_available_username)
 
     def validate_password_confirm(form, field):
         """
@@ -90,57 +124,15 @@ class UserFormMixin:
             raise ValidationError('Password confirmation does not match.')
 
 
-class NewUserForm(UserFormMixin, BaseFlaskForm):
-    """
-    New user account.
-    """
-    username = StringField(
-        label = 'Username',
-        validators = [
-            InputRequired(),
-            validate_available_username,
-        ],
-    )
-
-    password = PasswordField(
-        label = 'Password',
-        validators = [
-            InputRequired(),
-        ],
-        render_kw = dict(
-            autocomplete = 'off',
-        )
-    )
-
-    password_confirm = PasswordField(
-        label = 'Confirm password',
-        validators = [
-            InputRequired(),
-        ],
-        render_kw = dict(
-            autocomplete = 'off',
-        )
-    )
-
-
-class EditUserForm(UserFormMixin, BaseFlaskForm):
-    """
-    Edit user form.
-    """
-    # does not require unique
-    username = StringField(label='Username', validators = [InputRequired()])
-
-    password = PasswordField(
-        label = 'Password',
-        render_kw = dict(
-            autocomplete = 'off',
-        )
-    )
-
-    password_confirm = PasswordField(
-        label = 'Confirm password',
-        render_kw = dict(
-            autocomplete = 'off',
-        )
-    )
-
+    @classmethod
+    def standard_submit(cls, form, instance=None):
+        """
+        Avoid overwriting password by removing the attribute so that
+        populate_obj doesn't write an empty string.
+        If the password is submitted, the form validates password confirmation.
+        Here, if password is not given, we remove the password attribute.
+        """
+        if not form.password.data:
+            del form.password
+            del form.password_confirm
+        return super().standard_submit(form, instance)

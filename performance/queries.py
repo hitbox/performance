@@ -2,8 +2,12 @@ from .extensions import db
 from .models import Contract
 from .models import DestinationDelay
 from .models import Flight
+from .models import FlightType
 from .models import Report
 from .utils import quarter_of_date
+
+def get_scheduled_flight_type_instance():
+    return FlightType.query.filter(FlightType.name == 'Scheduled').one()
 
 def date_criteria(date):
     """
@@ -33,9 +37,16 @@ def lanes(date_criteria):
     """
     Select flights for `date_criteria` that are considered lanes.
     """
+    # last instruction was that lane count should always match the scheduled
+    # table count which is just a count of the flights in it.
     return (Flight.query
         .join(Report) # for date_criteria
-        .filter(date_criteria, Flight.is_lane))
+        .join(FlightType)
+        .filter(
+            date_criteria,
+            FlightType.name == 'Scheduled'
+        )
+    )
 
 def flights_with_controllable_destination_delays(date_criteria, over_minutes):
     """

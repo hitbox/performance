@@ -1,11 +1,19 @@
 from ..extensions import db
 
+from .mixin import AppContextMixin
 from .mixin import UniqueMixin
 
-class Delay(db.Model, UniqueMixin):
+class Delay(
+    AppContextMixin,
+    UniqueMixin,
+    db.Model,
+):
     """
     A flight delay with a code and, optionally, minutes and whether it was cancelled.
     """
+    class Meta:
+        # see AppContextMixin.noapp_pagination
+        order_by = 'code'
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -37,7 +45,7 @@ class Delay(db.Model, UniqueMixin):
 
     @classmethod
     def unique_hash(cls, code):
-        return code
+        return (code, )
 
     @classmethod
     def unique_filter(cls, query, code):

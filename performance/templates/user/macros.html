@@ -2,28 +2,28 @@
 
 
 {% macro render_user_table(users) %}
-<table>
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Admin?</th>
-            <th>Editor?</th>
-            <th>Active?</th>
-            <th>Reset Password?</th>
-            <th>Schedule Edit?</th>
-        </tr>
-    </thead>
-    <tbody>{% for user in users %}
-        <tr data-href="{{ url_for('admin.user.list', id=user.id) }}">
-            <td class="data">{{ user.username }}</td>
-            <td class="data"><a href="mailto:{{ user.email }}" tabindex="-1">{{ user.email }}</td>
-            <td class="data">{{ yes(user.is_admin) }}</td>
-            <td class="data">{{ yes(user.is_editor) }}</td>
-            <td class="data">{{ yes(user.is_active) }}</td>
-            <td class="data">{{ yes(user.reset_password) }}</td>
-            <td class="data">{{ yes(user.can_edit_schedule) }}</td>
-        </tr>{% endfor %}
-    </tbody>
-</table>
+{% set active_id = kwargs.active_id %}
+{% set instance_endpoint = kwargs.instance_endpoint %}
+<thead>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Admin?</th>
+        <th>Editor?</th>
+        <th>Active?</th>
+        <th>Reset Password?</th>
+        <th>Schedule Edit?</th>
+    </tr>
+</thead>
+<tbody>{% for user in users %}
+        <tr{% if active_id is not none and user.id == active_id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ url_for(instance_endpoint, id=user.id) }}"{% endif %}>
+        <td class="data">{{ user.username }}</td>
+        <td class="data"><a href="mailto:{{ user.email }}" tabindex="-1">{{ user.email }}</td>
+        <td class="data">{{ yes(user.is_admin) }}</td>
+        <td class="data">{{ yes(user.is_editor) }}</td>
+        <td class="data">{{ yes(user.is_active) }}</td>
+        <td class="data">{{ yes(user.reset_password) }}</td>
+        <td class="data">{{ yes(user.can_edit_schedule) }}</td>
+    </tr>{% endfor %}
+</tbody>
 {% endmacro %}

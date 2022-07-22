@@ -6,11 +6,13 @@ import sqlalchemy as sa
 from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from ..extensions import db
 from ..exceptions import PerformanceError
-from ..models import FlightType
-from ..models.mixin import MetaMixin
+from ..extensions import db
 from ..utils import quarter_of_date
+
+from .assumed_best import AssumedBest
+from .flight_type import FlightType
+from .mixin import MetaMixin
 
 FLIGHTS_BY_TYPE_SORT = attrgetter('origin_departure_estimated_time')
 
@@ -72,6 +74,15 @@ class Report(MetaMixin, db.Model):
     )
 
     @hybrid_property
+    def assumed_best(self):
+        # XXX: not quite sure this is a great way to do this, but I want this
+        #      attribute on report objects
+        return AssumedBest.query.filter(
+            sa.func.date_part("month", Report.date) == AssumedBest.month,
+            sa.func.date_part("year", Report.date) == AssumedBest.year,
+        ).first()
+
+    @hybrid_property
     def date_quarter(self):
         """
         The quarter part of the date.
@@ -85,7 +96,7 @@ class Report(MetaMixin, db.Model):
         """
         # quarter of a date calculation
         # (month - 1) // 3 + 1
-        # XXX: sa.func.div postgres specific
+        # NOTE: sa.func.div postgres specific
         quarter = sa.func.div(
             sa.cast(
                 sa.func.date_part('month', Report.date) - 1,

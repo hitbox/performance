@@ -3,54 +3,12 @@
 {% from "macros.html" import render_date %}
 
 
-{% macro OLD_render_assumed_best_td(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
-{# the original <td> renderer that shows how this is calculated #}
-<td class="data number" title="(<{{ to_date_string }} assumed lanes> - <{{ to_date_abbreviation }} chargeable delays>) / <{{ to_date_string }} assumed lanes>{% if can_calculate and lanes > 0 %}{# newline intended #}
-({{ lanes }} - {{ ndelays }}) / {{ lanes }} = {{ '%0.4f'|format((lanes - ndelays) / lanes) }}{% endif %}">{% if can_calculate and lanes > 0 %}{{ percent((lanes - ndelays) / lanes) }}{% endif %}</td>
-{% endmacro %}
+{% set thisurl = url_for(request.endpoint, **request.view_args) %}
+{% set controllable_delays_note = "Delays " + controllable_delay_codes | join(', ', attribute='code') %}
 
 
-{% macro render_performance_formula(to_date_string, to_date_abbreviation) %}
-{# firefox and a few others support this #}
-<math>
-    <mrow>
-        <mfrac>
-            <mrow>
-                <mo>(</mo>
-                <mi>{{ to_date_string }} assumed lanes</mi>
-                <mo>-</mo>
-                <mi>{{ to_date_abbreviation }} chargeable delays</mi>
-                <mo>)</mo>
-            </mrow>
-            <mrow>
-                <mi>{{ to_date_string }} assumed lanes</mi>
-            </mrow>
-        </mfrac>
-    </mrow>
-</math>
-{% endmacro %}
+{% macro performance_calc(lanes, delays) %}{% if lanes > 0 %}{{ percent((lanes - delays) / lanes) }}{% endif %}{% endmacro %}
 
-
-{% macro render_assumed_best_td_inner(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
-{% if kwargs.get('with_mathml') %}
-<details>
-    <summary>{% if can_calculate and lanes > 0 %}{{ percent((lanes - ndelays) / lanes) }}{% endif %}</summary>
-    {{ render_performance_formula(to_date_string, to_date_abbreviation) }}
-</details>
-{% else %}
-{% if can_calculate and lanes > 0 %}{{ percent((lanes - ndelays) / lanes) }}{% endif %}
-{% endif %}
-{% endmacro %}
-
-
-{% macro render_assumed_best_td(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) %}
-<td class="data number">
-    {{ render_assumed_best_td_inner(to_date_string, to_date_abbreviation, can_calculate, ndelays, lanes) }}
-</td>
-{% endmacro %}
-
-
-{% set controllable_delays_note = "Delays " + controllable_delay_codes|join(', ', attribute='code') %}
 
 <table id="performance-table">
     <thead>
@@ -59,7 +17,7 @@
             <th class="top">Daily</th>
             <th class="top" title="Month To Date">MTD</th>
             <th class="top" title="Quarter To Date">QTD</th>
-            {% if config.PERFORMANCE_CONTRACTS and contract %}<th class="top" title="Performance Contract Date Range: {{ render_date(contract.date_range_start, bare=true) }} to {{ render_date(contract.date_range_end, bare=true) }}">Contract</th>{% endif %}
+            {% if config.PERFORMANCE_CONTRACTS and contract %}<th class="top">Contract</th>{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -86,28 +44,35 @@
         </tr>
         <tr>
             <th class="row" title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
-            {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over15, daily.lanes) }}
-            {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over15, month_to_date.lanes) }}
-            {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over15, quarter_to_date.lanes) }}
-            {% if config.PERFORMANCE_CONTRACTS %}{{ render_assumed_best_td('contract range', 'Contract', contract_range, contract_range.flights_with_controllable_destination_delays_over15 if contract_range else 0, contract_range.lanes if contract_range else 0) }}{% endif %}
+            <td class="data number">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}</td>
+            <td class="data number">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}</td>
+            <td class="data number">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over15) }}</td>
+            {% if config.PERFORMANCE_CONTRACTS %}
+            {% set ndelays = contract_range.flights_with_controllable_destination_delays_over15 if contract_range else 0 %}
+            {% set lanes = contract_range.lanes if contract_range else 0 %}
+            <td class="data number">{{ performance_calc(lanes, ndelays) }}</td>
+            {% endif %}
         </tr>
         <tr>
             <th class="row" title="On-time Performance greater than 30 minutes">On-time Performance &gt; 30</th>
-            {{ render_assumed_best_td('daily', 'daily', true, daily.flights_with_controllable_destination_delays_over30, daily.lanes) }}
-            {{ render_assumed_best_td('month to date', 'MTD', true, month_to_date.flights_with_controllable_destination_delays_over30, month_to_date.lanes) }}
-            {{ render_assumed_best_td('quarter to date', 'QTD', true, quarter_to_date.flights_with_controllable_destination_delays_over30, quarter_to_date.lanes) }}
+            <td class="data number">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}</td>
+            <td class="data number">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}</td>
+            <td class="data number">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over30) }}</td>
             {% if config.PERFORMANCE_CONTRACTS %}<td class="data number"></td>{% endif %}
         </tr>
         <tr>
             <th class="row">
-                <a href="{{ url_for('assumed_best.edit', year=report.date.year, month=report.date.month, backurl=thisurl) }}">Assumed Best Arrival Performance for the Month</a>
+                <a href="{{ url_for('assumed_best.edit', id=report.assumed_best.id, backurl=thisurl) }}">Assumed Best Arrival Performance for the Month</a>
             </th>
             <td>{# deliberately empty #}</td>
             {# MTD assumed best #}
-            {% set can_calculate = assumed_best and assumed_best.lanes > 0 %}
-            {% set ndelays = month_to_date.controllable_destination_delays_over15 %}
-            {% if assumed_best %}{{ render_assumed_best_td('monthly', 'MTD', can_calculate, ndelays, assumed_best.lanes) }}{% else %}<td></td>{% endif %}
-            {% if config.PERFORMANCE_CONTRACTS and contract %}<td></td>{% endif %}
+            {% set ndelays = month_to_date.flights_with_controllable_destination_delays_over15 %}
+            {% if report.assumed_best %}{# checking because AssumedBest might not exist for this report #}
+            <td class="data number" title="Lanes: {{ report.assumed_best.lanes }}">{{ performance_calc(report.assumed_best.lanes, ndelays) }}</td>
+            {% else %}
+            <td>{# deliberately empty #}</td>
+            {% endif %}
+            {% if config.PERFORMANCE_CONTRACTS and contract %}<td>{# deliberately empty #}</td>{% endif %}
         </tr>
     </tbody>
 </table>

@@ -1,0 +1,52 @@
+{% from "macros.html" import string %}
+{% from "macros.html" import time %}
+
+
+{% set scheduled_flights_table_columns = 5 %}
+
+
+{% macro render_create_link(scheduled_report, flight_type, backurl) %}
+<h4>
+    <a href="{{ url_for('scheduled_flight.create', scheduled_report_id=scheduled_report.id, flight_type_id=flight_type.id, backurl=backurl) }}">Add {{ flight_type.name }} Flight</a>
+</h4>
+{% endmacro %}
+
+
+
+
+{% macro render_scheduled_flights_table(scheduled_flights) %}
+
+{#
+this macro could be used by another view or directly from the
+scheduled_flight view. therefore we need to fallback to the request object.
+#}
+{% set instance_endpoint = kwargs.instance_endpoint or request.endpoint %}
+{% set backurl = kwargs.backurl %}
+{% set instance_kwargs = kwargs.get('instance_kwargs', {'scheduled_report_id': request.view_args.scheduled_report_id}) %}
+{% set show_active = request.endpoint.startswith('scheduled_flight') %}
+<thead>
+    <tr>
+        <th>Flight</th>
+        <th>Orig</th>
+        <th>ETD</th>
+        <th>Dest</th>
+        <th>ETA</th>
+    </tr>
+</thead>
+<tbody>{% if not scheduled_flights %}
+    <tr>
+        <td colspan="{{ scheduled_flights_table_columns }}">
+            <h4>None</h4>
+        </td>
+    </tr>
+    {% else %}
+    {% for scheduled_flight in scheduled_flights %}
+    <tr{% if show_active and scheduled_flight.id == request.view_args.id %} class="active"{% endif %}{% if instance_endpoint is not none %} data-href="{{ url_for(instance_endpoint, id=scheduled_flight.id, backurl=backurl, **instance_kwargs) }}" title="{{ url_for(instance_endpoint, id=scheduled_flight.id, **instance_kwargs) }}"{% endif %}>
+        <td class="data">{{ string(scheduled_flight.flight_number) }}</td>
+        <td class="data">{{ string(scheduled_flight.origin_station) }}</td>
+        <td class="data number">{{ time(scheduled_flight.origin_departure_estimated_time) }}</td>
+        <td class="data">{{ string(scheduled_flight.destination_station) }}</td>
+        <td class="data number">{{ time(scheduled_flight.destination_arrival_estimated_time) }}</td>
+    </tr>{% endfor %}
+{% endif %}</tbody>
+{% endmacro %}

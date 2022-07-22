@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+
+{% block main %}
+<div class="list-view-container">
+    {% block pagehead %}<h2 class="page">Admin{% block subpagehead %}{% endblock %}</h2>{% endblock pagehead %}
+    {% block top %}{% endblock top %}
+    <div class="formlist">
+        <div class="listing">
+            {% block listing %}{% endblock listing %}
+        </div>
+        <div>
+            {% block form %}{% endblock form %}
+        </div>
+    </div>
+    {% block bottom %}{% endblock bottom %}
+</div>
+{% endblock main %}

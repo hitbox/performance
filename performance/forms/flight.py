@@ -9,23 +9,21 @@ from wtforms_alchemy import QuerySelectField
 from ..models import Flight
 from ..models import FlightType
 from ..models import Report
-from ..types import DelayCodesType
 
 from . import defaults
 from .base import ModelForm
-from .fields import DelayCodesField
 from .fields import StringTimeField
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
+
+DATE_FIELD_TITLE = 'Falls back to report date if blank.'
+DATE_FIELD_TABINDEX = '-1'
 
 def report_id_from_view_args():
     """
     Get the "current" report id from the view args.
     """
     return request.view_args['report_id']
-
-DATE_FIELD_TITLE = 'Falls back to report date if blank.'
-DATE_FIELD_TABINDEX = '-1'
 
 def date_field_classes_string(*specific_classes):
     return ' '.join(('flight', 'date-entry') + specific_classes)
@@ -37,51 +35,10 @@ class FlightForm(
 ):
     class Meta:
         model = Flight
+        presentation = True
         type_map = ClassMap({
             sa.Time: StringTimeField,
-            DelayCodesType: DelayCodesField,
         })
-        only = [
-            'leg',
-            'flight_number',
-            'tail_number',
-            'weight',
-            'origin_station',
-            'origin_departure_estimated_date',
-            'origin_departure_estimated_time',
-            'origin_departure_actual_date',
-            'origin_departure_actual_time',
-            #'origin_delays',
-            'destination_station',
-            'destination_arrival_estimated_date',
-            'destination_arrival_estimated_time',
-            'destination_arrival_actual_date',
-            'destination_arrival_actual_time',
-            #'destination_delays',
-            'comment',
-        ]
-        fields_order = [
-            'flight_type',
-            'leg',
-            'flight_number',
-            'tail_number',
-            'weight',
-            'origin_station',
-            'origin_departure_estimated_date',
-            'origin_departure_estimated_time',
-            'origin_departure_actual_date',
-            'origin_departure_actual_time',
-            #'origin_delays',
-            'destination_station',
-            'destination_arrival_estimated_date',
-            'destination_arrival_estimated_time',
-            'destination_arrival_actual_date',
-            'destination_arrival_actual_time',
-            #'destination_delays',
-            'comment',
-            'submit',
-            'delete',
-        ]
         field_args = {
             'flight_number': {
                 'label': 'Flight',
@@ -143,14 +100,8 @@ class FlightForm(
                     'placeholder': 'ATD',
                 },
             },
-            #'origin_delays': {
-            #    'label': 'Delays',
-            #    'render_kw': {
-            #        'autocomplete': 'off',
-            #        'class': 'flight delay',
-            #        'style': 'width: 45rem',
-            #    },
-            #},
+            'origin_delays_string': {
+            },
             'destination_station': {
                 'label': 'Station',
                 'render_kw': {
@@ -187,14 +138,6 @@ class FlightForm(
                     'placeholder': 'ATA',
                 },
             },
-            #'destination_delays': {
-            #    'label': 'Delays',
-            #    'render_kw': {
-            #        'autocomplete': 'off',
-            #        'class': 'flight delay',
-            #        'style': 'width: 45rem',
-            #    },
-            #},
             'comment': {
                 'label': 'Comment',
                 'render_kw': {
@@ -205,7 +148,7 @@ class FlightForm(
             },
         }
 
-    report_id = HiddenField(default=report_id_from_view_args)
+    report_id = HiddenField()
 
     flight_type = QuerySelectField(
         'Flight Type',
@@ -218,8 +161,23 @@ class FlightForm(
         }
     )
 
-    origin_delays_string = StringField('Delays')
-    destination_delays_string = StringField('Delays')
+    # NOTE:
+    # *_delays_string fields are added manually to avoid wtforms_alchemy
+    # crawling on them which is causing errors; probably because the model
+    # fields are not designed properly.
+    origin_delays_string = StringField(
+        'Delays',
+        render_kw = dict(
+            class_ = 'flight',
+        )
+    )
+
+    destination_delays_string = StringField(
+        'Delays',
+        render_kw = dict(
+            class_ = 'flight',
+        )
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

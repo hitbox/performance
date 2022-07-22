@@ -1,28 +1,20 @@
 
 
+{% macro diff_class(diff) %}{% if diff is not none %}{% if diff < config.EARLY_LT %} early{% elif diff > config.LATE_GT %} late{% else %} ontime{% endif %}{% endif %}{% endmacro %}
+
+
+{% macro nbsp(s) %}{% if s %}{{ s.replace(' ', '&nbsp;') | safe }}{% endif %}{% endmacro %}
+
+
+{% macro percent(v) %}
+{% if v is number %}
+    {% if v == 1 %}100%{% else %}{{ '%.2f%%' | format(v*100) }}{% endif %}
+{% elif kwargs.or_zero %}0
+{% endif %}{% endmacro %}
+
+
 {% macro render_back_link() %}
 <h4><a href="{{ request.args.backurl }}">Back</a></h4>
-{% endmacro %}
-
-
-{%- macro render_nav_item(endpoint, text) %}<a class="nav{% if request.endpoint == endpoint %} active{% endif %}" href="{{ url_for(endpoint) }}">{{ text }}</a>{% endmacro -%}
-
-
-{%- macro nbsp(s) %}{% if s %}{{ s.replace(' ', '&nbsp;')|safe }}{% endif %}{% endmacro -%}
-
-
-{% macro render_number(value) %}{% if value is number %}{{ value }}{% endif %}{% endmacro %}
-
-
-{% set button_types = ['SubmitField', 'DeleteField'] %}
-
-
-{% macro render_date_time_field(datefield, timefield) %}
-<div class="form-group">
-    {{ datefield.label }}
-    {{ datefield }}
-    {{ timefield }}
-</div>
 {% endmacro %}
 
 
@@ -36,57 +28,16 @@
 {% endmacro %}
 
 
-{% macro render_datetime(value) %}{% if value %}{{ value.strftime(config.DATETIMEFMT) }}{% endif %}{% endmacro %}
+{% macro render_delay(delay) %}
+{# render individual delay code object #}
+{# similar: parse.py:formatdelays #}
+{# NOTE: the check for cancelled and != XLD, is to avoid outputting XLD XLD. #}
 
-
-{% macro render_time(value) %}{% if value %}{{ value.strftime(config.TIMEFMT) }}{% endif %}{% endmacro %}
-
-
-{%- macro render_integer(v) %}{% if v is number %}{{ '{:,d}'.format(v) }}{% elif kwargs.or_zero %}0{% endif %}{% endmacro -%}
-
-
-{%- macro string(v) %}{% if v %}{{ v }}{% endif %}{% endmacro -%}
-
-
-{%- macro blank_if_none(s) %}{% if s is not none %}{{ s }}{% endif %}{% endmacro -%}
-
-
-{%- macro blank_if_falsy(s) %}{% if s %}{{ s }}{% endif %}{% endmacro -%}
-
-
-{%- macro diff_class(diff) %}{% if diff is not none %}{% if diff < config.EARLY_LT %} early{% elif diff > config.LATE_GT %} late{% else %} ontime{% endif %}{% endif %}{% endmacro -%}
-
-
-{%- macro percent(v) %}
-{% if v is number %}
-    {% if v == 1 %}100%{% else %}{{ '%.2f%%'|format(v*100) }}{% endif %}
-{% elif kwargs.or_zero %}0
-{%- endif %}{% endmacro -%}
-
-
-{%- macro time(t) %}{% if t %}{{ t.strftime('%H:%M') }}{% endif %}{% endmacro -%}
-
-
-{%- macro yesno(bool) %}{% if bool %}Yes{% else %}No{% endif %}{% endmacro -%}
-
-
-{%- macro yes(bool) %}{% if bool %}{% if kwargs.get('abbr') %}Y{% else %}Yes{% endif %}{% endif %}{% endmacro -%}
-
-
-{% macro render_javascript_injection(d) %}<script>{% for key, value in d.items() %}
-    let {{ key }} = {{ value|tojson }};{% endfor %}
-</script>{% endmacro %}
-
-
-{% macro render_delays_expanded(delays) %}
-<ol>{% for delay in delays %}
-    <li>
-        <dl>
-            <dt>code</dt>
-            <dd>{{ delay.code }}</dd>
-        </dl>
-    </li>
-{% endfor %}</ol>
+{# NOTE: unobserved a .cancelled delay with .minutes is integer #}
+{# NOTE: the only observed XLD is Delay(code='XLD', minutes=None, cancelled=True) #}
+<span class="delay-code">
+    <span class="delay-code{% if delay.is_cancelled %} cancelled{% endif %}">{{ delay.formatted }}</span>
+</span>
 {% endmacro %}
 
 
@@ -104,38 +55,8 @@
 {% endmacro %}
 
 
-{% macro render_delay(delay) %}
-{# render individual delay code object #}
-{# similar: parse.py:formatdelays #}
-{# NOTE: the check for cancelled and != XLD, is to avoid outputting XLD XLD. #}
-
-{# NOTE: unobserved a .cancelled delay with .minutes is integer #}
-{# NOTE: the only observed XLD is Delay(code='XLD', minutes=None, cancelled=True) #}
-<span class="delay-code">
-    <span class="delay-code{% if delay.is_cancelled %} cancelled{% endif %}">{{ delay.formatted }}</span>
-</span>
-{% endmacro %}
-
-
 {# text inside labels and headers indicating the estimated/actual difference minutes #}
 {% macro render_diff_minutes_text() %}(+/-){% endmacro %}
-
-
-{% macro render_previous_next_navigation(report_date) %}
-<div id="previous-next-navigation">
-    {% for days in [-1, 1] %}
-        {% set offset_date = report_date + datetime.timedelta(days=days) %}
-        <a href="{{ url_for('report.view_report_for_date', report_date=offset_date) }}">{{ offset_date.strftime(config.DATEFMT) }}</a>
-    {% endfor %}
-</div>
-{% endmacro %}
-
-
-{% macro render_field_errors(errors) %}
-<ul class="flat">{% for error in errors %}
-    <li class="field-error">{{ error }}</li>
-{% endfor %}</ul>
-{% endmacro %}
 
 
 {% macro render_field(field) %}
@@ -146,6 +67,7 @@
     {{ render_form(field) }}
 {% else %}
     {% if field.type == 'BooleanField' %}
+        {# reverse for checkboxes #}
         {% set first, second = second, first %}
     {% endif %}
     <div class="item first">{{ first }}</div>
@@ -155,6 +77,19 @@
     </div>
 {% endif %}
 {% endmacro %}
+
+
+{% macro render_field_errors(errors) %}
+<ul class="flat">{% for error in errors %}
+    <li class="field-error">{{ error }}</li>
+{% endfor %}</ul>
+{% endmacro %}
+
+
+{% macro render_form(form) %}
+{{ render_form_fields_part(form) }}
+{{ render_form_buttons(form, **kwargs) }}
+{% endmacro %}{# render_form #}
 
 
 {% macro render_form_buttons(form) %}
@@ -168,20 +103,7 @@
 {% endmacro %}
 
 
-{% macro render_form_hidden_parts(form) %}
-{% if form.hidden_tag %}{{ form.hidden_tag() }}{% endif %}
-{% endmacro %}
-
-
-{% macro render_form_simple_parts(form) %}
-{# render simple field and label pairs #}
-{% set unwanted = ('CSRFTokenField', 'HiddenField', 'FieldList', 'FormField', 'SubmitField') %}
-<div class="fields col-2">{% for field in form|rejectattr('type', 'in', unwanted) %}
-    {{ render_field(field) }}
-{% endfor %}</div>
-{% endmacro %}
-
-
+{# FieldList #}
 {% macro render_form_fieldlist_parts(form) %}
 {# expand FieldList and render #}
 <div class="fields col-2">{% for field_list in form|selectattr('type', 'in', ('FieldList',)) %}
@@ -189,15 +111,6 @@
         {{ render_field(field) }}
     {% endfor %}
 {% endfor %}</div>
-{% endmacro %}
-
-
-{% macro render_form_formfields_part(form) %}
-{# render fields that are forms #}
-{% for form_field in form|selectattr('type', 'in', ('FormField',)) %}
-    <p>{{ form_field.label }}</p>
-    {{ render_form(form_field, _is_form_field=true) }}
-{% endfor %}
 {% endmacro %}
 
 
@@ -209,10 +122,49 @@
 {% endmacro %}
 
 
-{% macro render_form(form) %}
-{{ render_form_fields_part(form) }}
-{{ render_form_buttons(form, **kwargs) }}
-{% endmacro %}{# render_form #}
+{# FormField #}
+{% macro render_form_formfields_part(form) %}
+{# render fields that are forms #}
+{% for form_field in form|selectattr('type', 'in', ('FormField',)) %}
+    <p>{{ form_field.label }}</p>
+    {{ render_form(form_field, _is_form_field=true) }}
+{% endfor %}
+{% endmacro %}
+
+
+{# Hidden #}
+{% macro render_form_hidden_parts(form) %}
+{% if form.hidden_tag %}{{ form.hidden_tag() }}{% endif %}
+{# display errors for hidden fields #}
+{% for field_name, errors in form.errors.items() %}
+    {% set field = form[field_name] %}
+    {% if field.type in ('HiddenField', ) %}
+    <p>{{ field.label }}</p>
+    {{ render_field_errors(errors) }}
+    {% endif %}
+{% endfor %}
+{% endmacro %}
+
+
+{# Simple Fields #}
+{% macro render_form_simple_parts(form) %}
+{# render simple field and label pairs #}
+{% set unwanted = ('CSRFTokenField', 'HiddenField', 'FieldList', 'FormField', 'SubmitField') %}
+<div class="fields col-2">{% for field in form|rejectattr('type', 'in', unwanted) %}
+    {{ render_field(field) }}
+{% endfor %}</div>
+{% endmacro %}
+
+
+{% macro render_javascript_injection(d) %}<script>{% for key, value in d.items() %}
+    let {{ key }} = {{ value|tojson }};{% endfor %}
+</script>{% endmacro %}
+
+
+{% macro render_nav_item(endpoint, text) %}{# site top nav #}<a class="nav{% if request.endpoint == endpoint %} active{% endif %}" href="{{ url_for(endpoint) }}">{{ text }}</a>{% endmacro %}
+
+
+{% macro render_number(value) %}{% if value is number %}{{ value }}{% endif %}{% endmacro %}
 
 
 {% macro render_pagination(pagination, endpoint) %}
@@ -234,41 +186,18 @@
 {% endmacro %}
 
 
-{% macro render_arrival_performance_contract_tier_table(contract) %}
-{# Arrival Performance Contract Tier Table #}
-<table class="performance-contract-table min-width">
-    <colgroup>
-        <col>{# used to set the width of columns #}
-        <col>{# used to set the width of columns #}
-    </colgroup>
-    <thead>
-        <tr>
-            <th>Arrival Performance during Contract Year</th>
-            <th>Annual Cost Escalation Tier</th>
-        </tr>
-    </thead>
-    <tbody>{% for tier in  contract.tiers %}
-        <tr>
-            <td class="data">{{ nbsp(tier.human_performance_range()) }}</td>
-            <td class="tier">Tier {{ tier.tier }}</td>
-        </tr>{% endfor %}
-    </tbody>
-</table>
-<small>Contract year runs from {{ render_date(contract.date_range_start) }} through {{ render_date(contract.date_range_end) }}</small>
-{% endmacro %}
+{% macro render_integer(v) %}{% if v is number %}{{ '{:,d}'.format(v) }}{% elif kwargs.or_zero %}0{% endif %}{% endmacro %}
 
 
-{% macro render_table(table) %}
-<table>
-    <thead>
-        <tr>{% for th in table.ths %}
-            <th>{{ th }}</th>
-        {% endfor %}</tr>
-    </thead>
-    <tbody>{% for row in table.rows %}
-        <tr>{% for td in row %}
-            <td>{{ td }}</td>
-        {% endfor %}{# td #}</tr>{% endfor %}{# row #}
-    </tbody>
-</table>
-{% endmacro %}
+{% macro string(v) %}{% if v %}{{ v }}{% endif %}{% endmacro %}
+
+
+{% macro time(t) %}{% if t %}{{ t.strftime(config.TIMEFMT) }}{% endif %}{% endmacro %}
+
+
+{% macro yes(bool) %}{% if bool %}{% if kwargs.get('abbr') %}Y{% else %}Yes{% endif %}{% endif %}{% endmacro %}
+
+
+{% macro yesno(bool) %}{% if bool %}Yes{% else %}No{% endif %}{% endmacro %}
+
+

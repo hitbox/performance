@@ -1,0 +1,93 @@
+{% extends "admin/base-list-form.html" %}
+
+
+{% from "macros.html" import render_form %}
+{% from "macros.html" import render_pagination %}
+
+
+{% from "scheduled-flight/macros.html" import render_scheduled_flights_table %}
+{% from "scheduled-report/macros.html" import render_scheduled_reports_table %}
+
+
+{% set singular = "Scheduled Report" %}
+{% set plural = "Scheduled Reports" %}
+{% set scheduled_report = instance %}{# rename #}
+{% set thisurl = url_for(request.endpoint, **request.view_args) %}
+
+
+{# scheduled reports and flights treated separately because there's a different
+   access level for them. they do not require admin privileges #}
+
+
+{% block pagehead %}{# remove <h2>Admin</h2> tag. perhaps design this better. #}{% endblock pagehead %}
+
+
+{% block top %}
+<h3 class="page">Schedule</h3>
+{% endblock %}
+
+
+{# scheduled report list #}
+{% block listing %}
+<h3 class="page">{{ plural }}</h3>
+<div class="expand">
+    <table id="scheduled-report" class="expand">
+        {{ render_scheduled_reports_table(
+               pagination.items,
+               instance_endpoint=request.endpoint,
+               active_id=scheduled_report.id
+           ) }}
+    </table>
+    {{ render_pagination(pagination, endpoint=request.endpoint) }}
+</div>
+{% endblock listing %}
+
+
+{# update or create form #}
+{% block form %}
+{% if scheduled_report %}
+    <h3>Editing "{{ scheduled_report.name }}"</h3>
+{% else %}
+    <h3>New {{ singular }}</h3>
+{% endif %}{# scheduled_report #}
+<form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+    {{ render_form(form) }}
+</form>
+{% if scheduled_report %}
+<h4 class="page">
+    <a href="{{ url_for(request.endpoint) }}">New {{ singular }}</a>
+</h4>
+{% endif %}{# scheduled_report #}
+{% endblock %}
+
+
+{% block bottom %}
+{% if scheduled_report %}
+<h3 class="page">Scheduled Flights</h3>
+<div class="formlist">
+    <div class="expand">
+        <h3>{{ scheduled_report.name }} Flights</h3>
+        <table class="expand">
+            {{ render_scheduled_flights_table(
+                   scheduled_report.scheduled_flights,
+                   instance_endpoint = 'scheduled_flight.listform',
+                   backurl = thisurl,
+                   instance_kwargs = dict(
+                       scheduled_report_id = scheduled_report.id,
+                   ),
+               ) }}
+        </table>
+    </div>
+    <div>
+        <h4>New Scheduled Flight</h4>
+        {# no backurl given so that user can stay on the scheduled flights list-form page #}
+        <form action="{{ url_for('scheduled_flight.listform', scheduled_report_id=scheduled_report.id) }}" class="tight" method="POST">
+            {{ render_form(new_scheduled_flight_form) }}
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock bottom %}
+
+
+

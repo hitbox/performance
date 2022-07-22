@@ -1,0 +1,33 @@
+{% from "macros.html" import yes %}
+
+
+{% macro render_delays_table(delays) %}
+{% set active_id = kwargs.active_id %}
+{% set instance_endpoint = kwargs.instance_endpoint %}
+{% set instance_kwargs = kwargs.get('instance_kwargs', {}) %}
+{% set backurl = kwargs.backurl %}
+<thead>
+    <tr>
+        <th>Code</th>
+        <th>Controllable?</th>
+        <th>Always Lane?</th>
+        <th>Always Show?</th>
+    </tr>
+</thead>
+<tbody>{% if not delays %}
+    <tr>
+        <td colspan="4">No delay codes</td>
+    </tr>{% else %}
+    {% for delay in delays %}
+    {% if instance_endpoint %}
+        {% set instance_url = url_for(instance_endpoint, id=delay.id, backurl=backurl, **instance_kwargs) %}
+        {% set title_url = url_for(instance_endpoint, id=delay.id) %}
+    {% endif %}
+    <tr{% if active_id is not none and active_id == delay.id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ instance_url }}" title="{{ title_url }}"{% endif %}>
+        <td class="data">{{ delay.code }}</td>
+        <td class="data">{{ yes(delay.is_controllable) }}</td>
+        <td class="data">{{ yes(delay.is_cancelled_lane) }}</td>
+        <td class="data">{{ yes(delay.is_always_show) }}</td>
+    </tr>{% endfor %}
+{% endif %}</tbody>
+{% endmacro %}

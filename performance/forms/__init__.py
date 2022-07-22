@@ -8,5 +8,4 @@ from .scheduled_flight import ScheduledFlightForm
 from .scheduled_report import ScheduledReportForm
 from .user import EditUserForm
 from .user import LoginForm
-from .user import NewUserForm
 from .user import ResetPasswordForm

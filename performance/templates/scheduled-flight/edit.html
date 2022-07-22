@@ -1,0 +1,39 @@
+{% extends 'pluggable/form.html' %}
+
+
+{% from "macros.html" import render_form %}
+
+
+{% block head %}
+{{ super() }}
+{% if request.endpoint.endswith('.edit') %}
+<script>
+{#
+duplicated from flight-edit.js
+needed to confirm delete and it's not easy to reuse flight-edit.js
+#}
+document.addEventListener("DOMContentLoaded", function() {
+    const deleteButton = document.getElementById("delete");
+    if (!deleteButton) {
+        alert("Clicking delete will not prompt first!");
+    }
+    deleteButton.addEventListener("click", function(event) {
+        if (!confirm("Delete this scheduled flight?")) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock head %}
+
+
+{% block header %}
+<h1>Flight for Scheduled Report</h1>
+{{ super() }}
+{% endblock header %}
+
+
+{% block inside_form %}
+    {{ render_form(form) }}
+{% endblock inside_form %}

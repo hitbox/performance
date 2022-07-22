@@ -30,16 +30,20 @@ def init_app(app):
     @app.route('/')
     @redirect_password_reset
     def index():
+        """
+        Redirect root to today's calendar.
+        """
         return redirect(url_for('select_date.goto_today'))
 
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(assumed_best_bp, url_prefix='/best')
-    app.register_blueprint(delay_bp, url_prefix='/delay')
+    # disabling because it's a bit of a mess to try and edit these
+    #app.register_blueprint(delay_bp, url_prefix='/delay')
     app.register_blueprint(flight_bp, url_prefix='/flight')
     app.register_blueprint(flight_type_bp)
     app.register_blueprint(report_bp, url_prefix='/report')
-    app.register_blueprint(scheduled_flight_bp, url_prefix='/scheduled-flight')
-    app.register_blueprint(scheduled_report_bp, url_prefix='/scheduled-report')
+    app.register_blueprint(scheduled_flight_bp, url_prefix='/scheduled/flight')
+    app.register_blueprint(scheduled_report_bp, url_prefix='/scheduled/report')
     app.register_blueprint(select_date_bp, url_prefix='/select')
     app.register_blueprint(user_bp)
 
@@ -51,7 +55,4 @@ def init_app_development(app):
     For development only!
     """
     from .debug import debug_bp
-    from .todo import todo_bp
-
-    app.register_blueprint(todo_bp, url_prefix='/todo')
     app.register_blueprint(debug_bp)

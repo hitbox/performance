@@ -18,7 +18,6 @@ def root_context():
     from .forms import EditUserForm
     from .forms import FlightForm
     from .forms import LoginForm
-    from .forms import NewUserForm
     from .forms import PerformanceTierForm
     from .forms import ReportForm
     from .forms import ResetPasswordForm

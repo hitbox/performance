@@ -4,7 +4,11 @@ from performance.forms.mixins import SubmitMixin
 
 from ..models import Report
 
-class ReportForm(BackLinkMixin, ModelForm, SubmitMixin):
+class ReportForm(
+    BackLinkMixin,
+    ModelForm,
+    SubmitMixin,
+):
     class Meta:
         model = Report
         only = ['system_detail']

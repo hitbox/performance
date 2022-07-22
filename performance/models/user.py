@@ -3,7 +3,13 @@ from sqlalchemy_utils import PasswordType
 
 from ..extensions import db
 
-class User(UserMixin, db.Model):
+from .mixin import AppContextMixin
+
+class User(
+    AppContextMixin,
+    UserMixin,
+    db.Model,
+):
     """
     A user of the web app with certain privileges.
     """

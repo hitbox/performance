@@ -6,6 +6,24 @@ class MetaMixin:
     updated = db.Column(db.DateTime(timezone=True), onupdate=db.func.now())
 
 
+class AppContextMixin:
+    """
+    Provide callables for import-time use that do not require application context.
+    """
+
+    @classmethod
+    def noapp_get_or_404(cls, identity, description=None):
+        return cls.query.get_or_404(identity, description)
+
+    @classmethod
+    def noapp_pagination(cls):
+        query = cls.query
+        if hasattr(cls, 'Meta') and hasattr(cls.Meta, 'order_by'):
+            attr = getattr(cls, cls.Meta.order_by)
+            query = query.order_by(attr)
+        return query.paginate()
+
+
 class UniqueMixin:
 
     @classmethod

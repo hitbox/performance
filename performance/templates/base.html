@@ -14,7 +14,7 @@
         {% assets 'sitecss' %}<link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">{% endassets %}
         {% assets 'screencss' %}<link href="{{ ASSET_URL }}" media="screen" rel="stylesheet" type="text/css">{% endassets %}
         {% assets 'printcss' %}<link href="{{ ASSET_URL }}" media="print" rel="stylesheet" type="text/css">{% endassets %}
-        {% assets 'sitejs' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+        {% assets 'sitejs' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
     {% endblock head %}</head>
     <body>{% block body %}
         {% include "topnav.html" %}

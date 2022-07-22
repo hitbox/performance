@@ -18,7 +18,6 @@
     --table-border-color: black;
     /* TODO */
     --flight-late-color: red;
-    --input-color: default;
 }
 
 [data-theme="dark"] {
@@ -37,7 +36,6 @@
     /* calendar */
     --a-date-today-background-color: DarkOliveGreen;
     --table-border-color: DarkGray;
-    --input-color: White;
     /* tables */
     --th-color: #ccc;
     --th-background-color: #444;

@@ -2,6 +2,8 @@ from flask import request
 from wtforms import HiddenField
 from wtforms import SubmitField
 
+from ..utils import get_thisurl
+
 # this exists because of so many forms there were problems keep the field
 # declarations consistent.
 
@@ -10,12 +12,9 @@ class BackLinkMixin:
     Add hidden field to form to redirect back to.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'backurl' in request.args:
-            self.backurl.data = request.args['backurl']
-
-    backurl = HiddenField()
+    backurl = HiddenField(
+        default = lambda: request.args.get('backurl', get_thisurl()),
+    )
 
 
 class DeleteMixin:
@@ -28,10 +27,15 @@ class DeleteMixin:
         )
     )
 
+    delete_url = HiddenField()
+
 
 class SubmitMixin:
+    """
+    Mixin a standard attribute name for a submit button.
+    """
 
-    submit = SubmitField('Create')
+    submit = SubmitField()
 
 
 class SearchCriteriaMixin:

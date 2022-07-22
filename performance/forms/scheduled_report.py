@@ -1,28 +1,27 @@
-import sqlalchemy as sa
-
-from wtforms import HiddenField
-from wtforms import StringField
-from wtforms import IntegerField
-from wtforms import SubmitField
-from wtforms_alchemy import ClassMap
-from wtforms_alchemy import QuerySelectField
-
-from ..models import FlightType
-from ..models import ScheduledFlight
 from ..models import ScheduledReport
 
-from . import defaults
-from .base import BaseFlaskForm
-from .fields import StringTimeField
+from .base import ModelForm
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
 
 class ScheduledReportForm(
     BackLinkMixin,
-    BaseFlaskForm,
+    ModelForm,
+    SubmitUpdateDeleteMixin,
 ):
-    name = StringField('Name', render_kw=dict(placeholder='Scheduled Report Name'))
-    display_order = IntegerField('Order')
-
-    update = SubmitField('Update')
-    delete = SubmitField('Delete', render_kw={'class': 'danger'})
+    class Meta:
+        model = ScheduledReport
+        presentation = True
+        only = [
+            'name',
+            'display_order',
+        ]
+        fields_order = only + ['submit', 'delete']
+        field_args = {
+            'name': {
+                'label': 'Name',
+            },
+            'display_order': {
+                'label': 'Display Order',
+            },
+        }

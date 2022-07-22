@@ -57,9 +57,18 @@ function initDangerButtons() {
     }
 }
 
+function initScrollToActive() {
+    const el = document.querySelector("tr.active");
+    if (el !== null) {
+        const alignToTop = false;
+        el.scrollIntoView(alignToTop);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function(event) {
     initDataHref();
     initCloseButton();
     initDatePickers();
     initDangerButtons();
+    initScrollToActive();
 });

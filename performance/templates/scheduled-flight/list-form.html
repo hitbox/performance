@@ -1,0 +1,54 @@
+{% extends "admin/base-list-form.html" %}
+
+
+{% from "macros.html" import render_form %}
+{% from "macros.html" import render_form_buttons %}
+{% from "macros.html" import render_form_fields_part %}
+{% from "macros.html" import render_pagination %}
+
+
+{% from "scheduled-flight/macros.html" import render_scheduled_flights_table %}
+
+
+{% set singular = "Scheduled Flight" %}
+{% set plural = "Scheduled Flights" %}
+{% set scheduled_flight = instance %}{# rename #}
+
+
+{% block pagehead %}{# remove <h2>Admin</h2> tag. perhaps design this better. #}{% endblock pagehead %}
+
+
+{% block top %}
+{# when configured for only one schedule, we hide the link back to a list of scheduled reports #}
+{% if not config.SCHEDULED_REPORTS_ONLYONE %}
+<h3 class="page"><a href="{{ url_for('scheduled_report.list', id=scheduled_report.id) }}">Back to Scheduled Reports</a></h3>
+{% endif %}{# not config.SCHEDULED_REPORTS_ONLYONE #}
+<h3 class="page">{{ scheduled_report.name }} Scheduled Report</h3>
+{% endblock %}
+
+
+{% block listing %}
+<h3 class="page">{{ plural }}</h3>
+<table class="expand">
+    {# we render all flights instead of pagination like admin #}
+    {{ render_scheduled_flights_table(scheduled_report.scheduled_flights) }}
+</table>
+{% endblock listing %}
+
+
+{% block form %}
+<div class="scheduled-flight form-container">
+    <h3 class="page">{% if scheduled_flight %}
+        Editing Flight "{{ scheduled_flight.flight_number }}"
+        {% else %}
+        New {{ singular }}
+        {% endif %}
+    </h3>
+    <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+        {{ render_form(form) }}
+    </form>
+    {% if scheduled_flight %}
+    <h4 class="page"><a href="{{ url_for('scheduled_flight.listform', scheduled_report_id=scheduled_report.id) }}">New {{ singular }}</a></h4>
+    {% endif %}
+</div>
+{% endblock %}

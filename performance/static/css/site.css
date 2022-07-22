@@ -8,6 +8,8 @@
     --th-color: var(--color);
     --th-background-color: LightGray;
     --table-border-color: #333;
+    --active-row-background-color: DarkOliveGreen;
+    --active-row-color: White;
     --head-padding: 4px 6px;
     --cell-padding: 3px 6px;
     /* calendar */
@@ -58,14 +60,14 @@ em {
     padding: 2px 8px 2px 4px;
 }
 
+.expand {
+    width: 100%;
+}
+
 /* table */
 
 table {
     border-collapse: collapse;
-}
-
-table.expand {
-    width: 100%;
 }
 
 table, th, td {
@@ -94,11 +96,23 @@ td {
     /* make non-.data tds a little smaller */
     font-size: .925rem;
     vertical-align: top;
+
+    /* height */
+    /* height is treated like min-height for <td> */
+    /* https://stackoverflow.com/a/25329017/2680592 */
+    /* for rows with all empty <td> tags. */
+    /* 2rem seems to make it exactly as tall as the filled <td> tags */
+    height: 2rem;
 }
 
 th.top {
     text-align: center;
     font-size: .9rem;
+}
+
+tr.active {
+    color: var(--active-row-color);
+    background-color: var(--active-row-background-color);
 }
 
 /* flash messages */
@@ -415,26 +429,45 @@ details:hover {
 
 /* forms */
 
+form {
+    min-width: 300px;
+}
+
 fieldset {
     margin: 1rem 0;
     padding: 1rem;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     color: inherit;
     background-color: inherit;
-    font-family: monospace;
     font-size: 1rem;
 }
 
-input, label, select {
-    margin: .3rem 0;
-    padding: .3rem;
-    min-height: 1rem;
+input:not([type=submit]),
+select {
+    width: 100%;
 }
 
-input:not([type=submit]), select {
-    width: 100%;
+input:not([type=submit]),
+label,
+select {
+    margin: .3rem 0;
+    min-height: 1rem;
+    padding: .3rem;
+}
+
+/* inputs besides buttons */
+input:not([type=submit,type=checkbox]),
+select {
+    font-family: monospace;
+    min-width: 200px;
+}
+
+input[type=checkbox] {
+    min-width: 1rem;
 }
 
 input[type=checkbox] {
@@ -444,6 +477,7 @@ input[type=checkbox] {
 
 input[type=submit] {
     min-width: 8rem;
+    padding: .5rem;
 }
 
 label {
@@ -491,36 +525,41 @@ form > .buttons {
     justify-content: space-between;
 }
 
-/* report form styling */
+/* TODO source: flight_form.css */
 
-input.narrowest {
-    width: 4rem;
-}
-
-/* flight form styling below */
-form #flight_type {
+/* classes included because these same identities exist for scheduled flights */
+form #flight_type.flight {
     width: 14rem;
 }
 
-form #leg {
+form #origin_delays_string.flight,
+form #destination_delays_string.flight {
+    width: 100%;
+}
+
+form #leg.flight {
     width: 5rem;
 }
 
-form #flight_number,
-form #tail_number,
-form #weight {
-    width: 8rem;
-}
-
-form #origin_station,
-form #destination_station {
+form #origin_station.flight,
+form #destination_station.flight,
+form #origin_departure_estimated_time.flight,
+form #origin_departure_actual_time.flight,
+form #destination_arrival_estimated_time.flight,
+form #destination_arrival_actual_time.flight,
+/* javascript populated estimated/actual diff minutes */
+form #origin-diff-minutes.flight,
+form #destination-diff-minutes.flight {
     width: 6rem;
 }
 
-form #origin_departure_estimated_date,
-form #origin_departure_actual_date,
-form #destination_arrival_estimated_date,
-form #destination_arrival_actual_date {
+form #flight_number.flight,
+form #tail_number.flight,
+form #weight.flight,
+form #origin_departure_estimated_date.flight,
+form #origin_departure_actual_date.flight,
+form #destination_arrival_estimated_date.flight,
+form #destination_arrival_actual_date.flight {
     width: 8rem;
 }
 
@@ -532,40 +571,12 @@ label[for="origin_departure_actual_time"] {
     display: none;
 }
 
-form #origin_departure_estimated_time,
-form #origin_departure_actual_time,
-form #destination_arrival_estimated_time,
-form #destination_arrival_actual_time,
-/* javascript populated estimated/actual diff minutes */
-form #origin-diff-minutes,
-form #destination-diff-minutes {
-    width: 6rem;
-}
-
-/* scheduled flight editor */
-form #flight_type.scheduled,
-form #flight_number.scheduled,
-form #origin_station.scheduled,
-form #destination_station.scheduled,
-form #origin_departure_estimated_time.scheduled,
-form #destination_arrival_estimated_time.scheduled {
-    box-sizing: border-box;
-    width: 100%;
-}
-
 /* late color if starts with dash and is not zero */
-/* (1) */ form #origin-diff-minutes:not([value^="-"]):not([value="0"]),
+form #origin-diff-minutes:not([value^="-"]):not([value="0"]), /* (1) */
 form #destination-diff-minutes:not([value^="-"]):not([value="0"]) {
     color: var(--flight-late-color);
 }
 /* (1) javascript populated estimated/actual diff minutes */
-
-/*
-form #origin_delays,
-form #destination_delays {
-    width: 40rem;
-}
-*/
 
 form div.delays {
     display: flex;
@@ -603,6 +614,10 @@ form.user-admin .buttons,
 #performance-contract-wrapper {
     width: min-content;
     margin-left: 1rem;
+}
+
+label[for=password_confirm] {
+    white-space: nowrap;
 }
 
 form .flight {
@@ -643,11 +658,7 @@ form .flight {
     padding: 2px 8px;
 }
 
-.full-width {
-    width: 100%;
-}
-
-.min-width {
+.tight {
     width: min-content;
 }
 
@@ -721,6 +732,7 @@ form .performance-tiers {
 
 .formlist {
     display: flex;
+    justify-content: space-between;
 }
 
 .formlist > * {
@@ -733,4 +745,22 @@ form .performance-tiers {
 
 .formlist > *:last-child {
     margin-right: 0;
+}
+
+.list-view-container {
+    min-width: 800px;
+}
+
+.formlist .listing {
+    width: 100%;
+}
+
+.scheduled-flight.form-container {
+    /* scheduled flight edit form container */
+    position: sticky;
+    top: 15px;
+}
+
+input[value="Update System Detail"] {
+    margin: 2rem 0;
 }

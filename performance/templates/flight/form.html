@@ -1,18 +1,18 @@
 {% extends 'pluggable/form.html' %}
 
 
-{% from "macros.html" import render_diff_minutes_text %}
-{% from "macros.html" import render_field_errors %}
-
-
-{% macro render_input_group(field) %}
-{{ field.label }}{{ field }}{% if field.errors %}{{ render_field_errors(field.errors) }}{% endif %}
-{% endmacro %}
+{% from 'macros.html' import render_date %}
+{% from 'macros.html' import render_diff_minutes_text %}
 
 
 {% macro render_diff_minutes_field(id) %}
 <label for="{{ id }}">{{ render_diff_minutes_text() }}</label>
-<input readonly id="{{ id }}" class="flight" tabindex="-1" title="Difference between estimated and actual, in minutes." value=""></input>
+<input readonly id="{{ id }}" class="flight" tabindex="-1" title="Difference between estimated and actual, in minutes." value="">
+{% endmacro %}
+
+
+{% macro render_input_group(field) %}
+{{ field.label }}{{ field }}{% if field.errors %}{{ render_field_errors(field.errors) }}{% endif %}
 {% endmacro %}
 
 
@@ -22,89 +22,95 @@
 <script>
 {# date to open datepickers to #}
 const fallbackDate = "{{ fallbackDate }}";
-const originDelayCodesId = "{{ form.origin_delays_string.id }}";
-const destinationDelayCodesId = "{{ form.destination_delays_string.id }}";
-{% set is_edit = request.endpoint.endswith('.edit') %}
-const isEdit = {{ is_edit|tojson }};
+const originDelayCodesId = "{{ form.origin_delays_string.id }}";{# the element's id value #}
+const destinationDelayCodesId = "{{ form.destination_delays_string.id }}";{# the element's id value #}
 {# communication to the backend for calculations and autofill #}
 </script>
-{% assets 'flighteditjs' %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+{% assets 'flighteditjs' %}<script src="{{ ASSET_URL }}">{# flight calculations #}</script>{% endassets %}
 {% endblock head %}
 
 
 {% block header %}
 <nav id="flight-form-back">
-    <h3>Back to <a href="{{ url_for('report.view_report', id=report.id) }}">{{ report.date.strftime(config.DATEFMT) }}</a></h3>
+    <h3>Back to <a href="{{ url_for('report.view_report', id=report.id) }}">{{ render_date(report.date) }}</a></h3>
 </nav>
 {% endblock header %}
 
 
-{% block inside_form %}
-{{ form.hidden_tag() }}
-<fieldset>
-    <legend>Flight</legend>
-    <div class="flight-form-row">
-        <div>
-            {{ render_input_group(form.flight_type) }}
+{% block content %}
+<article>
+    <form action="{{ url_for(request.endpoint, **request.view_args) }}" id="edit"{# create or update #} method="POST">
+        {{ form.hidden_tag() }}
+        <fieldset>
+            <legend>Flight</legend>
+            <div class="flight-form-row">
+                <div>
+                    {{ render_input_group(form.flight_type) }}
+                </div>
+                <div>
+                    {{ render_input_group(form.leg) }}
+                </div>
+                <div>
+                    {{ render_input_group(form.flight_number) }}
+                </div>
+                <div>
+                    {{ render_input_group(form.tail_number) }}
+                </div>
+                <div>
+                    {{ render_input_group(form.weight) }}
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Origin</legend>
+            <div class="flight-form-row">
+                <div>{{ render_input_group(form.origin_station) }}</div>
+                <div>
+                    {{ render_input_group(form.origin_departure_estimated_date) }}
+                    {{ render_input_group(form.origin_departure_estimated_time) }}
+                </div>
+                <div>
+                    {{ render_input_group(form.origin_departure_actual_date) }}
+                    {{ render_input_group(form.origin_departure_actual_time) }}
+                </div>
+                <div>
+                    {{ render_diff_minutes_field("origin-diff-minutes") }}
+                </div>
+            </div>
+            <div class="delays">{{ render_input_group(form.origin_delays_string) }}</div>
+        </fieldset>
+        <fieldset>
+            <legend>Destination</legend>
+            <div class="flight-form-row">
+                <div>
+                    {{ render_input_group(form.destination_station) }}
+                </div>
+                <div>
+                    {{ render_input_group(form.destination_arrival_estimated_date) }}
+                    {{ render_input_group(form.destination_arrival_estimated_time) }}
+                </div>
+                <div>
+                    {{ render_input_group(form.destination_arrival_actual_date) }}
+                    {{ render_input_group(form.destination_arrival_actual_time) }}
+                </div>
+                <div>
+                    {{ render_diff_minutes_field("destination-diff-minutes") }}
+                </div>
+            </div>
+            <div class="delays">{{ render_input_group(form.destination_delays_string) }}</div>
+        </fieldset>
+        <fieldset>
+            <legend>Comment</legend>
+            <div>{{ form.comment }}</div>
+        </fieldset>
+        <div class="buttons">
+            {% if form.submit %}{{ form.submit }}{% endif %}
+            {% if form.delete %}{{ form.delete }}{% endif %}
         </div>
-        <div>
-            {{ render_input_group(form.leg) }}
-        </div>
-        <div>
-            {{ render_input_group(form.flight_number) }}
-        </div>
-        <div>
-            {{ render_input_group(form.tail_number) }}
-        </div>
-        <div>
-            {{ render_input_group(form.weight) }}
-        </div>
-    </div>
-</fieldset>
-<fieldset>
-    <legend>Origin</legend>
-    <div class="flight-form-row">
-        <div>{{ render_input_group(form.origin_station) }}</div>
-        <div>
-            {{ render_input_group(form.origin_departure_estimated_date) }}
-            {{ render_input_group(form.origin_departure_estimated_time) }}
-        </div>
-        <div>
-            {{ render_input_group(form.origin_departure_actual_date) }}
-            {{ render_input_group(form.origin_departure_actual_time) }}
-        </div>
-        <div>
-            {{ render_diff_minutes_field("origin-diff-minutes") }}
-        </div>
-    </div>
-    <div class="delays">{{ render_input_group(form.origin_delays_string) }}</div>
-</fieldset>
-<fieldset>
-    <legend>Destination</legend>
-    <div class="flight-form-row">
-        <div>
-            {{ render_input_group(form.destination_station) }}
-        </div>
-        <div>
-            {{ render_input_group(form.destination_arrival_estimated_date) }}
-            {{ render_input_group(form.destination_arrival_estimated_time) }}
-        </div>
-        <div>
-            {{ render_input_group(form.destination_arrival_actual_date) }}
-            {{ render_input_group(form.destination_arrival_actual_time) }}
-        </div>
-        <div>
-            {{ render_diff_minutes_field("destination-diff-minutes") }}
-        </div>
-    </div>
-    <div class="delays">{{ render_input_group(form.destination_delays_string) }}</div>
-</fieldset>
-<fieldset>
-    <legend>Comment</legend>
-    <div>{{ form.comment }}</div>
-</fieldset>
-<div class="buttons">
-    {% if form.submit %}{{ form.submit }}{% endif %}
-    {% if form.delete %}{{ form.delete }}{% endif %}
-</div>
-{% endblock inside_form %}
+    </form>
+</article>
+{% endblock content %}
+
+
+
+

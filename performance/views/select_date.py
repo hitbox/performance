@@ -39,7 +39,7 @@ def calendar(year, month):
         today = today,
         month = month_object,
     )
-    return render_template('select_date.html', **context)
+    return render_template('select-date.html', **context)
 
 @select_date_bp.route('/today')
 @basic_check

@@ -29,9 +29,6 @@ class Flight(
     id = db.Column(db.Integer, primary_key=True)
     report_id = db.Column(db.ForeignKey('report.id'))
 
-    legacy_origin_delays = db.Column(db.String)
-    legacy_destination_delays = db.Column(db.String)
-
     origin_departure_actual_date = db.Column(db.Date)
     origin_departure_actual_time = db.Column(db.Time)
     destination_arrival_actual_date = db.Column(db.Date)

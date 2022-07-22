@@ -143,22 +143,7 @@ function initUpdaters() {
     });
 }
 
-function initDeleteConfirm() {
-    const deleteButton = document.getElementById("delete");
-    if (!deleteButton) {
-        alert("Clicking delete will not prompt first!");
-    }
-    deleteButton.addEventListener("click", function(event) {
-        if (!confirm("Delete this flight?")) {
-            event.preventDefault();
-        }
-    });
-}
-
 document.addEventListener("DOMContentLoaded", function() {
     // template injection
-    if (isEdit) {
-        initDeleteConfirm();
-    }
     initUpdaters();
 });

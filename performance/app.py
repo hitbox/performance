@@ -1,7 +1,5 @@
 import datetime
 
-from itertools import zip_longest
-
 from flask import Flask
 
 # ensure shared models defined
@@ -12,6 +10,7 @@ from . import config
 from . import converters
 from . import extensions
 from . import shell
+from . import utils
 from . import views
 
 def create_app(silent_config=False):
@@ -35,9 +34,8 @@ def create_app(silent_config=False):
         """
         context = dict(
             datetime = datetime,
-            zip = zip,
-            zip_longest = zip_longest,
             db = extensions.db,
+            thisurl = utils.get_thisurl(),
         )
         return context
 

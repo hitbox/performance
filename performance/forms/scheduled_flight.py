@@ -1,26 +1,30 @@
 import sqlalchemy as sa
 
 from wtforms import HiddenField
-from wtforms import SubmitField
+from wtforms.validators import DataRequired
 from wtforms_alchemy import ClassMap
-from wtforms_alchemy import QuerySelectField
 
-from ..models import FlightType
+from .. import queries
 from ..models import ScheduledFlight
 
-from . import defaults
 from .base import ModelForm
 from .fields import StringTimeField
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
 
+_class_names = 'scheduled-flight'
+
 class ScheduledFlightForm(
     BackLinkMixin,
     ModelForm,
+    SubmitUpdateDeleteMixin,
 ):
     class Meta:
         model = ScheduledFlight
-        type_map = ClassMap({sa.Time: StringTimeField})
+        presentation = True
+        type_map = ClassMap({
+            sa.Time: StringTimeField,
+        })
         only = [
             'flight_number',
             'origin_station',
@@ -33,48 +37,43 @@ class ScheduledFlightForm(
         field_args = {
             'flight_number': {
                 'render_kw': {
-                    'class': 'scheduled flight',
+                    'class': f'{_class_names}',
+                    'placeholder': 'Flight Number',
                 },
             },
             'origin_station': {
                 'label': 'Orig.',
                 'render_kw': {
-                    'class': 'scheduled flight',
+                    'class': f'{_class_names}',
+                    'placeholder': 'Origin Station',
                 },
             },
             'destination_station': {
                 'label': 'Dest.',
                 'render_kw': {
-                    'class': 'scheduled flight',
+                    'class': f'{_class_names}',
+                    'placeholder': 'Destination Station',
                 },
             },
             'origin_departure_estimated_time': {
                 'label': 'ETD',
                 'render_kw': {
-                    'class': 'scheduled flight origin',
+                    'class': f'{_class_names} origin',
                     'placeholder': 'ETD',
                 },
             },
             'destination_arrival_estimated_time': {
                 'label': 'ETA',
                 'render_kw': {
-                    'class': 'scheduled flight origin',
+                    'class': f'{_class_names} origin',
                     'placeholder': 'ETA',
                 },
             },
         }
 
-    scheduled_report_id = HiddenField()
+    scheduled_report_id = HiddenField(validators=[DataRequired()])
 
-    flight_type = QuerySelectField(
-        'Type',
-        default = defaults.flight_type,
-        get_label = 'name',
-        query_factory = lambda: FlightType.query.order_by(FlightType.report_order).all(),
-        render_kw = {
-            'class': 'scheduled flight',
-        },
+    flight_type_id = HiddenField(
+        default = lambda: queries.get_scheduled_flight_type_instance().id,
+        filters = [int],
     )
-
-    submit = SubmitField('Submit')
-    delete = SubmitField('Delete', render_kw={'class': 'danger', 'tabindex': '-1'})

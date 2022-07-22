@@ -1,8 +1,8 @@
 from wtforms import SubmitField
 
-from performance.forms.base import ModelForm
-from performance.forms.mixins import BackLinkMixin
-from performance.forms.mixins import SubmitMixin
+from .base import ModelForm
+from .mixins import BackLinkMixin
+from .mixins import SubmitMixin
 
 from ..models import AssumedBest
 

@@ -1,5 +1,13 @@
 import datetime as dt
+import math
 import re
+
+from flask import redirect
+from flask import request
+from flask import url_for
+
+def get_thisurl():
+    return url_for(request.endpoint, **request.view_args, **request.args)
 
 def camelcase(s):
     """
@@ -45,3 +53,51 @@ def diff_minutes(est_date, est_time, act_date, act_time):
         if est_dt > act_dt:
             minutes *= -1
         return minutes
+
+def is_field_populated(form, name):
+    field = getattr(form, name, None)
+    return (
+        hasattr(field, 'data')
+        and getattr(field, 'data', None)
+    )
+
+def get_form_redirect(form):
+    # putting this logic in one place
+    # TODO: should check that url is safe
+    # backendpoint, backviewargs? instead of full url?
+    if (
+        form.is_delete
+        and is_field_populated(form, 'delete_url')
+    ):
+        return form.delete_url.data
+    elif is_field_populated(form, 'backurl'):
+        return redirect(form.backurl.data)
+
+def sortfunc_by_type(obj):
+    """
+    Return function to sort 2-tuple items in an object according to the
+    object's type.
+    """
+    if isinstance(obj, dict):
+        def sortfunc(item):
+            """
+            Sort items in dictionary by values in same dict, or `math.inf` if missing.
+            """
+            name, field = item
+            return obj.get(name, math.inf)
+
+    elif isinstance(obj, list):
+        def sortfunc(item):
+            """
+            Sort items in a list by index or `math.inf` if name is missing.
+            """
+            name, field = item
+            if name in obj:
+                return obj.index(name)
+            else:
+                return math.inf
+
+    else:
+         raise TypeError('Sorting by %r not supported', type(obj))
+
+    return sortfunc

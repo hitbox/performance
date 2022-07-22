@@ -1,0 +1,61 @@
+{% from "macros.html" import render_date %}
+{% from "macros.html" import render_number %}
+{% from "macros.html" import nbsp %}
+
+
+{% macro render_arrival_performance_contract_tier_table(contract, with_edit) %}
+{# Arrival Performance Contract Tier Table #}
+{# this is the one that should appear on the reports #}
+<table class="performance-contract-table min-width">
+    <colgroup>
+        <col>{# used to set the width of columns #}
+        <col>{# used to set the width of columns #}
+    </colgroup>
+    <thead>
+        <tr>
+            <th>Arrival Performance during Contract Year</th>
+            <th>Annual Cost Escalation Tier</th>
+        </tr>
+    </thead>
+    <tbody>{% for tier in  contract.tiers %}
+        <tr>
+            <td class="data">{{ nbsp(tier.human_performance_range()) }}</td>
+            <td class="tier">Tier {{ tier.tier }}</td>
+        </tr>{% endfor %}
+    </tbody>
+</table>
+{% if with_edit %}<a href="{{ url_for('admin.performance_contract.listform', id=contract.id) }}">{% endif %}
+<small>Contract year runs from {{ render_date(contract.date_range_start) }} through {{ render_date(contract.date_range_end) }}</small>
+{% if with_edit %}</a>{% endif %}
+{% endmacro %}
+
+
+{% macro render_performance_contracts_table(performance_contracts) %}
+{# render iterable of performance contracts as table #}
+{% set instance_endpoint = kwargs.get('instance_endpoint') %}
+{% set instance_kwargs = kwargs.get('instance_kwargs', {}) %}
+{% set active_id = kwargs.active_id %}
+<thead>
+    <tr>
+        {#<th>ID</th>#}
+        <th>Name</th>
+        <th>Start</th>
+        <th>End</th>
+        <th># Tiers</th>
+    </tr>
+</thead>
+<tbody>{% if not performance_contracts %}<tr>
+        <td colspan="4">No performance contracts</td>
+    </tr>{% else %}{% for performance_contract in performance_contracts %}
+    <tr{% if active_id is not none and performance_contract.id == active_id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ url_for(instance_endpoint, id=performance_contract.id, **instance_kwargs) }}{% endif %}">
+        {#<td class="data">{{ performance_contract.id }}</td>#}
+        <td class="data">{{ performance_contract.name }}</td>
+        <td class="data date">{{ render_date(performance_contract.date_range_start) }}</td>
+        <td class="data date">{{ render_date(performance_contract.date_range_end) }}</td>
+        <td class="data number">{{ render_number(performance_contract.tiers|length) }}</td>
+    </tr>{% endfor %}
+{% endif %}</tbody>
+{% endmacro %}
+
+
+

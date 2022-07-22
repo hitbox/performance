@@ -1,57 +1,58 @@
 from flask import Blueprint
 from flask import request
-from flask import render_template
-from flask import redirect
 
-from ..authorization import edit_check
 from ..authorization import edit_schedule_check
-from ..extensions import db
-from ..models import FlightType
+from ..forms import ScheduledFlightForm
 from ..models import ScheduledFlight
-
-from .pluggable import CreateView
-from .pluggable import UpdateDeleteView
+from ..models import ScheduledReport
+from ..pluggable import FormListView
 
 scheduled_flight_bp = Blueprint('scheduled_flight', __name__)
 
-class CreateScheduledFlightView(CreateView):
+@edit_schedule_check
+@scheduled_flight_bp.before_request
+def before_request():
+    """
+    Enforce user can edit scheduled flight.
+    """
 
-    def dispatch_request(self, scheduled_report_id):
-        form = self.form_class(scheduled_report_id=scheduled_report_id)
-        if form.validate_on_submit():
-            flight = self.model()
-            db.session.add(flight)
-            flight.scheduled_report_id = scheduled_report_id
-            form.populate_obj(flight)
-            db.session.commit()
-            if hasattr(form, 'backurl') and form.backurl.data:
-                return redirect(form.backurl.data)
-        elif request.method == 'GET':
-            form.submit.label.text = 'Create'
-            del form.delete
-        return render_template(self.template, form=form)
+def instance_getter(*ignore_args, **ignore_kwargs):
+    # FormListView.dispatch_request will always see an instance identity passed
+    # to it because of scheduled_report_id. So we have to figure out if this is
+    # a new or edit operation.
+    if 'id' in request.view_args:
+        # edit scheduled flight instance
+        return ScheduledFlight.query.get(request.view_args['id'])
 
+def context_processor():
+    scheduled_report_id = request.view_args['scheduled_report_id']
+    scheduled_report = ScheduledReport.query.get_or_404(scheduled_report_id)
+    return dict(
+        scheduled_report = scheduled_report,
+    )
 
-def get_scheduled_flight_form_class():
-    # NOTE: must delay importing because wtforms_alchemy is very aggressive
-    from ..forms import ScheduledFlightForm
-    return ScheduledFlightForm
+def form_getter(**kwargs):
+    form = ScheduledFlightForm(**kwargs)
+    if hasattr(form, 'backurl'):
+        del form.backurl
+    return form
+
+view_func = FormListView.as_view(
+    name = 'listform',
+    template = 'scheduled-flight/list-form.html',
+    instance_getter = instance_getter,
+    pagination_getter = lambda: None,
+    form_getter = form_getter,
+    form_submitter = ScheduledFlightForm.standard_submit,
+    context_processor = context_processor,
+)
+
+scheduled_flight_bp.add_url_rule(
+    '/edit/<int:scheduled_report_id>/<int:id>',
+    view_func = view_func
+)
 
 scheduled_flight_bp.add_url_rule(
     '/create/<int:scheduled_report_id>',
-    view_func = edit_schedule_check(
-        CreateScheduledFlightView.as_view(
-            'create',
-            get_scheduled_flight_form_class,
-            template = 'scheduled_flight_edit.html',
-        )))
-
-scheduled_flight_bp.add_url_rule(
-    '/edit/<int:id>',
-    view_func = edit_schedule_check(
-        UpdateDeleteView.as_view(
-            'edit',
-            get_scheduled_flight_form_class,
-            template = 'scheduled_flight_edit.html',
-            instance_query = lambda id: ScheduledFlight.query.get_or_404(id)
-        )))
+    view_func = view_func
+)

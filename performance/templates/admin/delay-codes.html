@@ -1,0 +1,53 @@
+{% extends "admin/base-list-form.html" %}
+
+
+{% from "macros.html" import render_form %}
+{% from "macros.html" import render_pagination %}
+
+
+{% from "delay-codes/macros.html" import render_delays_table %}
+
+
+{% set singular = "Delay Code" %}
+{% set plural = "Delay Codes" %}
+{% set delay_code = instance %}
+
+
+{% block subpagehead %} - {{ plural }}{% endblock %}
+
+
+{% block listing %}
+{% if request.args.page %}
+    {% set instance_kwargs = dict(page=request.args.page) %}
+{% else %}
+    {% set instance_kwargs = dict() %}
+{% endif %}
+<table class="expand">
+    {{ render_delays_table(
+           pagination.items,
+           active_id = delay_code.id,
+           instance_endpoint = '.list',
+           instance_kwargs = instance_kwargs,
+           backurl = url_for(request.endpoint, page=request.args.page, **request.view_args)
+       ) }}
+</table>
+{{ render_pagination(pagination, endpoint=request.endpoint) }}
+{% endblock listing %}
+
+
+{% block form %}
+{% if delay_code %}
+    {% set action = url_for(request.endpoint, id=request.view_args.id) %}
+    <h3>Editing {{ singular }} "{{ delay_code.code }}"</h3>
+{% else %}
+    {% set action = url_for(request.endpoint) %}
+    <h3>New {{ singular }}</h3>
+{% endif %}
+<form action="{{ action }}" method="POST">
+    {{ render_form(form) }}
+</form>
+{# disabled because these get automatically created by the delay codes parser #}
+{% if false and delay_code %}
+<h4 class="page"><a href="{{ url_for(request.endpoint, page=request.args.page) }}">New {{ singular }}</a></h4>
+{% endif %}
+{% endblock %}

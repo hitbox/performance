@@ -1,0 +1,18 @@
+
+
+{% macro render_scheduled_reports_table(scheduled_reports) %}
+<thead>
+    <tr>
+        <th>Name</th>
+        <th>Display Order</th>
+        <th># Flights</th>
+    </tr>
+</thead>
+<tbody>{% for scheduled_report in scheduled_reports %}
+    <tr{% if 'active_id' in kwargs and scheduled_report.id == kwargs.active_id %} class="active"{% endif %}{% if 'instance_endpoint' in kwargs %} data-href="{{ url_for(kwargs.instance_endpoint, id=scheduled_report.id, backurl=kwargs.backurl) }}"{% endif %}>
+        <td class="data">{{ scheduled_report.name }}</td>
+        <td class="data number">{{ scheduled_report.display_order }}</td>
+        <td class="data number">{{ scheduled_report.scheduled_flights | length }}</td>
+    </tr>{% endfor %}
+</tbody>
+{% endmacro %}

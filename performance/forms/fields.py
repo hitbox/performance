@@ -47,22 +47,3 @@ class PercentField(Field):
             self.data = float(valuelist[0])/100
         else:
             self.data = float()
-
-
-class DelayCodesField(Field):
-    """
-    Delay codes field.
-    """
-    widget = TextInput()
-
-    def _value(self):
-        if self.data:
-            return parse.formatdelays(self.data)
-        else:
-            return ''
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            self.data = parse.delaystring(valuelist[0])
-        else:
-            self.data = []

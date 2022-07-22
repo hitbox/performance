@@ -1,0 +1,43 @@
+{% extends "report/base.html" %}
+
+
+{% from "macros.html" import render_date with context %}
+
+
+{% macro render_create_link(scheduled_report, text) %}
+{# optionally match and style matching weekday for schedule link #}
+{% set match_weekday = config.PROMPT_NEW_MATCH_SCHEDULED_WEEKDAY_NAME or False %}
+<h4>
+    <a{% if match_weekday and scheduled_report.name.lower() == report_date.strftime('%A').lower() %} class="prompt-new-weekday-match"{% endif %} href="{{ url_for('report.create_report_from_schedule', report_date=report_date, schedule_id=scheduled_report.id) }}">{{ text }}</a>
+</h4>
+{% endmacro %}{# render_create_link #}
+
+
+{% block report_header %}
+<nav id="report-nav">
+    <h4 class="noprint">
+        <a href="{{ url_for('report.view_report_for_date', report_date=prev_date) }}" title="{{ prev_date }}">{{ render_date(prev_date) }}</a>
+    </h4>
+    <h3 cid="report-title">New Report for {{ render_date(report_date) }}</h3>
+    <h4 class="noprint">
+        <a href="{{ url_for('report.view_report_for_date', report_date=next_date) }}" title="{{ next_date }}">{{ render_date(next_date) }}</a>
+    </h4>
+</nav>
+{% endblock report_header %}
+
+
+{# overwriting block "main" (because these templates were not designed well enough) #}
+{% block report_main %}<article id="new-report-prompt">
+    {% if config.SCHEDULED_REPORTS_ONLYONE %}
+        {# this is hiding the fact that there can be many scheduled reports to build from #}
+        {{ render_create_link(scheduled_report, 'Create new report from ' + scheduled_report.name) }}
+    {% else %}
+        <h3>From Schedule</h3>
+        <ul class="flat">{% for scheduled_report in scheduled_reports %}
+            <li>{{ render_create_link(scheduled_report, scheduled_report.name) }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+    <h4>
+        <a href="{{ url_for('report.create_report_blank', report_date=report_date) }}">Create blank report</a>
+    </h4>
+</article>{% endblock report_main %}

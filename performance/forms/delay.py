@@ -1,3 +1,5 @@
+from wtforms import SubmitField
+
 from ..models import Delay
 
 from .base import ModelForm
@@ -7,13 +9,13 @@ from .mixins import SubmitUpdateDeleteMixin
 class DelayForm(
     BackLinkMixin,
     ModelForm,
-    SubmitUpdateDeleteMixin,
 ):
     """
     Delay object form.
     """
     class Meta:
         model = Delay
+        presentation = True
         field_args = {
             'code': {
                 'label': 'Code',
@@ -36,3 +38,5 @@ class DelayForm(
             'submit',
             'delete',
         ]
+
+    submit = SubmitField()

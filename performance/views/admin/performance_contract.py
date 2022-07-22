@@ -1,13 +1,13 @@
 import click
 
 from flask import Blueprint
+from flask import abort
+from flask import current_app
 
 from performance.extensions import db
-from performance.glue import FormGetter
-from performance.glue import FormSubmitter
+from performance.forms import ContractForm
 from performance.models import Contract
-from performance.models import PerformanceTier
-from performance.views.pluggable import FormListView
+from performance.pluggable import FormListView
 
 performance_contract_bp = Blueprint(
     'performance_contract',
@@ -15,33 +15,29 @@ performance_contract_bp = Blueprint(
     url_prefix = '/performance-contract',
 )
 
-def contract_form_class(*args, **kwargs):
-    from performance.forms import ContractForm
-    form = ContractForm(*args, **kwargs)
-    form.submit.label.text = 'Update'
-    return form
+@performance_contract_bp.before_request
+def before_request():
+    """
+    Allow only if configured.
+    """
+    if not (
+        'PERFORMANCE_CONTRACTS' in current_app.config
+        and current_app.config['PERFORMANCE_CONTRACTS']
+    ):
+        abort(404)
 
-def new_contract_form_class(*args, **kwargs):
-    from performance.forms import ContractForm
-    form = ContractForm(*args, **kwargs)
-    form.submit.label.text = 'Create'
-    del form.delete
-    return form
-
-def get_pagination():
-    return Contract.query.order_by(Contract.date_range_start).paginate()
-
-view = FormListView.as_view(
-    'list',
-    instance_getter = lambda id: Contract.query.get_or_404(id),
-    pagination_getter = get_pagination,
-    form_getter = FormGetter(contract_form_class, new_contract_form_class),
-    form_submitter = FormSubmitter(Contract, object_name='Performance Contract'),
-    template = 'admin/performance_contracts.html',
+view_func = FormListView.as_view(
+    'listform',
+    instance_getter = Contract.noapp_get_or_404,
+    pagination_getter = Contract.noapp_pagination,
+    form_getter = ContractForm,
+    form_submitter = ContractForm.standard_submit,
+    template = 'admin/performance-contracts.html',
 )
 
-performance_contract_bp.add_url_rule('/', view_func=view)
-performance_contract_bp.add_url_rule('/<int:id>', view_func=view)
+performance_contract_bp.add_url_rule('/', view_func=view_func)
+
+performance_contract_bp.add_url_rule('/<int:id>', view_func=view_func)
 
 # CLI #
 

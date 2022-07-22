@@ -55,7 +55,7 @@ def reset_password():
         current_user.reset_password = False
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('reset_password.html', form=form)
+    return render_template('reset-password.html', form=form)
 
 @user_bp.route('/logout')
 @login_required

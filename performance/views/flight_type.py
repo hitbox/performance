@@ -5,16 +5,17 @@ from flask import Blueprint
 from ..authorization import admin_check
 from ..extensions import db
 from ..models import FlightType
-
-from .pluggable import SimpleListView
+from ..pluggable import ListView
 
 flight_type_bp = Blueprint('flight_type', __name__)
+
+# TODO: is this used?
 
 # month to date flights with chargeable delays
 flight_type_bp.add_url_rule(
     '/list',
     view_func = admin_check(
-        SimpleListView.as_view(
+        ListView.as_view(
             'list',
             template = 'flight_type/list.html',
             items_getter = lambda:

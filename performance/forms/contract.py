@@ -1,19 +1,9 @@
-import sqlalchemy as sa
-
-from flask import request
-from wtforms import FieldList
-from wtforms import FormField
 from wtforms import HiddenField
-from wtforms_alchemy import ClassMap
-from wtforms_alchemy import QuerySelectField
 
 from ..models import Contract
 from ..models import PerformanceTier
 
-from . import defaults
 from .base import ModelForm
-from .fields import DelayCodesField
-from .fields import StringTimeField
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
 
@@ -27,20 +17,26 @@ class PerformanceTierForm(
     """
     class Meta:
         model = PerformanceTier
+        presentation = True
         only = [
-            'order',
             'tier',
             'performance_range_start',
             'performance_range_end',
         ]
-        fields_order = [
-            'order',
-            'tier',
-            'performance_range_start',
-            'performance_range_end',
-            'submit',
-            'delete',
-        ]
+        fields_order = only + ['submit', 'delete']
+        field_args = dict(
+            tier = dict(
+                label = 'Tier',
+            ),
+            performance_range_start = dict(
+                label = 'Performance Range >',
+            ),
+            performance_range_end = dict(
+                label = 'Performance Range <',
+            ),
+        )
+
+    contract_id = HiddenField()
 
 
 class ContractForm(
@@ -53,15 +49,28 @@ class ContractForm(
     """
     class Meta:
         model = Contract
+        presentation = True
         only = [
             'name',
             'date_range_start',
             'date_range_end',
         ]
-        fields_order = [
-            'name',
-            'date_range_start',
-            'date_range_end',
-            'submit',
-            'delete',
-        ]
+        fields_order = only + ['submit', 'delete']
+        field_args = dict(
+            name = dict(
+                label = 'Name',
+            ),
+            date_range_start = dict(
+                label = 'Start',
+                render_kw = dict(
+                    pattern = '\d{4}-\d{2}-\d{2}'
+                ),
+            ),
+            date_range_end = dict(
+                label = 'End',
+                render_kw = dict(
+                    pattern = '\d{4}-\d{2}-\d{2}'
+                ),
+            ),
+        )
+

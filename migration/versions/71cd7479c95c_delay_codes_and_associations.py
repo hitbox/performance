@@ -35,8 +35,6 @@ flight_table = sa.Table(
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('origin_delays', sa.String), # legacy field
     sa.Column('destination_delays', sa.String), # legacy field
-    sa.Column('legacy_origin_delays', sa.String), # save legacy field
-    sa.Column('legacy_destination_delays', sa.String), # save legacy field
 )
 
 delay_table = sa.Table(
@@ -216,26 +214,13 @@ def upgrade():
     )
     engine = op.get_bind()
 
-    # "rename" old string delays columns
-    op.add_column('flight',
-        sa.Column('legacy_destination_delays', sa.VARCHAR(), autoincrement=False, nullable=True)
-    )
-    op.add_column('flight',
-        sa.Column('legacy_origin_delays', sa.VARCHAR(), autoincrement=False, nullable=True)
-    )
-    engine.execute(
-        sa.update(flight_table).values(
-            legacy_origin_delays = flight_table.c.origin_delays,
-            legacy_destination_delays = flight_table.c.destination_delays,
-        )
-    )
-
     insert_new_flight_delays(engine)
 
     op.drop_column('flight', 'origin_delays')
     op.drop_column('flight', 'destination_delays')
 
 def downgrade():
+    # XXX: will not restore legacy string values
     op.add_column('flight',
         sa.Column('destination_delays', sa.VARCHAR(), autoincrement=False, nullable=True)
     )
@@ -245,5 +230,3 @@ def downgrade():
     op.drop_table('origin_delay')
     op.drop_table('destination_delay')
     op.drop_table('delay')
-    op.drop_column('flight', 'legacy_origin_delays')
-    op.drop_column('flight', 'legacy_destination_delays')
