@@ -6,6 +6,7 @@ from performance.authorization import edit_check
 from performance.forms import AssumedBestForm
 from performance.models import AssumedBest
 from performance.pluggable.simpler import EditView
+from performance.pluggable import CreateView
 
 assumed_best_bp = Blueprint('assumed_best', __name__)
 
@@ -20,14 +21,25 @@ def before_request():
 def context_processor():
     return dict(calendar=calendar)
 
-view_func = EditView.as_view(
-    'edit',
-    template = 'assumed-best/edit.html',
-    instance_getter = AssumedBest.noapp_get_or_404,
-    form_getter = AssumedBestForm,
-    form_submitter = AssumedBestForm.standard_submit,
+def form_class():
+    return AssumedBestForm
+
+assumed_best_bp.add_url_rule(
+    '/create/<int:year>/<int:month>',
+    view_func = CreateView.as_view(
+        'create',
+        form_class,
+        template = 'assumed-best/edit.html',
+    )
 )
 
-assumed_best_bp.add_url_rule('/edit', view_func=view_func)
-
-assumed_best_bp.add_url_rule('/edit/<int:id>', view_func=view_func)
+assumed_best_bp.add_url_rule(
+    '/edit/<int:id>',
+    view_func = EditView.as_view(
+        'edit',
+        template = 'assumed-best/edit.html',
+        instance_getter = AssumedBest.noapp_get_or_404,
+        form_getter = AssumedBestForm,
+        form_submitter = AssumedBestForm.standard_submit,
+    ),
+)

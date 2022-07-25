@@ -138,7 +138,7 @@
 {# display errors for hidden fields #}
 {% for field_name, errors in form.errors.items() %}
     {% set field = form[field_name] %}
-    {% if field.type in ('HiddenField', ) %}
+    {% if field.type in ('HiddenField', 'HiddenIntegerField') %}
     <p>{{ field.label }}</p>
     {{ render_field_errors(errors) }}
     {% endif %}
@@ -149,7 +149,7 @@
 {# Simple Fields #}
 {% macro render_form_simple_parts(form) %}
 {# render simple field and label pairs #}
-{% set unwanted = ('CSRFTokenField', 'HiddenField', 'FieldList', 'FormField', 'SubmitField') %}
+{% set unwanted = ('CSRFTokenField', 'HiddenField', 'HiddenIntegerField', 'FieldList', 'FormField', 'SubmitField') %}
 <div class="fields col-2">{% for field in form|rejectattr('type', 'in', unwanted) %}
     {{ render_field(field) }}
 {% endfor %}</div>

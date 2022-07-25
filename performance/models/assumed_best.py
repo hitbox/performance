@@ -27,3 +27,4 @@ class AssumedBest(
     def validate_month(self, key, value):
         if not 0 < value < 13:
             raise ValueError('month must be between 1 and 12.')
+        return value

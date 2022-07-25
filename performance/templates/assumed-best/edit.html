@@ -5,12 +5,11 @@
 
 
 {% block main %}
-{% set month_name = calendar.month_name[instance.month] %}
-{% set year = instance.year %}
+{% set month_name = calendar.month_name[form.month.data] %}
 <h2>Assumed Best Arrival Performance for the Month</h2>
-<h3>{{ instance.year }} {{ calendar.month_name[instance.month] }}</h3>
+<h3>{{ form.year.data }} {{ month_name }}</h3>
 {% if request.args.backurl %}<h4><a href="{{ request.args.backurl }}">Back</a></h4>{% endif %}
-<form action="{{ url_for('assumed_best.edit', id=instance.id) }}" method="POST">
+<form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
     {{ render_form(form) }}
 </form>
 {% endblock main %}

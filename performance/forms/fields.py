@@ -1,4 +1,7 @@
 from wtforms import Field
+from wtforms import HiddenField
+from wtforms import IntegerField
+from wtforms.widgets import HiddenInput
 from wtforms.widgets import TextInput
 from wtforms_components import TimeField
 
@@ -47,3 +50,7 @@ class PercentField(Field):
             self.data = float(valuelist[0])/100
         else:
             self.data = float()
+
+
+class HiddenIntegerField(IntegerField):
+    widget = HiddenInput()

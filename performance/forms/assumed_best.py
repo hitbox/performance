@@ -1,8 +1,8 @@
 from wtforms import SubmitField
 
 from .base import ModelForm
+from .fields import HiddenIntegerField
 from .mixins import BackLinkMixin
-from .mixins import SubmitMixin
 
 from ..models import AssumedBest
 
@@ -12,6 +12,14 @@ class AssumedBestForm(
 ):
     class Meta:
         model = AssumedBest
-        only = ['lanes']
+        only = [
+            'year',
+            'month',
+            'lanes',
+        ]
+        presentation = True
+
+    year = HiddenIntegerField()
+    month = HiddenIntegerField()
 
     submit = SubmitField('Update')

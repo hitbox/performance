@@ -11,6 +11,7 @@ class BaseEditView(View):
     def __init__(
         self,
         form_class,
+        *, # keyword only
         model = None,
         instance_query = None,
         template = None,

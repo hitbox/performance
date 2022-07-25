@@ -80,6 +80,7 @@ th {
     vertical-align: bottom;
     color: var(--th-color);
     background-color: var(--th-background-color);
+    height: initial;
 }
 
 th.row {
@@ -89,6 +90,16 @@ th.row {
     white-space: nowrap;
     text-align: left;
     font-size: .9rem;
+}
+
+th.top {
+    text-align: center;
+    font-size: .9rem;
+}
+
+tr.active {
+    color: var(--active-row-color);
+    background-color: var(--active-row-background-color);
 }
 
 td {
@@ -102,17 +113,9 @@ td {
     /* https://stackoverflow.com/a/25329017/2680592 */
     /* for rows with all empty <td> tags. */
     /* 2rem seems to make it exactly as tall as the filled <td> tags */
-    height: 2rem;
-}
-
-th.top {
-    text-align: center;
-    font-size: .9rem;
-}
-
-tr.active {
-    color: var(--active-row-color);
-    background-color: var(--active-row-background-color);
+    /*height: 2rem;*/
+    /* Using height is making the <thead> really big on Firefox */
+    /* Disabling for now */
 }
 
 /* flash messages */

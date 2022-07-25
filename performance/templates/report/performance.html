@@ -61,7 +61,12 @@
         </tr>
         <tr>
             <th class="row">
-                <a href="{{ url_for('assumed_best.edit', id=report.assumed_best.id, backurl=thisurl) }}">Assumed Best Arrival Performance for the Month</a>
+            {% if report.assumed_best %}
+            {% set url = url_for('assumed_best.edit', id=report.assumed_best.id, backurl=thisurl) %}
+            {% else %}
+            {% set url = url_for('assumed_best.create', year=report.date.year, month=report.date.month, backurl=thisurl) %}
+            {% endif %}
+            <a href="{{ url }}">Assumed Best Arrival Performance for the Month</a>
             </th>
             <td>{# deliberately empty #}</td>
             {# MTD assumed best #}
