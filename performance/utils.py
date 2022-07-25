@@ -65,11 +65,11 @@ def get_form_redirect(form):
     # putting this logic in one place
     # TODO: should check that url is safe
     # backendpoint, backviewargs? instead of full url?
-    if (
-        form.is_delete
-        and is_field_populated(form, 'delete_url')
-    ):
-        return form.delete_url.data
+    if form.is_delete:
+        if is_field_populated(form, 'delete_url'):
+            return form.delete_url.data
+        # is delete but no specific url to go to
+        # just let the view fall through
     elif is_field_populated(form, 'backurl'):
         return redirect(form.backurl.data)
 

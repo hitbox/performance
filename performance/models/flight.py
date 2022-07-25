@@ -240,39 +240,6 @@ class Flight(
             ))
 
 
-def configured_performance_lanes_flighttype_names():
-    # TODO: move stuff like this to config.py?
-    flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
-    return flight_types_names
-
-_configured_performance_lanes_flighttypes = None
-
-def configured_performance_lanes_flighttypes():
-    """
-    The FlightType's that count for lanes.
-    """
-    global _configured_performance_lanes_flighttypes
-    if _configured_performance_lanes_flighttypes is not None:
-        return _configured_performance_lanes_flighttypes
-    from .flight_type import FlightType
-    flight_types_names = current_app.config['PERFORMANCE_LANES_FLIGHTTYPES']
-    flight_types = FlightType.query.filter(FlightType.name.in_(flight_types_names)).all()
-    _configured_performance_lanes_flighttypes = flight_types
-    return _configured_performance_lanes_flighttypes
-
-_configured_include_cancelled_delays = None
-
-def configured_include_cancelled_delays():
-    """
-    The required, configured delay codes to include in counting lanes.
-    """
-    global _configured_include_cancelled_delays
-    if _configured_include_cancelled_delays is not None:
-        return _configured_include_cancelled_delays
-    key = 'PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS'
-    _configured_include_cancelled_delays = current_app.config[key]
-    return _configured_include_cancelled_delays
-
 def should_show_delays(diff_minutes, delays):
     """
     Return whether the delay codes should be shown.

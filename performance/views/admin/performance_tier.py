@@ -1,7 +1,9 @@
 from flask import Blueprint
 from flask import abort
 from flask import current_app
+from flask import redirect
 from flask import request
+from flask import url_for
 
 from performance.forms import PerformanceTierForm
 from performance.models import Contract
@@ -19,10 +21,7 @@ def before_request():
     """
     Allow only if configured.
     """
-    if not (
-        'PERFORMANCE_CONTRACTS' in current_app.config
-        and current_app.config['PERFORMANCE_CONTRACTS']
-    ):
+    if not current_app.config.get('PERFORMANCE_CONTRACTS'):
         abort(404)
 
 def instance_getter(identity):
@@ -39,12 +38,21 @@ def context_processor():
         contract = contract,
     )
 
+def response_for_delete(form):
+    return redirect(
+        url_for(
+            'admin.performance_tier.listform',
+            contract_id = request.view_args['contract_id'],
+        )
+    )
+
 view_func = FormListView.as_view(
     'listform',
     instance_getter = instance_getter,
     pagination_getter = None, #PerformanceTier.noapp_pagination,
     form_getter = PerformanceTierForm,
     form_submitter = PerformanceTierForm.standard_submit,
+    response_for_delete = response_for_delete,
     template = 'admin/performance-tiers.html',
     context_processor = context_processor,
 )

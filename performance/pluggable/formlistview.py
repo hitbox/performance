@@ -15,6 +15,7 @@ class FormListView(View):
         form_getter,
         form_submitter,
         template,
+        response_for_delete = None,
         context_processor = None,
     ):
         """
@@ -37,6 +38,7 @@ class FormListView(View):
         self.form_getter = form_getter
         self.form_submitter = form_submitter
         self.template = template
+        self.response_for_delete = response_for_delete
         self.context_processor = context_processor
 
     def dispatch_request(self, **instance_identity):
@@ -49,7 +51,9 @@ class FormListView(View):
 
         if request.method == 'POST':
             result_for_submit = self.form_submitter(form, instance)
-            if result_for_submit:
+            if form.is_delete and self.response_for_delete:
+                return self.response_for_delete(form)
+            elif result_for_submit:
                 return result_for_submit
 
         context = dict(

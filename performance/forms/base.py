@@ -9,6 +9,7 @@ from wtforms_alchemy import model_form_factory
 
 from ..extensions import db
 from ..utils import get_form_redirect
+from ..utils import is_field_populated
 from ..utils import sortfunc_by_type
 
 class BaseForm(Form):
@@ -63,7 +64,7 @@ class BaseForm(Form):
 
     @property
     def is_delete(self):
-        return hasattr(self, 'delete') and self.delete and self.delete.data
+        return is_field_populated(self, 'delete')
 
     @classmethod
     def standard_submit(cls, form, instance=None):

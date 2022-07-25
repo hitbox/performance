@@ -17,6 +17,7 @@ class BaseEditView(View):
         instance_name = None,
         form_render_kw = None,
         context_processor = None,
+        redirect_for_delete = None,
         disabled = None,
     ):
         if callable(form_class):
@@ -34,6 +35,7 @@ class BaseEditView(View):
         self.instance_name = instance_name
         self.form_render_kw = form_render_kw
         self.context_processor = context_processor
+        self.redirect_for_delete = redirect_for_delete
         self.disabled = disabled
 
     def get_query(self):

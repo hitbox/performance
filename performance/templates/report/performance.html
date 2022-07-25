@@ -9,7 +9,6 @@
 
 {% macro performance_calc(lanes, delays) %}{% if lanes > 0 %}{{ percent((lanes - delays) / lanes) }}{% endif %}{% endmacro %}
 
-
 <table id="performance-table">
     <thead>
         <tr>
@@ -17,7 +16,7 @@
             <th class="top">Daily</th>
             <th class="top" title="Month To Date">MTD</th>
             <th class="top" title="Quarter To Date">QTD</th>
-            {% if config.PERFORMANCE_CONTRACTS and contract %}<th class="top">Contract</th>{% endif %}
+            {% if config.PERFORMANCE_CONTRACTS %}<th class="top">Contract</th>{% endif %}
         </tr>
     </thead>
     <tbody>

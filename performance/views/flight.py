@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint
 from flask import jsonify
+from flask import redirect
 from flask import request
 from flask import url_for
 
@@ -14,7 +15,6 @@ from performance.models import Report
 from performance.utils import diff_minutes as diff_minutes_func
 from performance.utils import massage_time
 from performance.pluggable import CreateView
-from performance.pluggable import DeleteView
 from performance.pluggable import UpdateView
 
 flight_bp = Blueprint('flight', __name__)
@@ -150,6 +150,9 @@ def update_delete_context_processor():
     )
     return context
 
+def redirect_for_delete(form):
+    return redirect(url_for('report.view_report', id=form.report_id.data))
+
 # create flight
 # NOTE: forms will snag report_id out of the request.view_args
 flight_bp.add_url_rule(
@@ -170,4 +173,5 @@ flight_bp.add_url_rule(
         instance_query = lambda id: Flight.query.get_or_404(id),
         template = 'flight/form.html',
         context_processor = update_delete_context_processor,
+        redirect_for_delete = redirect_for_delete,
     ))

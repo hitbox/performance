@@ -3,6 +3,8 @@ import click
 from flask import Blueprint
 from flask import abort
 from flask import current_app
+from flask import redirect
+from flask import url_for
 
 from performance.extensions import db
 from performance.forms import ContractForm
@@ -20,11 +22,11 @@ def before_request():
     """
     Allow only if configured.
     """
-    if not (
-        'PERFORMANCE_CONTRACTS' in current_app.config
-        and current_app.config['PERFORMANCE_CONTRACTS']
-    ):
+    if not current_app.config.get('PERFORMANCE_CONTRACTS'):
         abort(404)
+
+def response_for_delete(form):
+    return redirect(url_for('admin.performance_contract.listform'))
 
 view_func = FormListView.as_view(
     'listform',
@@ -32,6 +34,7 @@ view_func = FormListView.as_view(
     pagination_getter = Contract.noapp_pagination,
     form_getter = ContractForm,
     form_submitter = ContractForm.standard_submit,
+    response_for_delete = response_for_delete,
     template = 'admin/performance-contracts.html',
 )
 

@@ -49,7 +49,7 @@
     </div>{% else %}
         <div>
         {% if current_user.is_admin %}
-            <a class="noprint" href="{{ url_for('admin.performance_contract.list') }}">Add performance contract</a>
+            <a class="noprint" href="{{ url_for('admin.performance_contract.listform') }}">Add performance contract</a>
         {% else %}
             <p>No performance contract</p>
         {% endif %}

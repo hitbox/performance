@@ -19,13 +19,15 @@ class UpdateView(BaseEditView):
             abort(404)
         instance = self.get_instance(ident)
         form = self.form_class(obj=instance)
-        #form.submit.label.text = 'Update'
         if form.validate_on_submit():
+            is_delete = form.delete.data
             if instance:
-                if form.delete.data:
+                if is_delete:
+                    # delete
                     db.session.delete(instance)
                     # TODO: response for delete
                 else:
+                    # update
                     form.populate_obj(instance)
             else:
                 instance = self.model()
@@ -33,9 +35,12 @@ class UpdateView(BaseEditView):
                 form.populate_obj(instance)
             db.session.commit()
 
-            response = get_form_redirect(form)
-            if response:
-                return response
+            if is_delete and self.redirect_for_delete:
+                return self.redirect_for_delete(form)
+            else:
+                response = get_form_redirect(form)
+                if response:
+                    return response
 
         context = self.get_context(
             form = form,
