@@ -100,6 +100,7 @@ def test_flight_origin_delay_codes(app):
                 ('GHI', 32, False),
             ],
         )
+        # change GHI minutes
         check_flight_delays(
             flight = flight,
             attr = 'origin',
