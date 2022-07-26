@@ -22,6 +22,10 @@ def app(request):
     with app.app_context():
         db.drop_all()
 
+        cache = getattr(db.session, '_unique_cache', None)
+        if cache:
+            cache.clear()
+
     # How to clear the bundles
     # https://stackoverflow.com/a/20948072/2680592
     assets._named_bundles = {}
