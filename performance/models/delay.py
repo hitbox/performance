@@ -17,7 +17,7 @@ class Delay(
 
     id = db.Column(db.Integer, primary_key=True)
 
-    code = db.Column(db.String, nullable=False)
+    code = db.Column(db.String, nullable=False, unique=True)
 
     is_controllable = db.Column(
         db.Boolean,
