@@ -62,11 +62,13 @@ class Flight(
         set origin_delays attribute.
         """
         delays_setter(
-            db.session,
-            delay_codes_string,
-            self.origin_delays,
-            OriginDelay,
-            self.id,
+            session = db.session,
+            delays_string = delay_codes_string,
+            delays_list = self.origin_delays,
+            flight_delay_class = OriginDelay,
+            flight_id = self.id,
+            flight = self,
+            attr = 'origin_delays',
         )
 
     @origin_delays_string.expression
@@ -118,11 +120,13 @@ class Flight(
         objects and set destination_delays attribute.
         """
         delays_setter(
-            db.session,
-            delay_codes_string,
-            self.destination_delays,
-            DestinationDelay,
-            self.id,
+            session = db.session,
+            delays_string = delay_codes_string,
+            delays_list = self.destination_delays,
+            flight_delay_class = DestinationDelay,
+            flight_id = self.id,
+            flight = self,
+            attr = 'destination_delays',
         )
 
     @destination_delays_string.expression

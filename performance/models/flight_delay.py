@@ -134,7 +134,7 @@ class DelayAssocMixin(UniqueMixin):
         )
 
     @classmethod
-    def unique_hash(cls, flight_id, delay_id, position):
+    def unique_hash(cls, *, flight_id, delay_id, position):
         """
         Return hashable object to uniquely identify a flight delay.
         """
@@ -144,7 +144,7 @@ class DelayAssocMixin(UniqueMixin):
         return (flight_id, delay_id, position)
 
     @classmethod
-    def unique_filter(cls, query, flight_id, delay_id, position):
+    def unique_filter(cls, query, *, flight_id, delay_id, position):
         """
         Fix up query with criteria to retrieve instance from database.
         """

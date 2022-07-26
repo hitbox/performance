@@ -44,12 +44,14 @@ class Delay(
     )
 
     @classmethod
-    def unique_hash(cls, code):
-        return (code, )
+    def unique_hash(cls, *, code):
+        return (code.upper(), )
 
     @classmethod
-    def unique_filter(cls, query, code):
-        return query.filter(cls.code == code)
+    def unique_filter(cls, query, *, code):
+        return query.filter(
+            db.func.upper(cls.code) == db.func.upper(code)
+        )
 
     @db.validates('code')
     def uppercase(self, key, value):

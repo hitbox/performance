@@ -38,33 +38,40 @@ class AppContextMixin:
 class UniqueMixin:
 
     @classmethod
-    def unique_hash(cls, *args, **kwargs):
+    def unique_hash(cls, **kwargs):
         """
         Return the hash value used for caching and avoid database hits.
         """
         raise NotImplementedError
 
     @classmethod
-    def unique_filter(cls, query, *args, **kwargs):
+    def unique_filter(cls, query, **kwargs):
         """
         Fixup query to lookup instance from database.
         """
         raise NotImplementedError
 
     @classmethod
-    def as_unique(cls, session, *args, **kwargs):
+    def as_unique(cls, session, **kwargs):
         return unique(
             session = session,
             cls = cls,
-            hashfunc = cls.unique_hash,
-            queryfunc = cls.unique_filter,
+            unique_hash = cls.unique_hash,
+            unique_filter = cls.unique_filter,
             constructor = cls,
-            args = args,
-            kwargs = kwargs
+            **kwargs,
         )
 
 
-def unique(session, cls, hashfunc, queryfunc, constructor, args, kwargs):
+def unique(
+    *, # keyword only
+    session,
+    cls,
+    unique_hash,
+    unique_filter,
+    constructor,
+    **kwargs,
+):
     """
     Return a cached instance if possible. If not, then from database. Finally,
     by creator if necessary.
@@ -75,15 +82,18 @@ def unique(session, cls, hashfunc, queryfunc, constructor, args, kwargs):
         session._unique_cache = {}
         cache = session._unique_cache
 
-    key = (cls, hashfunc(*args, **kwargs))
+    key = (cls, unique_hash(**kwargs))
 
     if key not in cache:
+        # update cache...
         with session.no_autoflush:
+            # ...from database
             query = session.query(cls)
-            query = queryfunc(query, *args, **kwargs)
+            query = unique_filter(query, **kwargs)
             instance = query.first()
             if not instance:
-                instance = constructor(*args, **kwargs)
+                # ...create new
+                instance = constructor(**kwargs)
                 session.add(instance)
         cache[key] = instance
 
