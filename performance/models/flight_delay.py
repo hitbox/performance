@@ -173,8 +173,8 @@ class OriginDelay(
 
 
 class DestinationDelay(
-    db.Model,
     DelayAssocMixin,
+    db.Model,
 ):
     """
     Destination delay
