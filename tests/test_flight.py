@@ -1,9 +1,14 @@
 import datetime
 
+import pytest
+import sqlalchemy as sa
+
 from performance import parse
 from performance.extensions import db
 from performance.models import Delay
+from performance.models import DestinationDelay
 from performance.models import Flight
+from performance.models import OriginDelay
 from performance.models import Report
 
 datetime_attrmap = {
@@ -29,19 +34,30 @@ def test_flights_empty(app):
         flights = Flight.query.all()
         assert len(flights) == 0
 
-def check_flight_delays(flight, attr, delays_string, *expected_delays):
+def check_flight_delays(
+    *, # keyword only
+    flight,
+    attr,
+    delays_string,
+    expected_delays,
+):
     """
     Update flight delays from formatted string and check database objects'
     attributes.
     """
     assert attr in ('origin', 'destination')
 
+    # update flight delays objects through the _string setter and commit
     delays_string_attr = attr + '_delays_string'
     setattr(flight, delays_string_attr, delays_string)
     db.session.commit()
 
     # check delay attributes match
     flight_delays = getattr(flight, attr + '_delays')
+
+    # length
+    assert len(flight_delays) == len(expected_delays)
+
     items = zip(flight_delays, expected_delays)
     for enumitem in enumerate(items):
         expected_position, delay_item = enumitem
@@ -52,7 +68,7 @@ def check_flight_delays(flight, attr, delays_string, *expected_delays):
         assert flight_delay.minutes == expected_minutes
         assert flight_delay.position == expected_position
 
-    # check assembles formatted string correctly
+    # check that it assembles formatted string correctly
     flight_delays_string = getattr(flight, delays_string_attr)
     delay_fields = ['code', 'minutes', 'is_cancelled']
     expected_delays_as_data = [
@@ -73,21 +89,37 @@ def test_flight_origin_delay_codes(app):
     with app.app_context():
         flight = Flight()
         db.session.add(flight)
+        db.session.commit()
         check_flight_delays(
-            flight,
-            'origin',
-            'ABC DEF GHI(32)',
-            ('ABC', None, False),
-            ('DEF', None, False),
-            ('GHI', 32, False),
+            flight = flight,
+            attr = 'origin',
+            delays_string = 'ABC DEF GHI(32)',
+            expected_delays = [
+                ('ABC', None, False),
+                ('DEF', None, False),
+                ('GHI', 32, False),
+            ],
         )
         check_flight_delays(
-            flight,
-            'origin',
-            'ABC DEF GHI64',
-            ('ABC', None, False),
-            ('DEF', None, False),
-            ('GHI', 64, False)
+            flight = flight,
+            attr = 'origin',
+            delays_string = 'ABC DEF GHI64',
+            expected_delays = [
+                ('ABC', None, False),
+                ('DEF', None, False),
+                ('GHI', 64, False)
+            ],
+        )
+        # the ABC code twice in a row
+        check_flight_delays(
+            flight = flight,
+            attr = 'origin',
+            delays_string = 'ABC ABC GHI64',
+            expected_delays = [
+                ('ABC', None, False),
+                ('ABC', None, False),
+                ('GHI', 64, False)
+            ],
         )
 
 def test_flight_destination_delay_code(app):
@@ -98,31 +130,177 @@ def test_flight_destination_delay_code(app):
         flight = Flight()
         db.session.add(flight)
         check_flight_delays(
-            flight,
-            'destination',
-            'JKL MNO PQR(8)',
-            ('JKL', None, False),
-            ('MNO', None, False),
-            ('PQR', 8, False),
+            flight = flight,
+            attr = 'destination',
+            delays_string = 'JKL MNO PQR(8)',
+            expected_delays = [
+                ('JKL', None, False),
+                ('MNO', None, False),
+                ('PQR', 8, False),
+            ]
         )
-        # removed 8 minutes for PQR, added 5 minutes to MNO
+        # remove 8 minutes from PQR, and add 5 minutes to MNO
         check_flight_delays(
-            flight,
-            'destination',
-            'JKL MNO5 PQR',
-            ('JKL', None, False),
-            ('MNO', 5, False),
-            ('PQR', None, False),
+            flight = flight,
+            attr = 'destination',
+            delays_string = 'JKL MNO5 PQR',
+            expected_delays = [
+                ('JKL', None, False),
+                ('MNO', 5, False),
+                ('PQR', None, False),
+            ]
         )
-        # removed JKL
+        # remove JKL from flight
         check_flight_delays(
-            flight,
-            'destination',
-            'MNO(5) PQR',
-            ('MNO', 5, False),
-            ('PQR', None, False),
+            flight = flight,
+            attr = 'destination',
+            delays_string = 'MNO(5) PQR',
+            expected_delays = [
+                ('MNO', 5, False),
+                ('PQR', None, False),
+            ]
         )
+        # delay object with code should stay in database
         Delay.query.filter(Delay.code == 'JKL').one()
+        # but the association object should not
+        query = DestinationDelay.query.join(
+            Flight,
+            Delay,
+        ).filter(
+            DestinationDelay.code == 'JKL',
+            DestinationDelay.minutes == None,
+            DestinationDelay.is_cancelled == False,
+        )
+        assert query.one_or_none() is None
+
+def test_duplicate_delay_codes(app):
+    with (
+        app.app_context(),
+        pytest.raises(sa.exc.IntegrityError)
+    ):
+        flight = Flight(
+            origin_delays = [
+                OriginDelay(
+                    delay_object = Delay(
+                        code = 'abc',
+                    )
+                )
+            ],
+            destination_delays = [
+                DestinationDelay(
+                    delay_object = Delay(
+                        code = 'abc',
+                    )
+                )
+            ],
+        )
+        db.session.add(flight)
+        db.session.commit()
+
+def test_manually(app):
+    """
+    Straight-forward add all at once works.
+    """
+    with app.app_context():
+        db.session.add_all([
+            Delay(code='abc'),
+            Delay(code='def'),
+            Delay(code='ghi'),
+        ])
+        db.session.commit()
+        flight = Flight(
+            origin_delays = [
+                OriginDelay(
+                    # using the normal constructor inside here will duplicate codes
+                    delay_object = Delay.as_unique(
+                        db.session,
+                        code = 'abc',
+                    ),
+                ),
+                OriginDelay(
+                    # association_proxy
+                    code = 'def',
+                    minutes = 12,
+                ),
+            ],
+            destination_delays = [
+                DestinationDelay(
+                    delay_object = Delay.as_unique(
+                        db.session,
+                        code = 'abc',
+                    ),
+                ),
+                DestinationDelay(
+                    # association_proxy
+                    code = 'def',
+                    minutes = 12,
+                ),
+                DestinationDelay(
+                    # association_proxy
+                    code = 'ghi',
+                    minutes = 5,
+                ),
+            ],
+        )
+        db.session.add(flight)
+        db.session.commit()
+        # only one code of each
+        Delay.query.filter(Delay.code == 'ABC').one()
+        Delay.query.filter(Delay.code == 'DEF').one()
+        Delay.query.filter(Delay.code == 'GHI').one()
+        # expected length
+        assert len(flight.origin_delays) == 2
+        assert len(flight.destination_delays) == 3
+        # origin delays
+        delay = flight.origin_delays[0]
+        assert delay.code == 'ABC'
+        assert delay.minutes is None
+        delay = flight.origin_delays[1]
+        assert delay.code == 'DEF'
+        assert delay.minutes == 12
+        # destination delays
+        delay = flight.destination_delays[0]
+        assert delay.code == 'ABC'
+        assert delay.minutes is None
+        delay = flight.destination_delays[1]
+        assert delay.code == 'DEF'
+        assert delay.minutes == 12
+        delay = flight.destination_delays[2]
+        assert delay.code == 'GHI'
+        assert delay.minutes == 5
+
+def test_delay_objects_normally(app):
+    with app.app_context():
+        delay_objects = [
+            Delay(code='abc'),
+            Delay(code='ghi'),
+        ]
+        db.session.add_all(delay_objects)
+        db.session.commit()
+        assert Delay.query.count() == 2
+        Delay.query.filter(Delay.code == 'ABC').one()
+        Delay.query.filter(Delay.code == 'GHI').one()
+
+def test_delay_objects_as_unique(app):
+    with app.app_context():
+        abc, ghi = delay_objects = [
+            Delay.as_unique(db.session, code='abc'),
+            Delay.as_unique(db.session, code='ghi'),
+        ]
+        db.session.add_all(delay_objects)
+        db.session.commit()
+        assert Delay.query.count() == 2
+        assert Delay.as_unique(db.session, code='abc') is abc
+        assert Delay.as_unique(db.session, code='ghi') is ghi
+
+def test_flight_origin_and_destination(app):
+    with app.app_context():
+        flight = Flight()
+        flight.origin_delays_string = 'ABC1 ABC GHI3'
+        flight.destination_delays_string = 'ABC1 ABC GHI3'
+        db.session.add(flight)
+        db.session.commit()
+        assert Delay.query.count() == 2
 
 def create_flight(est, act, origdest, est_date=None, act_date=None):
     """

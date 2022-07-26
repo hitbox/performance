@@ -249,35 +249,43 @@ def delays_setter(
     delays_string,
     delays_list,
     flight_delay_class,
-    flight_id
+    flight_id,
+    flight,
+    attr,
 ):
     """
     Generic function to clear and update the flight delays list.
     """
     delays_data = parse.delaystring(delays_string)
-    delays_list.clear()
+    assocs = []
+
+    delay_objects = []
+    for delay_data in delays_data:
+        delay_object = Delay.as_unique(
+            session,
+            code = delay_data['code']
+        )
+        delay_objects.append(delay_object)
+    session.commit()
+
     for position, delay_data in enumerate(delays_data):
-        # see flask_sqlalchemy.SQLAlchemy(session_options=...)
-        # not sure why this should happen anyway but the unique object pattern
-        # from (actual) SQLAlchemy do not seem compatible on this.
-        delay_code = Delay.as_unique(session, code=delay_data['code'])
-        if delay_code.id is None:
-            # new
-            flight_delay = flight_delay_class(
-                flight_id = flight_id,
-                delay_object = delay_code,
-                position = position,
-            )
-        else:
-            # lookup from cache or database, or create
-            flight_delay = flight_delay_class.as_unique(
-                session,
-                flight_id = flight_id,
-                delay_id = delay_code.id,
-                position = position,
-            )
-        flight_delay.minutes = delay_data['minutes']
-        delays_list.append(flight_delay)
+        delay_object = Delay.as_unique(
+            session,
+            code = delay_data['code']
+        )
+        session.add(delay_object)
+        flight_delay_assoc = flight_delay_class.as_unique(
+            session,
+            flight_id = flight_id,
+            delay_id = delay_object.id,
+            position = position,
+        )
+        flight_delay_assoc.minutes = delay_data['minutes']
+        #
+        flight_delay_assoc.flight = flight
+        flight_delay_assoc.delay_object = delay_object
+        assocs.append(flight_delay_assoc)
+    setattr(flight, attr, assocs)
 
 def sql_delays_string(cls, flight_delay_class):
     if db.engine.dialect.name != 'postgresql':
