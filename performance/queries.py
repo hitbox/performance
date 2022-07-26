@@ -1,3 +1,5 @@
+from flask import current_app
+
 from .extensions import db
 from .models import Contract
 from .models import DestinationDelay
@@ -44,7 +46,9 @@ def lanes(date_criteria):
         .join(FlightType)
         .filter(
             date_criteria,
-            FlightType.name == 'Scheduled'
+            FlightType.name.in_(
+                current_app.config.get('PERFORMANCE_LANES_FLIGHTTYPES', [])
+            )
         )
     )
 
