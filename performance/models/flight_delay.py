@@ -151,16 +151,11 @@ class DelayAssocMixin(UniqueMixin):
         if cls is DelayAssocMixin:
             raise NotImplementedError(
                 'unique_filter should never be called from %s' % cls)
-        # circular dependency
-        from .flight import Flight
-        return (query
-            .join(Flight)
-            .join(Delay)
-            .filter(
-                Flight.id == flight_id,
-                Delay.id == delay_id,
-                cls.position == position,
-            ))
+        return cls.query.filter(
+            cls.flight_id == flight_id,
+            cls.delay_id == delay_id,
+            cls.position == position,
+        )
 
 
 class OriginDelay(
