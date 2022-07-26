@@ -2,8 +2,19 @@ from ..extensions import db
 
 class MetaMixin:
 
-    created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
-    updated = db.Column(db.DateTime(timezone=True), onupdate=db.func.now())
+    @db.declared_attr
+    def created(cls):
+        return db.Column(
+            db.DateTime(timezone = True),
+            server_default = db.func.now()
+        )
+
+    @db.declared_attr
+    def updated(cls):
+        return db.Column(
+            db.DateTime(timezone = True),
+            onupdate = db.func.now()
+        )
 
 
 class AppContextMixin:

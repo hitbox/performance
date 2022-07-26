@@ -34,19 +34,19 @@ class Flight(
     destination_arrival_actual_date = db.Column(db.Date)
     destination_arrival_actual_time = db.Column(db.Time)
 
-    # origin_delays #
+    origin_delays = db.relationship(
+        'OriginDelay',
+        cascade = 'all, delete-orphan',
+        collection_class = ordering_list('position'),
+        order_by = 'OriginDelay.position',
+    )
 
-    @db.declared_attr
-    def origin_delays(cls):
-        """
-        Origin delay objects.
-        """
-        return db.relationship(
-            'OriginDelay',
-            cascade = 'all, delete-orphan',
-            collection_class = ordering_list('position'),
-            order_by = 'OriginDelay.position',
-        )
+    destination_delays = db.relationship(
+        'DestinationDelay',
+        cascade = 'all, delete-orphan',
+        collection_class = ordering_list('position'),
+        order_by = 'DestinationDelay.position',
+    )
 
     @hybrid_property
     def origin_delays_string(self):
@@ -102,20 +102,6 @@ class Flight(
         return should_show_delays(
             self.origin_diff_minutes_value(),
             self.origin_delays
-        )
-
-    # destination_delays #
-
-    @db.declared_attr
-    def destination_delays(cls):
-        """
-        Destination delay objects.
-        """
-        return db.relationship(
-            'DestinationDelay',
-            cascade = 'all, delete-orphan',
-            collection_class = ordering_list('position'),
-            order_by = 'DestinationDelay.position',
         )
 
     @hybrid_property
