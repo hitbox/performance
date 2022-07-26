@@ -303,6 +303,28 @@ def test_flight_origin_and_destination(app):
         db.session.commit()
         assert Delay.query.count() == 2
 
+def test_flight_updating_like_form(app):
+    with app.app_context():
+        flight = Flight()
+        flight.origin_departure_actual_time = datetime.time(3,0)
+        flight.destination_arrival_actual_time = datetime.time(4,0)
+        flight.weight = 99_999
+        flight.origin_delays_string = 'ABC1 ABC GHI3'
+        flight.destination_delays_string = 'ABC1 ABC GHI3'
+        db.session.add(flight)
+        db.session.commit()
+        assert Flight.query.one()
+        assert Delay.query.count() == 2
+        assert flight.weight == 99_999
+
+    with app.app_context():
+        flight = Flight.query.first()
+        flight.weight = 88_888
+        flight.origin_delays_string = 'ABC1 ABC GHI3'
+        flight.destination_delays_string = 'ABC1 ABC GHI3'
+        db.session.commit()
+        assert flight.weight == 88_888
+
 def create_flight(est, act, origdest, est_date=None, act_date=None):
     """
     Convenience function for populating date and time fields of a new flight.
