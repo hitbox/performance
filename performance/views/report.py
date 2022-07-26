@@ -1,7 +1,5 @@
 import datetime
 
-from itertools import zip_longest
-
 import click
 import sqlalchemy as sa
 
