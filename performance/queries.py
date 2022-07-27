@@ -77,12 +77,9 @@ def performance_contract_query(date):
 
 def contract_range_criteria(date, contract):
     """
+    Return the Report.date criteria for a given date and contract.
     """
     return db.and_(
-        Report.date.between(
-            contract.date_range_start,
-            contract.date_range_end,
-        ),
-        db.func.date_part('year', Report.date) <= date.year,
-        db.func.date_part('month', Report.date) <= date.month,
+        Report.date >= contract.date_range_start,
+        Report.date <= date,
     )
