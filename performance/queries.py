@@ -66,19 +66,23 @@ def flights_with_controllable_destination_delays(date_criteria, over_minutes):
             DestinationDelay.minutes > over_minutes,
         ))
 
-def performance_contract(date):
+def performance_contract_query(date):
     """
     Select the performance contract for a date.
     """
     return Contract.query.filter(
         Contract.date_range_start <= date,
-        Contract.date_range_end >= date)
+        Contract.date_range_end >= date
+    )
 
-def contract_range_criteria(contract):
+def contract_range_criteria(date, contract):
     """
     """
     return db.and_(
         Report.date.between(
             contract.date_range_start,
             contract.date_range_end,
-        ))
+        ),
+        db.func.date_part('year', Report.date) <= date.year,
+        db.func.date_part('month', Report.date) <= date.month,
+    )
