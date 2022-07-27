@@ -7,7 +7,11 @@
 {% set controllable_delays_note = "Delays " + controllable_delay_codes | join(', ', attribute='code') %}
 
 
-{% macro performance_calc(lanes, delays) %}{% if lanes > 0 %}{{ percent((lanes - delays) / lanes) }}{% endif %}{% endmacro %}
+{% macro render_performance_calc_formula(lanes, delays) %}{% if lanes > 0 %}({{ lanes }} - {{ delays }}) / {{ lanes }}{% endif %}{% endmacro %}
+
+
+{% macro performance_calc(lanes, delays) %}{% if lanes > 0 %}{{ percent(Decimal((lanes - delays)|string) / lanes) }}{% endif %}{% endmacro %}
+
 
 <table id="performance-table">
     <thead>
@@ -43,20 +47,20 @@
         </tr>
         <tr>
             <th class="row" title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
-            <td class="data number">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}</td>
-            <td class="data number">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}</td>
-            <td class="data number">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over15) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over15) }}</td>
             {% if config.PERFORMANCE_CONTRACTS %}
             {% set ndelays = contract_range.flights_with_controllable_destination_delays_over15 if contract_range else 0 %}
             {% set lanes = contract_range.lanes if contract_range else 0 %}
-            <td class="data number">{{ performance_calc(lanes, ndelays) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(lanes, ndelays) }}">{{ performance_calc(lanes, ndelays) }}</td>
             {% endif %}
         </tr>
         <tr>
             <th class="row" title="On-time Performance greater than 30 minutes">On-time Performance &gt; 30</th>
-            <td class="data number">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}</td>
-            <td class="data number">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}</td>
-            <td class="data number">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over30) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over30) }}</td>
             {% if config.PERFORMANCE_CONTRACTS %}<td class="data number"></td>{% endif %}
         </tr>
         <tr>
@@ -72,7 +76,7 @@
             {# MTD assumed best #}
             {% set ndelays = month_to_date.flights_with_controllable_destination_delays_over15 %}
             {% if report.assumed_best %}{# checking because AssumedBest might not exist for this report #}
-            <td class="data number" title="Lanes: {{ report.assumed_best.lanes }}">{{ performance_calc(report.assumed_best.lanes, ndelays) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(report.assumed_best.lanes, ndelays) }}">{{ performance_calc(report.assumed_best.lanes, ndelays) }}</td>
             {% else %}
             <td>{# deliberately empty #}</td>
             {% endif %}

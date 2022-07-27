@@ -1,5 +1,7 @@
 import datetime
 
+from decimal import Decimal
+
 import click
 import sqlalchemy as sa
 
@@ -24,6 +26,12 @@ from ..models import ScheduledReport
 from ..utils import get_form_redirect
 
 report_bp = Blueprint('report', __name__)
+
+@report_bp.context_processor
+def context_processor():
+    return dict(
+        Decimal = Decimal,
+    )
 
 def get_report_form_class():
     """
