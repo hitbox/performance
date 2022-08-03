@@ -32,21 +32,13 @@ def delaystring(text):
     # interpret and convert into Delay objects.
     delays = []
     for code, minutes in matches:
-        if code != CANCELLED:
-            # take as non-cancelled code
-            data = dict(code=code, is_cancelled=False, minutes=minutes)
-            delays.append(data)
-        else:
-            # consume next match making it cancelled
+        is_cancelled = code == CANCELLED
+        if is_cancelled:
+            # consume next match overwriting namespace
             for code, minutes in matches:
-                data = dict(code=code, minutes=minutes, is_cancelled=True)
-                delays.append(data)
                 break
-            else:
-                # no next match, keep code with no minutes
-                data = dict(code=code, minutes=None, is_cancelled=True)
-                delays.append(data)
-            # what if cancelled is the last code?
+        data = dict(code=code, minutes=minutes, is_cancelled=is_cancelled)
+        delays.append(data)
     return delays
 
 def string_for_cancelled(is_cancelled):

@@ -91,11 +91,22 @@ def test_parse_cancelled():
     assert delaystring('XLD XLD') == [
             dict(code='XLD', minutes=None, is_cancelled=True)
         ]
+    assert delaystring('XLD XLD AAA13 BBB23') == [
+            dict(code='XLD', minutes=None, is_cancelled=True),
+            dict(code='AAA', minutes=13, is_cancelled=False),
+            dict(code='BBB', minutes=23, is_cancelled=False),
+        ]
 
 def test_formatdelays():
     assert formatdelays(delaystring('AAA1 BBB2 CCC')) == 'AAA(1) BBB(2) CCC'
     assert formatdelays(delaystring('AAA1 XLD BBB2 CCC')) == 'AAA(1) XLD BBB(2) CCC'
 
+def test_placeholder():
+    assert delaystring('AAA11 BBB22 XXX33') == [
+            dict(code='AAA', minutes=11, is_cancelled=False),
+            dict(code='BBB', minutes=22, is_cancelled=False),
+            dict(code='XXX', minutes=33, is_cancelled=False),
+        ]
 
 if __name__ == '__main__':
     unittest.main()
