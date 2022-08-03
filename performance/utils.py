@@ -7,7 +7,11 @@ from flask import request
 from flask import url_for
 
 def get_thisurl():
-    return url_for(request.endpoint, **request.view_args, **request.args)
+    try:
+        url = url_for(request.endpoint, **request.view_args, **request.args)
+    except TypeError:
+        url = url_for('index')
+    return url
 
 def camelcase(s):
     """
