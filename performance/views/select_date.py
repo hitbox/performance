@@ -1,3 +1,4 @@
+import calendar as calendarlib
 import datetime
 
 from flask import Blueprint
@@ -9,6 +10,7 @@ from flask import url_for
 from .. import config
 from ..authorization import basic_check
 from ..extensions import db
+from ..models import AssumedBest
 from ..models import Report
 from ..month import Month
 
@@ -16,8 +18,14 @@ config.require('FIRSTWEEKDAY', 'isint')
 
 select_date_bp = Blueprint('select_date', __name__)
 
-@select_date_bp.route('/<int:year>/<int:month>')
+@select_date_bp.before_request
 @basic_check
+def before_request():
+    """
+    basic_check for all requests
+    """
+
+@select_date_bp.route('/daily/<int:year>/<int:month>')
 def calendar(year, month):
     """
     Display a calendar with indication of existing reports and with links
@@ -42,10 +50,28 @@ def calendar(year, month):
     return render_template('select-date.html', **context)
 
 @select_date_bp.route('/today')
-@basic_check
 def goto_today():
     """
     Redirect to current calendar.
     """
     today = datetime.date.today()
     return redirect(url_for('.calendar', year=today.year, month=today.month))
+
+@select_date_bp.route('/monthly/<int:year>')
+def monthly(year):
+    """
+    Yearly calendar to select a month.
+    """
+    existing_bests = AssumedBest.query.filter(
+        AssumedBest.year == year,
+    ).all()
+    context = dict(
+        existing_months = [best.month for best in existing_bests],
+        month_names = [name for name in calendarlib.month_name if name],
+    )
+    return render_template('select-month.html', **context)
+
+@select_date_bp.route('/month')
+def monthly_today():
+    today = datetime.date.today()
+    return redirect(url_for('.monthly', year=today.year))

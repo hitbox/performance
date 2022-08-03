@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+
+{% set year = request.view_args.year %}
+{% set thisurl = url_for(request.endpoint, **request.view_args) %}
+
+
+{% block header %}
+<nav class="title" id="monthly-nav">
+    <h4 class="select-month"><a href="{{ url_for('select_date.monthly', year=year-1) }}">{{ year - 1 }}</a></h4>
+    <h3 class="select-month">{{ year }}</h3>
+    <h4 class="select-month"><a href="{{ url_for('select_date.monthly', year=year+1) }}">{{ year + 1 }}</a></h4>
+</nav>
+{% endblock header %}
+
+
+{% block content %}
+<div class="flat months">{% for month_name in month_names %}
+    {% set month = loop.index %}
+    <a class="card month-name" href="{{ url_for('assumed_best.for_', year=year, month=month, backurl=thisurl) }}">{% if month in existing_months %}&starf; {% endif %}{{ month_name }}</a>{% endfor %}
+</div>
+{% endblock content %}
+
+
+{% block footer %}
+<h4>&starf; Assumed best exists</h4>
+{% endblock footer %}

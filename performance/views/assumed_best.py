@@ -1,6 +1,9 @@
 import calendar
 
 from flask import Blueprint
+from flask import redirect
+from flask import request
+from flask import url_for
 
 from performance.authorization import edit_check
 from performance.forms import AssumedBestForm
@@ -20,6 +23,21 @@ def before_request():
 @assumed_best_bp.context_processor
 def context_processor():
     return dict(calendar=calendar)
+
+@assumed_best_bp.route('/for/<int:year>/<int:month>')
+def for_(year, month):
+    """
+    Convenience for templates to avoid lots of control flow.
+    """
+    assumed_best = AssumedBest.query.filter(
+        AssumedBest.year == year,
+        AssumedBest.month == month,
+    ).one_or_none()
+    if not assumed_best:
+        url = url_for('.create', year=year, month=month, **request.args)
+    else:
+        url = url_for('.edit', id=assumed_best.id, **request.args)
+    return redirect(url)
 
 def form_class():
     return AssumedBestForm
