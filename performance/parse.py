@@ -9,11 +9,11 @@ PLACEHOLDER_CODE = 'XXX'
 
 _delaystring_re = re.compile(
     r'(?P<code>[a-zA-Z]{3})' # three letter codes, allowing lowercase in
-    r'\s*' # whitespace
+    r'\s*' # optional whitespace
     r'\(?' # optional left parenthesis
-    r'\s*' # whitespace
+    r'\s*' # optional whitespace
     r'(?P<minutes>[0-9]*)?' # optional number of minutes
-    r'\s*' # whitespace
+    r'\s*' # optional whitespace
     r'\)?' # optional right parenthesis
 )
 
@@ -73,6 +73,9 @@ def format_delay(code, minutes, is_cancelled):
     return s
 
 def get_delay_tuple(delay):
+    """
+    Ensure delay data is a properly ordered tuple for format_delay.
+    """
     code = getattr(delay, 'code', delay['code'])
     minutes = getattr(delay, 'minutes', delay['minutes'])
     is_cancelled = getattr(delay, 'is_cancelled', delay['is_cancelled'])
