@@ -77,10 +77,10 @@ class Report(MetaMixin, db.Model):
     def assumed_best(self):
         # XXX: not quite sure this is a great way to do this, but I want this
         #      attribute on report objects
-        return AssumedBest.query.filter(
-            sa.func.date_part("month", Report.date) == AssumedBest.month,
-            sa.func.date_part("year", Report.date) == AssumedBest.year,
-        ).first()
+        return AssumedBest.query.get(dict(
+            month = self.date.month,
+            year = self.date.year,
+        ))
 
     @hybrid_property
     def date_quarter(self):

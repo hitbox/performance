@@ -16,10 +16,8 @@ class AssumedBest(
     Assumed best performance number for a month.
     """
 
-    id = db.Column(db.Integer, primary_key=True)
-
-    month = db.Column(db.Integer, nullable=False)
-    year = db.Column(db.Integer, nullable=False)
+    month = db.Column(db.Integer, primary_key=True)
+    year = db.Column(db.Integer, primary_key=True)
 
     lanes = db.Column(db.Integer, nullable=False)
 

@@ -29,14 +29,14 @@ def for_(year, month):
     """
     Convenience for templates to avoid lots of control flow.
     """
-    assumed_best = AssumedBest.query.filter(
-        AssumedBest.year == year,
-        AssumedBest.month == month,
-    ).one_or_none()
+    assumed_best = AssumedBest.query.get(dict(
+        year = year,
+        month = month,
+    ))
     if not assumed_best:
         url = url_for('.create', year=year, month=month, **request.args)
     else:
-        url = url_for('.edit', id=assumed_best.id, **request.args)
+        url = url_for('.edit', year=year, month=month, **request.args)
     return redirect(url)
 
 def form_class():
@@ -52,7 +52,7 @@ assumed_best_bp.add_url_rule(
 )
 
 assumed_best_bp.add_url_rule(
-    '/edit/<int:id>',
+    '/edit/<int:year>/<int:month>',
     view_func = EditView.as_view(
         'edit',
         template = 'assumed-best/edit.html',
