@@ -6,6 +6,7 @@
     {% if current_user.is_admin %}
         {{ render_nav_item('admin.index', 'Admin') }}
     {% endif %}
+    {{ render_nav_item('select_date.monthly_today', 'Best') }}
     {% if current_user.is_admin or current_user.can_edit_schedule %}
         {{ render_nav_item('scheduled_report.list', 'Schedule') }}
     {% endif %}

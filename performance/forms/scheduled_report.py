@@ -20,8 +20,10 @@ class ScheduledReportForm(
         field_args = {
             'name': {
                 'label': 'Name',
+                'render_kw': {'class': 'scheduled-report'},
             },
             'display_order': {
                 'label': 'Display Order',
+                'render_kw': {'class': 'scheduled-report'},
             },
         }

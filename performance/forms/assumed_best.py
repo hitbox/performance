@@ -17,6 +17,11 @@ class AssumedBestForm(
             'month',
             'lanes',
         ]
+        field_args = {
+            'lanes': {
+                'label': 'Lanes',
+            },
+        }
         presentation = True
 
     year = HiddenIntegerField()

@@ -17,13 +17,9 @@ from .. import business
 from ..authorization import basic_check
 from ..authorization import edit_check
 from ..extensions import db
-from ..models import AssumedBest
-from ..models import Contract
 from ..models import Delay
-from ..models import Flight
 from ..models import Report
 from ..models import ScheduledReport
-from ..utils import get_form_redirect
 
 report_bp = Blueprint('report', __name__)
 

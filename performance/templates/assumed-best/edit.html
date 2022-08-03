@@ -4,12 +4,16 @@
 {% from "macros.html" import render_form %}
 
 
-{% block main %}
 {% set month_name = calendar.month_name[form.month.data] %}
-<h2>Assumed Best Arrival Performance for the Month</h2>
-<h3>{{ form.year.data }} {{ month_name }}</h3>
-{% if request.args.backurl %}<h4><a href="{{ request.args.backurl }}">Back</a></h4>{% endif %}
+
+
+{% block main %}
+<h2 class="title">Assumed Best</h2>
+{# second h2 to avoid too-wide form #}
+<h2 class="title">Arrival Performance for</h2>
+<h2 class="title">{{ month_name }} {{ form.year.data }}</h2>
 <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
     {{ render_form(form) }}
 </form>
+{% if request.args.backurl %}<h4><a href="{{ request.args.backurl }}">Back</a></h4>{% endif %}
 {% endblock main %}

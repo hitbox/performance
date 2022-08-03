@@ -44,6 +44,15 @@ h1, h2, h3, h4, h5, h6 {
     margin: var(--header-separation) 0;
 }
 
+h1.title,
+h2.title,
+h3.title,
+h4.title,
+h5.title,
+h6.title {
+    text-align: center;
+}
+
 a.pill,
 strong.pill {
     display: inline-block;
@@ -184,10 +193,21 @@ nav > *:last-child {
 
 #calendar-nav,
 #report-nav,
-#flight-form-back {
-    width: 900px;
+#flight-form-back,
+#monthly-nav {
     margin-top: 2rem;
     margin-bottom: 2rem;
+}
+
+#calendar-nav, /* the daily date selector for reports */
+#report-nav,
+#flight-form-back {
+    width: 900px;
+}
+
+#monthly-nav {
+    /* monthly calendar selector for assumed best */
+    width: 700px;
 }
 
 .click:hover {
@@ -255,6 +275,33 @@ ul.horiz > li {
 ul.horiz > li:first-child {
     /* (1) */
     margin-left: 1rem;
+}
+
+.months {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+}
+
+.card {
+    display: block;
+    width: 100%;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    text-align: center;
+    outline: 1px solid var(--color);
+}
+
+.card.month-name {
+    font-size: 1.25rem;
+}
+
+/* year number need to be a little bigger */
+h3.select-month {
+    font-size: 1.75rem;
+}
+
+h4.select-month {
+    font-size: 1.3rem;
 }
 
 .setting {
@@ -432,10 +479,6 @@ details:hover {
 
 /* forms */
 
-form {
-    min-width: 300px;
-}
-
 fieldset {
     margin: 1rem 0;
     padding: 1rem;
@@ -485,7 +528,9 @@ input[type=submit] {
 
 label {
     display: inline-block;
+    white-space: nowrap; /* generally don't want labels wrapping */
 }
+
 
 textarea {
     font-family: monospace;
@@ -589,6 +634,13 @@ form.scheduled-report {
     margin-top: 2em;
 }
 
+/* inputs on the schedule editor */
+input.scheduled-report,
+input.scheduled-flight {
+    /* avoid squishing the side-by-side form against the right */
+    min-width: 14rem;
+}
+
 form.scheduled-report .buttons,
 form.user-admin .buttons,
 .buttons-2 {
@@ -617,10 +669,6 @@ form.user-admin .buttons,
 #performance-contract-wrapper {
     width: min-content;
     margin-left: 1rem;
-}
-
-label[for=password_confirm] {
-    white-space: nowrap;
 }
 
 form .flight {
