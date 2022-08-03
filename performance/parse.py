@@ -52,8 +52,7 @@ def delaystring(text):
 
 def string_for_cancelled(is_cancelled):
     if is_cancelled:
-        # NOTE: space after
-        return f'{CANCELLED} '
+        return CANCELLED + ' '
     else:
         return ''
 
