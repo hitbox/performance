@@ -325,6 +325,60 @@ def test_flight_updating_like_form(app):
         db.session.commit()
         assert flight.weight == 88_888
 
+def test_flight_origin_cancelled(app):
+    """
+    Reproduce XLD <code><minutes> losing the code.
+    """
+    # NOTE: is_cancelled was missing from comparisons and updates
+    with app.app_context():
+        flight = Flight()
+        flight.origin_delays_string = f'{parse.CANCELLED} AAA60'
+        flight.destination_delays_string = f'{parse.CANCELLED} BBB31'
+        db.session.add(flight)
+        db.session.commit()
+
+    with app.app_context():
+        flight = Flight.query.first()
+        assert flight.origin_delays[0].code == 'AAA'
+        assert flight.origin_delays[0].minutes == 60
+        assert flight.origin_delays[0].is_cancelled
+        assert flight.origin_delays_string == f'{parse.CANCELLED} AAA(60)'
+        assert flight.destination_delays_string == f'{parse.CANCELLED} BBB(31)'
+
+def test_flight_keeps_placeholder(app):
+    """
+    Test the placeholder delay code is kept.
+    """
+    # simply removed list comprehension filter
+    with app.app_context():
+        flight = Flight()
+        flight.origin_delays_string = f'AAA5 BBB10 {parse.PLACEHOLDER_CODE}15'
+        flight.destination_delays_string = f'CCC8 DDD6 {parse.PLACEHOLDER_CODE}15'
+        db.session.add(flight)
+        db.session.commit()
+
+    with app.app_context():
+        flight = Flight.query.first()
+        assert flight.origin_delays[0].code == 'AAA'
+        assert flight.origin_delays[0].minutes == 5
+        assert not flight.origin_delays[0].is_cancelled
+        assert flight.origin_delays[1].code == 'BBB'
+        assert flight.origin_delays[1].minutes == 10
+        assert not flight.origin_delays[1].is_cancelled
+        assert flight.origin_delays[2].code == parse.PLACEHOLDER_CODE
+        assert flight.origin_delays[2].minutes == 15
+        assert not flight.origin_delays[2].is_cancelled
+        #
+        assert flight.destination_delays[0].code == 'CCC'
+        assert flight.destination_delays[0].minutes == 8
+        assert not flight.destination_delays[0].is_cancelled
+        assert flight.destination_delays[1].code == 'DDD'
+        assert flight.destination_delays[1].minutes == 6
+        assert not flight.destination_delays[1].is_cancelled
+        assert flight.destination_delays[2].code == parse.PLACEHOLDER_CODE
+        assert flight.destination_delays[2].minutes == 15
+        assert not flight.destination_delays[2].is_cancelled
+
 def create_flight(est, act, origdest, est_date=None, act_date=None):
     """
     Convenience function for populating date and time fields of a new flight.

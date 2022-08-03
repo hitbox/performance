@@ -258,7 +258,6 @@ def delays_setter(
     """
     delays_data = [
         data for data in parse.delaystring(delays_string)
-        if data['code'] != parse.PLACEHOLDER_CODE
     ]
     # ensure all delay code objects exist in database
     for delay_data in delays_data:
@@ -288,6 +287,7 @@ def delays_setter(
                     flight_delay_class.flight_id == flight_id,
                     flight_delay_class.delay_id == delay_object.id,
                     flight_delay_class.position == position,
+                    flight_delay_class.is_cancelled == delay_data['is_cancelled'],
                 ).one_or_none()
                 if exists:
                     delay_assoc = exists
@@ -299,6 +299,7 @@ def delays_setter(
                     )
                     db.session.add(delay_assoc)
         delay_assoc.minutes = delay_data['minutes']
+        delay_assoc.is_cancelled = delay_data['is_cancelled']
     # delete flight_delays not in string
     for exist_delay in delays_list:
         for position, delay_data in enumerate(delays_data):
@@ -306,9 +307,12 @@ def delays_setter(
                 exist_delay.code == delay_data['code']
                 and exist_delay.minutes == delay_data['minutes']
                 and exist_delay.position == position
+                and exist_delay.is_cancelled == delay_data['is_cancelled']
             ):
                 break
         else:
+            # flight delay not in string but exists in either database or just
+            # python side.
             if db.inspect(exist_delay).persistent:
                 db.session.delete(exist_delay)
     # need to commit because the other origin/destination codes may happen?
