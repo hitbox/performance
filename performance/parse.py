@@ -1,9 +1,5 @@
 import re
 
-from collections import namedtuple
-from operator import attrgetter
-from operator import itemgetter
-
 CANCELLED = 'XLD'
 PLACEHOLDER_CODE = 'XXX'
 
