@@ -18,6 +18,9 @@ def int_or_none(string):
         return int(string)
 
 def marshal(code, minutes):
+    """
+    Data types and validation for delay codes.
+    """
     return (code.upper(), int_or_none(minutes))
 
 def delaystring(text):
