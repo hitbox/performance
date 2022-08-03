@@ -7,8 +7,13 @@ from flask import request
 from flask import url_for
 
 def get_thisurl():
+    kwargs = {}
+    if request.args:
+        kwargs.update(request.args)
+    if request.view_args:
+        kwargs.update(request.view_args)
     try:
-        url = url_for(request.endpoint, **request.view_args, **request.args)
+        url = url_for(request.endpoint, **kwargs)
     except TypeError:
         url = url_for('index')
     return url
