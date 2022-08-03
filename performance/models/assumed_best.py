@@ -21,7 +21,7 @@ class AssumedBest(
     month = db.Column(db.Integer, nullable=False)
     year = db.Column(db.Integer, nullable=False)
 
-    lanes = db.Column(db.Integer, info=dict(label='Lanes'))
+    lanes = db.Column(db.Integer, nullable=False)
 
     @db.validates('month')
     def validate_month(self, key, value):
