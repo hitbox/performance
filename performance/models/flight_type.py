@@ -11,6 +11,7 @@ class FlightType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     report_order = db.Column(db.Integer, default=0)
+    # TODO: remove this, is_lane?
     is_lane = db.Column(
         db.Boolean,
         nullable = False,
