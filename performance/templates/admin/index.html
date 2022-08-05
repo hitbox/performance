@@ -1,13 +1,13 @@
 {% extends "admin/base.html" %}
 
 
-{% block main %}
-<h3>Administration</h3>
+{# TODO: remove commented code #}
+{#
+{% block content %}
 <ul class="flat">
-    <li><a href="{{ url_for('admin.user.list') }}">User accounts</a></li>
-    {% if config.PERFORMANCE_CONTRACTS %}<li><a href="{{ url_for('admin.performance_contract.listform') }}">Performance Contracts</a></li>{% endif %}
-    {#
     <li><a href="{{ url_for('admin.delay.list') }}">Delay codes</a></li>
-    #}
+    {% if config.PERFORMANCE_CONTRACTS %}<li><a href="{{ url_for('admin.performance_contract.listform') }}">Performance Contracts</a></li>{% endif %}
+    <li><a href="{{ url_for('admin.user.list') }}">User accounts</a></li>
 </ul>
-{% endblock main %}
+{% endblock content %}
+#}

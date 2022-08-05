@@ -32,7 +32,11 @@ class AppContextMixin:
         if hasattr(cls, 'Meta') and hasattr(cls.Meta, 'order_by'):
             attr = getattr(cls, cls.Meta.order_by)
             query = query.order_by(attr)
-        return query.paginate()
+        # keyword args for paginate
+        paginate_kw = {}
+        if hasattr(cls, 'Meta'):
+            paginate_kw = getattr(cls.Meta, 'paginate_kw', {})
+        return query.paginate(**paginate_kw)
 
 
 class UniqueMixin:

@@ -4,13 +4,13 @@
 <nav class="noprint">
     {% if config.PERFORMANCE_DEBUG %}<a href="{{ url_for('debug.index') }}">Debug</a>{% endif %}
     {% if current_user.is_admin %}
-        {{ render_nav_item('admin.index', 'Admin') }}
+        {{ render_nav_item('admin.index', 'Admin', active_prefix='admin.') }}
     {% endif %}
-    {{ render_nav_item('select_date.monthly_today', 'Best') }}
+    {{ render_nav_item('select_date.monthly_today', 'Best', active_prefix='select_date.monthly') }}
     {% if current_user.is_admin or current_user.can_edit_schedule %}
-        {{ render_nav_item('scheduled_report.list', 'Schedule') }}
+        {{ render_nav_item('scheduled_report.list', 'Schedule', active_prefix='scheduled_report.') }}
     {% endif %}
-    {{ render_nav_item('select_date.goto_today', 'Reports') }}
-    {{ render_nav_item('user.profile', 'Profile') }}
+    {{ render_nav_item('select_date.goto_today', 'Reports', active_prefix='select_date.calendar') }}
+    {{ render_nav_item('user.profile', 'Profile', active_prefix='user.profile') }}
     {% include "theme-toggle.html" %}
 </nav>

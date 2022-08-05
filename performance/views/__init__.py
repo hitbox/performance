@@ -37,8 +37,7 @@ def init_app(app):
 
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(assumed_best_bp, url_prefix='/best')
-    # disabling because it's a bit of a mess to try and edit these
-    #app.register_blueprint(delay_bp, url_prefix='/delay')
+    app.register_blueprint(delay_bp, url_prefix='/delay')
     app.register_blueprint(flight_bp, url_prefix='/flight')
     app.register_blueprint(flight_type_bp)
     app.register_blueprint(report_bp, url_prefix='/report')

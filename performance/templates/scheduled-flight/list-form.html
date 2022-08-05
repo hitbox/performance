@@ -2,9 +2,6 @@
 
 
 {% from "macros.html" import render_form %}
-{% from "macros.html" import render_form_buttons %}
-{% from "macros.html" import render_form_fields_part %}
-{% from "macros.html" import render_pagination %}
 
 
 {% from "scheduled-flight/macros.html" import render_scheduled_flights_table %}
@@ -15,7 +12,7 @@
 {% set scheduled_flight = instance %}{# rename #}
 
 
-{% block pagehead %}{# remove <h2>Admin</h2> tag. perhaps design this better. #}{% endblock pagehead %}
+{% block header %}{# disable showing admin links #}{% endblock %}
 
 
 {% block top %}

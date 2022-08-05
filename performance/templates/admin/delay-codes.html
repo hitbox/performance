@@ -13,9 +13,6 @@
 {% set delay_code = instance %}
 
 
-{% block subpagehead %} - {{ plural }}{% endblock %}
-
-
 {% block listing %}
 {% if request.args.page %}
     {% set instance_kwargs = dict(page=request.args.page) %}

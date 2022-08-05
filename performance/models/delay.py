@@ -14,6 +14,9 @@ class Delay(
     class Meta:
         # see AppContextMixin.noapp_pagination
         order_by = 'code'
+        paginate_kw = dict(
+            per_page = 100,
+        )
 
     id = db.Column(db.Integer, primary_key=True)
 

@@ -33,6 +33,7 @@ body {
     display: flex;
     flex-direction: column;
     font-family: arial;
+    margin: 0;
 }
 
 main {
@@ -177,6 +178,7 @@ nav {
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 1rem;
 }
 
 nav > * {
@@ -189,6 +191,15 @@ nav > *:first-child {
 
 nav > *:last-child {
     margin-right: 0;
+}
+
+a.nav {
+    padding: 0.5rem 1rem;
+}
+
+a.nav.active {
+    color: var(--active-row-color);
+    background-color: var(--active-row-background-color);
 }
 
 #calendar-nav,
@@ -786,24 +797,12 @@ form .performance-tiers {
     justify-content: space-between;
 }
 
-.formlist > * {
-    margin: 0 1rem;
-}
-
 .formlist > *:first-child {
-    margin-left: 0;
+    margin-right: 0.5rem;
 }
 
 .formlist > *:last-child {
-    margin-right: 0;
-}
-
-.list-view-container {
-    min-width: 800px;
-}
-
-.formlist .listing {
-    width: 100%;
+    margin-left: 0.5rem;
 }
 
 .scheduled-flight.form-container {
