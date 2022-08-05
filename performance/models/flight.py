@@ -28,6 +28,10 @@ class Flight(
 
     id = db.Column(db.Integer, primary_key=True)
     report_id = db.Column(db.ForeignKey('report.id'))
+    report = db.relationship(
+        'Report',
+        back_populates = 'flights',
+    )
 
     origin_departure_actual_date = db.Column(db.Date)
     origin_departure_actual_time = db.Column(db.Time)

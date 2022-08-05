@@ -63,7 +63,7 @@ class Report(MetaMixin, db.Model):
     date = db.Column(db.Date, unique=True)
     flights = db.relationship(
         'Flight',
-        backref = 'report',
+        back_populates = 'report',
         cascade = 'all,delete-orphan',
     )
     system_detail = db.Column(
