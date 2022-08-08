@@ -40,7 +40,7 @@
     {% set action = url_for(request.endpoint) %}
     <h3>New {{ singular }}</h3>
 {% endif %}
-<form action="{{ action }}" method="POST">
+<form action="{{ action }}" class="delay-code" method="POST">
     {{ render_form(form) }}
 </form>
 {# disabled because these get automatically created by the delay codes parser #}

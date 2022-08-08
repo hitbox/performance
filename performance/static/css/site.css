@@ -802,3 +802,7 @@ form .performance-tiers {
 input[value="Update System Detail"] {
     margin: 2rem 0;
 }
+
+form.delay-code #description {
+    font-family: arial;
+}
