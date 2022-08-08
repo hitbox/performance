@@ -25,7 +25,7 @@
            active_id = delay_code.id,
            instance_endpoint = '.list',
            instance_kwargs = instance_kwargs,
-           backurl = url_for(request.endpoint, page=request.args.page, **request.view_args)
+           backurl = url_for(request.endpoint, page=request.args.page or 1, **request.view_args)
        ) }}
 </table>
 {{ render_pagination(pagination, endpoint=request.endpoint) }}
