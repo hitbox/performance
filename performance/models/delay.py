@@ -22,6 +22,8 @@ class Delay(
 
     code = db.Column(db.String, nullable=False, unique=True)
 
+    description = db.Column(db.String)
+
     is_controllable = db.Column(
         db.Boolean,
         nullable = False,

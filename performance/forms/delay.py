@@ -1,4 +1,5 @@
 from wtforms import SubmitField
+from wtforms.widgets import TextArea
 
 from ..models import Delay
 
@@ -16,25 +17,31 @@ class DelayForm(
     class Meta:
         model = Delay
         presentation = True
+        only = [
+            'code',
+            'description',
+            'is_controllable',
+        ]
         field_args = {
             'code': {
                 'label': 'Code',
             },
+            'description': {
+                'label': 'Description',
+                'widget': TextArea(),
+                'render_kw': {
+                    'cols': 40,
+                    'rows': 5,
+                }
+            },
             'is_controllable': {
                 'label': 'Controllable?',
-            },
-            'is_cancelled_lane': {
-                'label': 'Always Lane?',
-            },
-            'is_always_show': {
-                'label': 'Always Show?',
             },
         }
         fields_order = [
             'code',
+            'description',
             'is_controllable',
-            'is_cancelled_lane',
-            'is_always_show',
             'submit',
             'delete',
         ]
