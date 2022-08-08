@@ -27,7 +27,7 @@
     <tr{% if active_id is not none and active_id == delay.id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ instance_url }}" title="{{ title_url }}"{% endif %}>
         <td class="data">{{ delay.code }}</td>
         <td class="data">{{ yes(delay.is_controllable) }}</td>
-        <td class="data">{{ string(delay.description) }}</td>
+        <td>{{ string(delay.description) }}</td>
     </tr>{% endfor %}
 {% endif %}</tbody>
 {% endmacro %}

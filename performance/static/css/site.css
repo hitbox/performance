@@ -114,18 +114,6 @@ tr.active {
 
 td {
     padding: var(--cell-padding);
-    /* make non-.data tds a little smaller */
-    font-size: .925rem;
-    vertical-align: top;
-
-    /* height */
-    /* height is treated like min-height for <td> */
-    /* https://stackoverflow.com/a/25329017/2680592 */
-    /* for rows with all empty <td> tags. */
-    /* 2rem seems to make it exactly as tall as the filled <td> tags */
-    /*height: 2rem;*/
-    /* Using height is making the <thead> really big on Firefox */
-    /* Disabling for now */
 }
 
 /* flash messages */
