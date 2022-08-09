@@ -11,6 +11,8 @@ from performance.models import Flight
 from performance.models import OriginDelay
 from performance.models import Report
 
+XLD = parse.CANCELLED
+
 datetime_attrmap = {
     'origin': [
         'origin_departure_estimated_date',
@@ -430,3 +432,20 @@ def test_flight_diff_minutes():
         -60*24, # expected
         act_date = datetime.date(1999,12,31),
     )
+
+def test_delay_code_change_order(app):
+    """
+    Autoflush when accessing the attributes of objects causing when simply
+    changing the order of codes.
+    """
+    with app.app_context():
+        flight = Flight()
+        flight.origin_delays_string = f'AAA5 BBB10 {XLD}15'
+        flight.destination_delays_string = f'CCC8 DDD6 {XLD}32'
+        db.session.add(flight)
+        db.session.commit()
+        flight.origin_delays_string = f'{XLD}15 AAA5 BBB10'
+        flight.destination_delays_string = f'{XLD}32 CCC8 DDD6'
+        db.session.commit()
+        assert flight.origin_delays_string == f'{XLD}(15) AAA(5) BBB(10)'
+        assert flight.destination_delays_string == f'{XLD}(32) CCC(8) DDD(6)'
