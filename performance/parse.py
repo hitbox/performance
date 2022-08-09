@@ -57,8 +57,11 @@ def format_delay(code, minutes, is_cancelled):
     """
     Format a single flight delay from attributes.
     """
+    code = code.upper()
+    if is_cancelled and code == CANCELLED:
+        return CANCELLED
     s = string_for_cancelled(is_cancelled)
-    s += code.upper()
+    s += code
     s += string_for_minutes(minutes)
     return s
 

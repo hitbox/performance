@@ -97,9 +97,15 @@ def test_parse_cancelled():
             dict(code='BBB', minutes=23, is_cancelled=False),
         ]
 
+def format_for_test(string):
+    return formatdelays(delaystring(string))
+
 def test_formatdelays():
-    assert formatdelays(delaystring('AAA1 BBB2 CCC')) == 'AAA(1) BBB(2) CCC'
-    assert formatdelays(delaystring('AAA1 XLD BBB2 CCC')) == 'AAA(1) XLD BBB(2) CCC'
+    assert format_for_test('AAA1 BBB2 CCC') == 'AAA(1) BBB(2) CCC'
+    assert format_for_test('AAA1 XLD BBB2 CCC') == 'AAA(1) XLD BBB(2) CCC'
+    assert format_for_test('XLD') == 'XLD'
+    assert format_for_test('XLD AAA') == 'XLD AAA'
+    assert format_for_test('XLD AAA10') == 'XLD AAA(10)'
 
 def test_placeholder():
     assert delaystring('AAA11 BBB22 XXX33') == [
