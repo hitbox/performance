@@ -104,7 +104,9 @@ def test_formatdelays():
     assert format_for_test('AAA1 BBB2 CCC') == 'AAA(1) BBB(2) CCC'
     assert format_for_test('AAA1 XLD BBB2 CCC') == 'AAA(1) XLD BBB(2) CCC'
     assert format_for_test('XLD') == 'XLD'
+    assert format_for_test('XLD14') == 'XLD(14)'
     assert format_for_test('XLD AAA') == 'XLD AAA'
+    assert format_for_test('XLD13 AAA') == 'XLD(13) AAA'
     assert format_for_test('XLD AAA10') == 'XLD AAA(10)'
 
 def test_placeholder():

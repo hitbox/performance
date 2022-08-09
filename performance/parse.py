@@ -33,7 +33,7 @@ def delaystring(text):
     delays = []
     for code, minutes in matches:
         is_cancelled = code == CANCELLED
-        if is_cancelled:
+        if is_cancelled and minutes is None:
             # consume next match overwriting namespace
             for code, minutes in matches:
                 break
@@ -59,9 +59,10 @@ def format_delay(code, minutes, is_cancelled):
     """
     code = code.upper()
     if is_cancelled and code == CANCELLED:
-        return CANCELLED
-    s = string_for_cancelled(is_cancelled)
-    s += code
+        s = CANCELLED
+    else:
+        s = string_for_cancelled(is_cancelled)
+        s += code
     s += string_for_minutes(minutes)
     return s
 
