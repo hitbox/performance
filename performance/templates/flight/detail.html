@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+
+{% from "macros.html" import diff_class %}
+{% from "macros.html" import render_date %}
+{% from "macros.html" import render_delays %}
+{% from "macros.html" import render_diff_minutes_text %}
+{% from "macros.html" import render_integer %}
+{% from "macros.html" import string %}
+{% from "macros.html" import time %}
+{% from "macros.html" import yes %}
+
+
+
+{% block content %}
+<h1>Flight Details</h1>
+<h2>{{ date_range_name }} {{ key_name }} {{ render_date(report.date) }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Tail</th>
+            <th>Flight</th>
+            <th>Orig</th>
+            <th>ETD</th>
+            <th>ATD</th>
+            <th>{{ render_diff_minutes_text() }}</th>
+            <th title="{{ controllable_delays_note }}">Delay Codes</th>
+            <th>Dest</th>
+            <th>ETA</th>
+            <th>ATA</th>
+            <th>{{ render_diff_minutes_text() }}</th>
+            <th title="{{ controllable_delays_note }}">Delay Codes</th>
+            <th>&gt;&nbsp;15</th>
+            <th>&gt;&nbsp;30</th>
+            <th>Weight</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for flight in flights %}<tr data-href="{{ url_for('report.view_report', id=flight.report.id) }}">
+            <td class="data number">{{ render_integer(loop.index) }}</td>
+            <td class="data">{{ render_date(flight.report.date) }}</td>
+            <td class="data">{{ flight.flight_type.name }}</td>
+            <td class="data">{{ string(flight.tail_number) }}</td>
+            <td class="data">{{ string(flight.flight_number) }}</td>
+
+            {#- orgin -#}
+            <td class="data">{{ string(flight.origin_station) }}</td>
+            <td class="data">{{ time(flight.origin_departure_estimated_time) }}</td>
+            <td class="data">{{ time(flight.origin_departure_actual_time) }}</td>
+            {% set origin_diff_minutes = flight.origin_diff_minutes_value() %}
+            <td class="data number{{ diff_class(origin_diff_minutes) }}">{{ render_integer(origin_diff_minutes) }}</td>
+            <td class="data">{% if flight.show_origin_delays() %}{{ render_delays(flight.origin_delays) }}{% endif %}</td>
+
+            {#- destination -#}
+            <td class="data">{{ string(flight.destination_station) }}</td>
+            <td class="data">{{ time(flight.destination_arrival_estimated_time) }}</td>
+            <td class="data">{{ time(flight.destination_arrival_actual_time) }}</td>
+            {% set destination_diff_minutes = flight.destination_diff_minutes_value() %}
+            <td class="data number{{ diff_class(destination_diff_minutes) }}">{{ render_integer(destination_diff_minutes) }}</td>
+            <td class="data">{% if flight.show_destination_delays() %}{{ render_delays(flight.destination_delays) }}{% endif %}</td>
+
+            {#- controllable delays -#}
+            {% for over_minutes in [15, 30] %}
+                {#{% set delays = flight.controllable_destination_delays(over_minutes) %}#}
+                {% set is_over = flight.controllable_destination_delays_minutes > over_minutes %}
+                <td{% if is_over %} class="data late"{% endif %}>{{ yes(is_over) }}</td>
+            {% endfor %}
+            {#- weight -#}
+            <td class="data number">{{ render_integer(flight.weight) }}</td>
+        </tr>{% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

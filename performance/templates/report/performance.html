@@ -26,23 +26,59 @@
     <tbody>
         <tr>
             <th class="row">Lanes</th>
-            <td class="data number">{{ render_integer(daily.lanes) }}</td>
-            <td class="data number">{{ render_integer(month_to_date.lanes) }}</td>
-            <td class="data number">{{ render_integer(quarter_to_date.lanes) }}</td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='lanes') }}">
+                    {{ render_integer(daily.lanes) }}
+                </a>
+            </td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='month_to_date', performance_key='lanes') }}">
+                    {{ render_integer(month_to_date.lanes) }}
+                </a>
+            </td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='quarter_to_date', performance_key='lanes') }}">
+                    {{ render_integer(quarter_to_date.lanes) }}
+                </a>
+            </td>
             {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
         </tr>
         <tr>
             <th class="row" title="{{ controllable_delays_note }}">Chargeable Delays</th>
-            <td class="data number">{{ render_integer(daily.flights_with_controllable_destination_delays_over15) }}</td>
-            <td class="data number">{{ render_integer(month_to_date.flights_with_controllable_destination_delays_over15) }}</td>
-            <td class="data number">{{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over15) }}</td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='flights_with_controllable_destination_delays_over15') }}">
+                    {{ render_integer(daily.flights_with_controllable_destination_delays_over15) }}
+                </a>
+            </td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='month_to_date', performance_key='flights_with_controllable_destination_delays_over15') }}">
+                    {{ render_integer(month_to_date.flights_with_controllable_destination_delays_over15) }}
+                </a>
+            </td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='quarter_to_date', performance_key='flights_with_controllable_destination_delays_over15') }}">
+                    {{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over15) }}
+                </a>
+            </td>
             {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
         </tr>
         <tr>
             <th class="row" title="{{ controllable_delays_note }}">Delays &gt; 30 Count</th>
-            <td class="data number">{{ render_integer(daily.flights_with_controllable_destination_delays_over30) }}</td>
-            <td class="data number">{{ render_integer(month_to_date.flights_with_controllable_destination_delays_over30) }}</td>
-            <td class="data number">{{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over30) }}</td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='flights_with_controllable_destination_delays_over30') }}">
+                    {{ render_integer(daily.flights_with_controllable_destination_delays_over30) }}
+                </a>
+            </td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='month_to_date', performance_key='flights_with_controllable_destination_delays_over30') }}">
+                    {{ render_integer(month_to_date.flights_with_controllable_destination_delays_over30) }}
+                </a>
+            </td>
+            <td class="data number">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='quarter_to_date', performance_key='flights_with_controllable_destination_delays_over30') }}">
+                    {{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over30) }}
+                </a>
+            </td>
             {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
         </tr>
         <tr>
@@ -53,7 +89,11 @@
             {% if config.PERFORMANCE_CONTRACTS %}
             {% set ndelays = contract_range.flights_with_controllable_destination_delays_over15 if contract_range else 0 %}
             {% set lanes = contract_range.lanes if contract_range else 0 %}
-            <td class="data number" title="{{ render_performance_calc_formula(lanes, ndelays) }}">{{ performance_calc(lanes, ndelays) }}</td>
+            <td class="data number" title="{{ render_performance_calc_formula(lanes, ndelays) }}">
+                <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='contract_range', performance_key='flights_with_controllable_destination_delays_over15') }}">
+                    {{ performance_calc(lanes, ndelays) }}
+                </a>
+            </td>
             {% endif %}
         </tr>
         <tr>

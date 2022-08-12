@@ -51,7 +51,7 @@ def get_context(report):
         Delay.code,
     ).all()
 
-    context.update(business.performance_details(report.date, contract))
+    context.update(business.performance_summary(report.date, contract))
     return context
 
 def get_prev_next_context(report_date):

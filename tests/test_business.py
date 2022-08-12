@@ -51,7 +51,7 @@ def test_more_than_one_chargeable(app):
         db.session.add(flight)
         db.session.commit()
         #
-        data = business.performance_details(datetime.date(1970,1,1))
+        data = business.performance_summary(datetime.date(1970,1,1))
         assert len(data) == 3
         assert data['daily']['flights_with_controllable_destination_delays_over15'] == 2
         assert data['daily']['flights_with_controllable_destination_delays_over30'] == 2
