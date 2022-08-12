@@ -161,7 +161,7 @@
 </script>{% endmacro %}
 
 
-{% macro render_nav_item(endpoint, text) %}{# site top nav #}<a class="nav{% if 'active_prefix' in kwargs and request.endpoint.startswith(kwargs.active_prefix or '') %} active{% endif %}" href="{{ url_for(endpoint) }}" title="{{ request.endpoint }}">{{ text }}</a>{% endmacro %}
+{% macro render_nav_item(endpoint, text) %}{# site top nav #}<a class="nav{% if 'active_prefix' in kwargs and request.endpoint and request.endpoint.startswith(kwargs.active_prefix or '') %} active{% endif %}" href="{{ url_for(endpoint) }}" title="{{ request.endpoint }}">{{ text }}</a>{% endmacro %}
 
 
 {% macro render_number(value) %}{% if value is number %}{{ value }}{% endif %}{% endmacro %}
