@@ -3,20 +3,27 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from ..extensions import db
 
-class FlightType(db.Model):
+from .mixin import AppContextMixin
+
+class FlightType(
+    AppContextMixin,
+    db.Model,
+):
     """
     Valid types of flights. Scheduled and extra.
     """
+    class Meta:
+        order_by = 'report_order'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     report_order = db.Column(db.Integer, default=0)
-    # TODO: remove this, is_lane?
-    is_lane = db.Column(
+
+    is_controllable = db.Column(
         db.Boolean,
         nullable = False,
         server_default = 'false',
-        doc = 'Count flights of this type as lanes.'
+        doc = 'Count flights of this type as controllable/chargeable.'
     )
 
     def __lt__(self, other):

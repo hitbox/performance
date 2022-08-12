@@ -3,6 +3,7 @@ from .contract import ContractForm
 from .contract import PerformanceTierForm
 from .delay import DelayForm
 from .flight import FlightForm
+from .flight_type import FlightTypeForm
 from .report import ReportForm
 from .scheduled_flight import ScheduledFlightForm
 from .scheduled_report import ScheduledReportForm

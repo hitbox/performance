@@ -1,0 +1,32 @@
+{% from "macros.html" import string %}
+{% from "macros.html" import yes %}
+
+
+{% macro render_flight_types_table(flight_types) %}
+{% set active_id = kwargs.active_id %}
+{% set instance_endpoint = kwargs.instance_endpoint %}
+{% set instance_kwargs = kwargs.get('instance_kwargs', {}) %}
+{% set backurl = kwargs.backurl %}
+<thead>
+    <tr>
+        <th>Name</th>
+        <th>Report Order</th>
+        <th>Controllable?</th>
+    </tr>
+</thead>
+<tbody>{% if not flight_types %}
+    <tr>
+        <td colspan="4">No flight types</td>
+    </tr>{% else %}
+    {% for flight_type in flight_types %}
+    {% if instance_endpoint %}
+        {% set instance_url = url_for(instance_endpoint, id=flight_type.id, backurl=backurl, **instance_kwargs) %}
+        {% set title_url = url_for(instance_endpoint, id=flight_type.id) %}
+    {% endif %}
+    <tr{% if active_id is not none and active_id == flight_type.id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ instance_url }}" title="{{ title_url }}"{% endif %}>
+        <td class="data">{{ flight_type.name }}</td>
+        <td class="data">{{ flight_type.report_order }}</td>
+        <td class="data">{{ yes(flight_type.is_controllable) }}</td>
+    </tr>{% endfor %}
+{% endif %}</tbody>
+{% endmacro %}

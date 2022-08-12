@@ -15,17 +15,17 @@ from performance.models import Report
 
 def test_more_than_one_chargeable(app):
     with app.app_context():
-        # configure chargeable
-        app.config['PERFORMANCE_LANES_FLIGHTTYPES'] = ['TestChargeableFlightType']
         # add
         flight_types = \
         test_flight_type1, \
         test_flight_type_chargeable = [
             FlightType(
                 name = 'Test1',
+                is_controllable = False
             ),
             FlightType(
                 name = 'TestChargeableFlightType',
+                is_controllable = True,
             ),
         ]
         db.session.add_all(flight_types)

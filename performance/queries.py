@@ -46,9 +46,7 @@ def lanes(date_criteria):
         .join(FlightType)
         .filter(
             date_criteria,
-            FlightType.name.in_(
-                current_app.config.get('PERFORMANCE_LANES_FLIGHTTYPES', [])
-            )
+            FlightType.is_controllable == True,
         )
     )
 
@@ -59,9 +57,11 @@ def flights_with_controllable_destination_delays(date_criteria, over_minutes):
     """
     return (Flight.query
         .join(Report) # for date_criteria
+        .join(FlightType)
         .join(DestinationDelay)
         .filter(
             date_criteria,
+            FlightType.is_controllable == True,
             DestinationDelay.is_controllable == True,
             DestinationDelay.minutes > over_minutes,
         ))
