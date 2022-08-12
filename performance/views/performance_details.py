@@ -26,13 +26,13 @@ PERFORMANCE_DATE_RANGE_NICE_NAMES = {
     'daily': 'Daily',
     'month_to_date': 'MTD',
     'quarter_to_date': 'QTD',
+    'contract_range': 'Contract',
 }
 
 PERFORMANCE_KEY_NICE = {
     'lanes': 'Lanes',
     'flights_with_controllable_destination_delays_over15': '>15',
     'flights_with_controllable_destination_delays_over30': '>30',
-    'contract_range': 'Contract',
 }
 
 @performance_details_bp.route(
