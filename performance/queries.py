@@ -39,14 +39,12 @@ def lanes(date_criteria):
     """
     Select flights for `date_criteria` that are considered lanes.
     """
-    # last instruction was that lane count should always match the scheduled
-    # table count which is just a count of the flights in it.
     return (Flight.query
         .join(Report) # for date_criteria
         .join(FlightType)
         .filter(
             date_criteria,
-            FlightType.is_controllable == True,
+            FlightType.is_lane == True,
         )
     )
 

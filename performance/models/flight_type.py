@@ -23,7 +23,14 @@ class FlightType(
         db.Boolean,
         nullable = False,
         server_default = 'false',
-        doc = 'Count flights of this type as controllable/chargeable.'
+        doc = 'Include flights of this type in controllable/chargeable count.'
+    )
+
+    is_lane = db.Column(
+        db.Boolean,
+        nullable = False,
+        server_default = 'false',
+        doc = 'Include flights of this type in lane count.'
     )
 
     def __lt__(self, other):

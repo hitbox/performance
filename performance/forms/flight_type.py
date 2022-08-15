@@ -1,4 +1,5 @@
 from wtforms import SubmitField
+from wtforms.validators import Optional
 from wtforms.widgets import TextArea
 
 from ..models import FlightType
@@ -21,6 +22,7 @@ class FlightTypeForm(
             'name',
             'report_order',
             'is_controllable',
+            'is_lane',
         ]
         field_args = {
             'name': {
@@ -29,8 +31,23 @@ class FlightTypeForm(
             'report_order': {
                 'label': 'Report Order',
             },
+            # NOTE: These flag fields are set to Optional to avoid html
+            #       required attribute.
             'is_controllable': {
                 'label': 'Is Controllable?',
+                'validators': [Optional()],
+                'render_kw': {
+                    'title': 'Flights in this category/type are considered for'
+                             ' chargeable delays.',
+                },
+            },
+            'is_lane': {
+                'label': 'Is Lane?',
+                'validators': [Optional()],
+                'render_kw': {
+                    'title': 'Flights in this category/type are counted'
+                             ' as lanes.',
+                },
             }
         }
 

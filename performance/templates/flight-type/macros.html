@@ -12,6 +12,7 @@
         <th>Name</th>
         <th>Report Order</th>
         <th>Controllable?</th>
+        <th>Lane?</th>
     </tr>
 </thead>
 <tbody>{% if not flight_types %}
@@ -27,6 +28,7 @@
         <td class="data">{{ flight_type.name }}</td>
         <td class="data">{{ flight_type.report_order }}</td>
         <td class="data">{{ yes(flight_type.is_controllable) }}</td>
+        <td class="data">{{ yes(flight_type.is_lane) }}</td>
     </tr>{% endfor %}
 {% endif %}</tbody>
 {% endmacro %}
