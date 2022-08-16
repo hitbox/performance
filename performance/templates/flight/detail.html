@@ -13,8 +13,12 @@
 
 
 {% block content %}
+<h3><a href="{{ url_for('report.view_report', id=report.id) }}">Back to report</a></h3>
 <h1>Flight Details</h1>
 <h2>{{ date_range_name }} {{ key_name }} {{ render_date(report.date) }}</h2>
+{% if not flights %}
+<h3>None</h3>
+{% else %}
 <table>
     <thead>
         <tr>
@@ -73,4 +77,5 @@
         </tr>{% endfor %}
     </tbody>
 </table>
+{% endif %}{# if flights #}
 {% endblock content %}
