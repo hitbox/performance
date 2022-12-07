@@ -93,5 +93,5 @@ def init_app(app):
     db.init_app(app)
     login_manager.init_app(app)
 
-    if app.env == 'development':
+    if 'PREFIX' in app.config:
         app.wsgi_app = PrefixMiddleware(app.wsgi_app, app.config['PREFIX'])
