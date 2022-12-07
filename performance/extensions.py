@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 class PrefixMiddleware:
     """
-    For development, prefix url.
+    Prefix url for running many apps on one machine.
     """
 
     def __init__(self, app, prefix):
