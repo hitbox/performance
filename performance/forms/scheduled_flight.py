@@ -31,6 +31,7 @@ class ScheduledFlightForm(
             'origin_departure_estimated_time',
             'destination_station',
             'destination_arrival_estimated_time',
+            'is_active',
         ]
         fields_order = ['flight_type'] + only + ['submit', 'delete']
         # overriding estimated times labels because there's no date fields
@@ -67,6 +68,12 @@ class ScheduledFlightForm(
                 'render_kw': {
                     'class': f'{_class_names} origin',
                     'placeholder': 'ETA',
+                },
+            },
+            'is_active': {
+                'label': 'Active?',
+                'render_kw': {
+                    'title': 'Flight is loaded on new operation',
                 },
             },
         }
