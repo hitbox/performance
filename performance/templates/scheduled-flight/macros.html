@@ -1,5 +1,6 @@
 {% from "macros.html" import string %}
 {% from "macros.html" import time %}
+{% from "macros.html" import yes %}
 
 
 {% set scheduled_flights_table_columns = 5 %}
@@ -31,6 +32,7 @@ scheduled_flight view. therefore we need to fallback to the request object.
         <th>ETD</th>
         <th>Dest</th>
         <th>ETA</th>
+        <th>Active?</th>
     </tr>
 </thead>
 <tbody>{% if not scheduled_flights %}
@@ -47,6 +49,7 @@ scheduled_flight view. therefore we need to fallback to the request object.
         <td class="data number">{{ time(scheduled_flight.origin_departure_estimated_time) }}</td>
         <td class="data">{{ string(scheduled_flight.destination_station) }}</td>
         <td class="data number">{{ time(scheduled_flight.destination_arrival_estimated_time) }}</td>
+        <td class="data">{{ yes(scheduled_flight.is_active) }}</td>
     </tr>{% endfor %}
 {% endif %}</tbody>
 {% endmacro %}

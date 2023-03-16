@@ -38,5 +38,6 @@ class ScheduledReport(
             flights = [
                 scheduled_flight.as_flight()
                 for scheduled_flight in self.scheduled_flights
+                if scheduled_flight.is_active
             ],
         )
