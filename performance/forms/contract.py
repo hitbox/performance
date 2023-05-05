@@ -2,6 +2,7 @@ from wtforms import HiddenField
 
 from ..models import Contract
 from ..models import PerformanceTier
+from ..models.contract import Operator
 
 from .base import ModelForm
 from .mixins import BackLinkMixin
@@ -20,7 +21,9 @@ class PerformanceTierForm(
         presentation = True
         only = [
             'tier',
+            'performance_operator_start',
             'performance_range_start',
+            'performance_operator_end',
             'performance_range_end',
         ]
         fields_order = only + ['submit', 'delete']
@@ -29,10 +32,18 @@ class PerformanceTierForm(
                 label = 'Tier',
             ),
             performance_range_start = dict(
-                label = 'Performance Range >',
+                label = 'Range Start',
+            ),
+            performance_operator_start = dict(
+                label = 'Start Operator',
+                choices = Operator.as_choices(),
             ),
             performance_range_end = dict(
-                label = 'Performance Range <',
+                label = 'Range End',
+            ),
+            performance_operator_end = dict(
+                label = 'End Operator',
+                choices = Operator.as_choices(),
             ),
         )
 

@@ -1,3 +1,7 @@
+from enum import Enum
+
+from sqlalchemy_utils import ChoiceType
+
 from performance.extensions import db
 
 from .mixin import AppContextMixin
@@ -31,6 +35,39 @@ class Contract(
     )
 
 
+class Operator(Enum):
+    """
+    Comparison operators
+    """
+    LT = 1
+    LE = 2
+    EQ = 3
+    GE = 4
+    GT = 5
+
+    @classmethod
+    def as_choices(cls):
+        get_label = '{0.char} ({0.text})'.format
+        return [(member.value, get_label(member)) for member in cls]
+
+
+Operator.LT.char = '<'
+Operator.LT.text = 'less than'
+
+Operator.LE.char = '≤'
+Operator.LE.text = 'less than or equal'
+
+Operator.EQ.char = '='
+Operator.EQ.text = 'equal'
+
+Operator.GE.char = '≥'
+Operator.GE.text = 'greater than or equal'
+
+Operator.GT.char = '>'
+Operator.GT.text = 'greater than'
+
+_valid_operator_values = tuple(op.value for op in Operator)
+
 class PerformanceTier(
     AppContextMixin,
     MetaMixin,
@@ -46,7 +83,33 @@ class PerformanceTier(
 
     performance_range_start = db.Column(db.Numeric)
 
+    performance_operator_start = db.Column(
+        ChoiceType(
+            Operator,
+            impl = db.Integer(),
+        ),
+        db.CheckConstraint(
+            f'performance_operator_start IN {_valid_operator_values}'
+        ),
+        default = Operator.GT,
+        server_default = str(Operator.GT.value),
+        nullable = False,
+    )
+
     performance_range_end = db.Column(db.Numeric)
+
+    performance_operator_end = db.Column(
+        ChoiceType(
+            Operator,
+            impl = db.Integer(),
+        ),
+        db.CheckConstraint(
+            f'performance_operator_end IN {_valid_operator_values}'
+        ),
+        default = Operator.LT,
+        server_default = str(Operator.LT.value),
+        nullable = False,
+    )
 
     contract_id = db.Column(db.Integer, db.ForeignKey('contract.id'))
     contract = db.relationship('Contract', back_populates='tiers')
@@ -56,8 +119,8 @@ class PerformanceTier(
         Return human readable performance range string.
         """
         parts = [
-            self.performance_range_start,
-            self.performance_range_end,
+            (self.performance_range_start, self.performance_operator_start),
+            (self.performance_range_end, self.performance_operator_end),
         ]
-        parts = [f'{opstr}{part:.1f}%' for part, opstr in zip(parts, '><') if part]
+        parts = [f'{op.char}{value:.1f}%' for value, op in parts if value]
         return ' and '.join(parts)

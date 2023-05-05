@@ -1,6 +1,11 @@
 {% from "macros.html" import render_number %}
 
 
+{% macro render_performance_range_string(value, operator) %}
+    {% if value %}{{ operator.char }}{{ '{:.1f}'.format(value) }}{% endif %}
+{% endmacro %}
+
+
 {% macro render_performance_tiers_table(tiers) %}
 {# renders inside of table, the other table renderers should be changed too #}
 {% set instance_endpoint = kwargs.get('instance_endpoint') %}
@@ -18,12 +23,12 @@
 </thead>
 <tbody>{% if not tiers %}
     <tr>
-        <td colspan="3"><h4>No performance tiers</h4></td>
+        <td colspan="4"><h4>No performance tiers</h4></td>
     </tr>{% else %}{% for tier in tiers %}
     <tr{% if active_id is not none and tier.id == active_id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ url_for(instance_endpoint, id=tier.id, **instance_kwargs) }}"{% endif %}>
         <td class="data">{{ tier.tier }}</td>
-        <td class="data number">{{ render_number(tier.performance_range_start) }}</td>
-        <td class="data number">{{ render_number(tier.performance_range_end) }}</td>
+        <td class="data">{{ render_performance_range_string(tier.performance_range_start, tier.performance_operator_start) }}</td>
+        <td class="data">{{ render_performance_range_string(tier.performance_range_end, tier.performance_operator_end) }}</td>
     </tr>{% endfor %}
 {% endif %}</tbody>
 {% endmacro %}

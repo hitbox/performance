@@ -36,7 +36,7 @@
     {{ render_form_fields_part(form) }}
     {{ render_form_buttons(form) }}
     {% if performance_contract %}
-    <h4 class="page"><a href="{{ url_for(request.endpoint, page=request.args.page) }}">New {{ singular }}</a></h4>
+    <h4 class="page"><a href="{{ url_for(request.endpoint, page=request.args.get('page', '1')) }}">New {{ singular }}</a></h4>
     {% endif %}
     {# mix the tiers table inside the contract form #}
     {% if performance_contract %}
@@ -53,7 +53,7 @@
            ) }}
         <tfoot>
             <tr>
-                <td colspan="3">
+                <td colspan="4">
                     <h4><a href="{{ url_for('admin.performance_tier.listform', contract_id=performance_contract.id) }}">New tier</a></h4>
                 </td>
             </tr>
