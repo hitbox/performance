@@ -32,7 +32,7 @@ html {
 body {
     display: flex;
     flex-direction: column;
-    font-family: arial;
+    font-family: sans-serif;
     margin: 0;
 }
 
