@@ -80,7 +80,7 @@ def raise_for_config(app):
                     raise ConfigError(
                         f'{prefix}Invalid config value {value!r} for {key!r}.'
                         f'Expected {validator}')
-    if app.env == 'development':
+    if app.debug:
         _raise_for_config(app, _development_registry, prefix='Development: ')
     _raise_for_config(app, _required_registry)
 

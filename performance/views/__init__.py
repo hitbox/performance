@@ -48,7 +48,7 @@ def init_app(app):
     app.register_blueprint(select_date_bp, url_prefix='/select')
     app.register_blueprint(user_bp)
 
-    if app.env == 'development':
+    if app.debug:
         init_app_development(app)
 
 def init_app_development(app):
