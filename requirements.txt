@@ -11,7 +11,7 @@ jsmin
 marshmallow-sqlalchemy
 openpyxl
 passlib
-psycopg2
+psycopg
 pytest
 pywin32; sys_platform == 'win32'
 sqlalchemy
