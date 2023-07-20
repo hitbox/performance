@@ -28,11 +28,16 @@ def before_request():
 def response_for_delete(form):
     return redirect(url_for('admin.performance_contract.listform'))
 
+def configured_contract_form(*args, **kwargs):
+    form = ContractForm(*args, **kwargs)
+    form._update_for_app_config()
+    return form
+
 view_func = FormListView.as_view(
     'listform',
     instance_getter = Contract.noapp_get_or_404,
     pagination_getter = Contract.noapp_pagination,
-    form_getter = ContractForm,
+    form_getter = configured_contract_form,
     form_submitter = ContractForm.standard_submit,
     response_for_delete = response_for_delete,
     template = 'admin/performance-contracts.html',

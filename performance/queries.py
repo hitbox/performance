@@ -1,3 +1,5 @@
+import sqlalchemy as sa
+
 from flask import current_app
 
 from .extensions import db
@@ -79,16 +81,25 @@ def performance_contract_query(date):
     """
     Select the performance contract for a date.
     """
-    return Contract.query.filter(
-        Contract.date_range_start <= date,
-        Contract.date_range_end >= date
+    stmt = sa.select(
+        Contract
     )
+    if current_app.config.get('PERFORMANCE_CONTRACTS_USE_DATE_RANGE' ):
+        stmt = stmt.where(
+            date >= Contract.date_range_start,
+            date <= Contract.date_range_end,
+        )
+    return stmt
 
 def contract_range_criteria(date, contract):
     """
     Return the Report.date criteria for a given date and contract.
     """
-    return db.and_(
-        Report.date >= contract.date_range_start,
+    criteria = [
         Report.date <= date,
-    )
+    ]
+    if contract.date_range_start:
+        criteria.append(
+            Report.date >= contract.date_range_start,
+        )
+    return db.and_(*criteria)

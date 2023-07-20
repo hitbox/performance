@@ -25,7 +25,11 @@
     </tbody>
 </table>
 {% if with_edit %}<a href="{{ url_for('admin.performance_contract.listform', id=contract.id) }}">{% endif %}
+{% if config.get('PERFORMANCE_CONTRACTS_USE_DATE_RANGE', True) %}
 <small>Contract year runs from {{ render_date(contract.date_range_start) }} through {{ render_date(contract.date_range_end) }}</small>
+{% else %}
+<small>Edit performance contract</small>
+{% endif %}{# PERFORMANCE_CONTRACTS_USE_DATE_RANGE #}
 {% if with_edit %}</a>{% endif %}
 {% endmacro %}
 
@@ -37,10 +41,11 @@
 {% set active_id = kwargs.active_id %}
 <thead>
     <tr>
-        {#<th>ID</th>#}
         <th>Name</th>
+        {% if config.PERFORMANCE_CONTRACTS_USE_DATE_RANGE %}
         <th>Start</th>
         <th>End</th>
+        {% endif %}
         <th># Tiers</th>
     </tr>
 </thead>
@@ -50,8 +55,10 @@
     <tr{% if active_id is not none and performance_contract.id == active_id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ url_for(instance_endpoint, id=performance_contract.id, **instance_kwargs) }}{% endif %}">
         {#<td class="data">{{ performance_contract.id }}</td>#}
         <td class="data">{{ performance_contract.name }}</td>
+        {% if config.PERFORMANCE_CONTRACTS_USE_DATE_RANGE %}
         <td class="data date">{{ render_date(performance_contract.date_range_start) }}</td>
         <td class="data date">{{ render_date(performance_contract.date_range_end) }}</td>
+        {% endif %}
         <td class="data number">{{ render_number(performance_contract.tiers|length) }}</td>
     </tr>{% endfor %}
 {% endif %}</tbody>

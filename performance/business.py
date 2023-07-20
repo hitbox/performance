@@ -1,4 +1,5 @@
 from . import queries
+from .extensions import db
 
 PERFORMANCE_DATE_RANGE_KEYS = [
     'daily',
@@ -19,22 +20,23 @@ def performance_contract_for_date(date):
     Return the performance contract for a (report) date.
     """
     query = queries.performance_contract_query(date)
-    contract = query.first()
-    return contract
+    return db.session.scalars(query).first()
 
 def _performance_queries(date, contract=None):
     """
     The performance numbers queries inside a nested dictionary.
     """
+    long_prefix = 'flights_with_controllable_destination_delays'
+
     nested_queries = dict()
     for performance_name, criteria_func in PERFORMANCE_SUMMARY:
         criteria = criteria_func(date)
         subdict = nested_queries[performance_name] = dict()
         subdict['lanes'] = queries.lanes(criteria)
-        subdict['flights_with_controllable_destination_delays_over15'] = (
+        subdict[f'{long_prefix}_over15'] = (
             queries.flights_with_controllable_destination_delays(criteria, 15)
         )
-        subdict['flights_with_controllable_destination_delays_over30'] = (
+        subdict[f'{long_prefix}_over30'] = (
             queries.flights_with_controllable_destination_delays(criteria, 30)
         )
 
@@ -42,7 +44,7 @@ def _performance_queries(date, contract=None):
         criteria = queries.contract_range_criteria(date, contract)
         subdict = nested_queries['contract_range'] = dict()
         subdict['lanes'] = queries.lanes(criteria)
-        subdict['flights_with_controllable_destination_delays_over15'] = (
+        subdict[f'{long_prefix}_over15'] = (
             queries.flights_with_controllable_destination_delays(criteria, 15)
         )
 

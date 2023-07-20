@@ -43,6 +43,8 @@ def calendar(year, month):
     for day in month_object.days:
         if day.date in report_dates:
             day.report = report_dates[day.date]
+        else:
+            day.report = None
     context = dict(
         today = today,
         month = month_object,

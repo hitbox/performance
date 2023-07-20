@@ -11,9 +11,14 @@ class ReportForm(
 ):
     class Meta:
         model = Report
-        only = ['system_detail']
+        only = [
+            'system_detail',
+        ]
         field_args = {
             'system_detail': {
-                'render_kw': { 'cols': 133, 'rows': 15 },
+                'render_kw': {
+                    'cols': 133,
+                    'rows': 15,
+                },
             },
         }

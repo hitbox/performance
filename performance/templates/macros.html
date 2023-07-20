@@ -186,7 +186,7 @@
 {% endmacro %}
 
 
-{% macro render_integer(v) %}{% if v is number %}{{ '{:,d}'.format(v) }}{% elif kwargs.or_zero %}0{% endif %}{% endmacro %}
+{% macro render_integer(v) %}{% if v is number %}{{ '{:,d}'.format(v) }}{% elif kwargs.get('or_zero') %}0{% endif %}{% endmacro %}
 
 
 {% macro string(v) %}{% if v %}{{ v }}{% endif %}{% endmacro %}

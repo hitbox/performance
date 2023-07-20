@@ -1,3 +1,4 @@
+from flask import current_app
 from wtforms import HiddenField
 
 from ..models import Contract
@@ -37,6 +38,7 @@ class PerformanceTierForm(
             performance_operator_start = dict(
                 label = 'Start Operator',
                 choices = Operator.as_choices(),
+                default = Operator.GE,
             ),
             performance_range_end = dict(
                 label = 'Range End',
@@ -44,6 +46,7 @@ class PerformanceTierForm(
             performance_operator_end = dict(
                 label = 'End Operator',
                 choices = Operator.as_choices(),
+                default = Operator.LE,
             ),
         )
 
@@ -85,3 +88,10 @@ class ContractForm(
             ),
         )
 
+    def _update_for_app_config(self):
+        use_date_range = current_app.config.get(
+            'PERFORMANCE_CONTRACTS_USE_DATE_RANGE'
+        )
+        if not use_date_range:
+            del self.date_range_start
+            del self.date_range_end

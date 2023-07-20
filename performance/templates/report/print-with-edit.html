@@ -31,7 +31,7 @@
 <div id="performance-top">
     {% include "report/performance.html" %}
     {# DEVELOPMENT ONLY DETAILS #}
-    {% if config.PERFORMANCE_FLIGHT_DETAILS %}<div class="noprint">
+    {% if config.get('PERFORMANCE_FLIGHT_DETAILS') %}<div class="noprint">
         <h3>Details</h3>
         <ul class="flat">
             <li><a href="{{ url_for('flight.detail_daily', date=report.date) }}">Daily</a></li>
@@ -46,7 +46,7 @@
     {% if config.PERFORMANCE_CONTRACTS %}
     {% if contract %}<div id="performance-contract-wrapper">
         {{ render_arrival_performance_contract_tier_table(contract, current_user.is_admin) }}
-    </div>{% else %}
+    </div>{% else %}{# no contract #}
         <div>
         {% if current_user.is_admin %}
             <a class="noprint" href="{{ url_for('admin.performance_contract.listform') }}">Add performance contract</a>
