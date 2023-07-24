@@ -13,6 +13,9 @@
 {% macro performance_calc(lanes, delays) %}{% if lanes > 0 %}{{ percent(Decimal((lanes - delays)|string) / lanes) }}{% endif %}{% endmacro %}
 
 
+{% set show_contracts_column = config.PERFORMANCE_CONTRACTS and config.PERFORMANCE_CONTRACTS_USE_DATE_RANGE %}
+
+
 <table id="performance-table">
     <thead>
         <tr>
@@ -20,7 +23,7 @@
             <th class="top">Daily</th>
             <th class="top" title="Month To Date">MTD</th>
             <th class="top" title="Quarter To Date">QTD</th>
-            {% if config.PERFORMANCE_CONTRACTS %}<th class="top">Contract</th>{% endif %}
+            {% if show_contracts_column %}<th class="top">Contract</th>{% endif %}
         </tr>
     </thead>
     <tbody>
@@ -41,7 +44,7 @@
                     {{ render_integer(quarter_to_date.lanes) }}
                 </a>
             </td>
-            {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
+            {% if show_contracts_column %}<td></td>{% endif %}
         </tr>
         <tr>
             <th class="row" title="{{ controllable_delays_note }}">Chargeable Delays</th>
@@ -60,7 +63,7 @@
                     {{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over15) }}
                 </a>
             </td>
-            {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
+            {% if show_contracts_column %}<td></td>{% endif %}
         </tr>
         <tr>
             <th class="row" title="{{ controllable_delays_note }}">Delays &gt; 30 Count</th>
@@ -79,14 +82,14 @@
                     {{ render_integer(quarter_to_date.flights_with_controllable_destination_delays_over30) }}
                 </a>
             </td>
-            {% if config.PERFORMANCE_CONTRACTS %}<td></td>{% endif %}
+            {% if show_contracts_column %}<td></td>{% endif %}
         </tr>
         <tr>
             <th class="row" title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
             <td class="data number" title="{{ render_performance_calc_formula(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over15) }}</td>
-            {% if config.PERFORMANCE_CONTRACTS %}
+            {% if show_contracts_column %}
             {% set ndelays = contract_range.flights_with_controllable_destination_delays_over15 if contract_range else 0 %}
             {% set lanes = contract_range.lanes if contract_range else 0 %}
             <td class="data number" title="{{ render_performance_calc_formula(lanes, ndelays) }}">
@@ -101,7 +104,7 @@
             <td class="data number" title="{{ render_performance_calc_formula(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over30) }}</td>
-            {% if config.PERFORMANCE_CONTRACTS %}<td class="data number"></td>{% endif %}
+            {% if show_contracts_column %}<td class="data number"></td>{% endif %}
         </tr>
         <tr>
             <th class="row">
@@ -116,7 +119,7 @@
             {% else %}
             <td>{# deliberately empty #}</td>
             {% endif %}
-            {% if config.PERFORMANCE_CONTRACTS and contract %}<td>{# deliberately empty #}</td>{% endif %}
+            {% if show_contracts_column and contract %}<td>{# deliberately empty #}</td>{% endif %}
         </tr>
     </tbody>
 </table>
