@@ -28,6 +28,13 @@
 
 {# overwriting block "main" (because these templates were not designed well enough) #}
 {% block report_main %}<article id="new-report-prompt">
+    {% if config.PERFORMANCE_EXTERNAL_IMPORT %}
+    <h4>
+        <a href="{{ url_for('external.import_for_new', report_date=report_date) }}">
+            Import Citrix/OPS++
+        </a>
+    </h4>
+    {% endif %}
     {% if config.SCHEDULED_REPORTS_ONLYONE %}
         {# this is hiding the fact that there can be many scheduled reports to build from #}
         {{ render_create_link(scheduled_report, 'Create new report from ' + scheduled_report.name) }}

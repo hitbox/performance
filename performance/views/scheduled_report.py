@@ -4,6 +4,7 @@ from flask import redirect
 from flask import request
 from flask import url_for
 
+from .. import settings
 from ..authorization import edit_schedule_check
 from ..forms import ScheduledFlightForm
 from ..forms import ScheduledReportForm
@@ -22,7 +23,7 @@ def before_request():
     # decorator enforces access
     if (
         'id' not in request.view_args
-        and current_app.config.get('SCHEDULED_REPORTS_ONLYONE')
+        and settings.scheduled_reports_onlyone()
     ):
         # throw exception for not one
         # redirect to the flights

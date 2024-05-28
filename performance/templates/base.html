@@ -1,10 +1,11 @@
 {% from "macros.html" import render_javascript_injection -%}
+{%- from "macros.html" import render_nav_item -%}
 
 
 <!doctype html>
 <html lang="en">
     <head>{% block head %}
-        <link rel="icon" href="data:,">{# empty favicon #}
+        <link rel="icon" href="{{ url_for('static', filename='performance.svg') }}">
         <meta charset="utf-8">
         <title>{% block title %}{{ config.PERFORMANCE_HEAD_TITLE }}{% endblock title %}</title>
         {# data injection for javascript from config #}
@@ -17,11 +18,38 @@
         {% assets 'sitejs' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
     {% endblock head %}</head>
     <body>{% block body %}
-        {% include "topnav.html" %}
-        {% include "flash.html" %}
+        <nav class="noprint">
+            {% if config.get('PERFORMANCE_DEBUG') %}<a href="{{ url_for('debug.index') }}">Debug</a>{% endif %}
+            {% if current_user.is_admin %}
+                {{ render_nav_item('admin.index', 'Admin', active_prefix='admin.') }}
+            {% endif %}
+            {{ render_nav_item('select_date.monthly_today', 'Best', active_prefix='select_date.monthly') }}
+            {% if current_user.is_admin or current_user.can_edit_schedule %}
+                {{ render_nav_item('scheduled_report.list', 'Schedule', active_prefix='scheduled_report.') }}
+            {% endif %}
+            {{ render_nav_item('select_date.goto_today', 'Reports', active_prefix='select_date.calendar') }}
+            {{ render_nav_item('user.profile', 'Profile', active_prefix='user.profile') }}
+            {% include "theme-toggle.html" %}
+        </nav>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <aside class="flash noprint">
+            <ul id="flashes" class="flat">
+                {% for category, message in messages %}
+                <li class="flash {{ category or 'info'  }}">
+                    <div class="message">{% for line in message.splitlines() %}
+                        <div>{{ line|safe }}</div>{% endfor %}
+                    </div>
+                    <div class="click close">&times;</div>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+        {% endif %}
+        {% endwith %}
         <main>{% block main %}
             {% block header %}{% endblock header %}
-            {% block content %}{% endblock %}
+            {% block content %}{% endblock content %}
             {% block footer %}{% endblock footer %}
         {% endblock %}</main>
     {% endblock %}</body>

@@ -1,3 +1,4 @@
+import datetime
 import string
 
 from flask import current_app
@@ -80,6 +81,40 @@ class Flight(
         SQL side of origin_delays_string
         """
         return sql_delays_string(cls, OriginDelay)
+
+    @hybrid_property
+    def origin_departure_actual_datetime(self):
+        return datetime.datetime.combine(
+            self.origin_departure_actual_date or self.report.date,
+            self.origin_departure_actual_time,
+        )
+
+    @origin_departure_actual_datetime.expression
+    def origin_departure_actual_datetime(cls):
+        return (
+            cls.origin_departure_actual_date
+            + db.func.cast(
+                self.origin_departure_actual_time,
+                db.func.Interval(second_precision=True),
+            )
+        )
+
+    @hybrid_property
+    def destination_arrival_actual_datetime(self):
+        return datetime.datetime.combine(
+            self.destination_arrival_actual_date or self.report.date,
+            self.destination_arrival_actual_time,
+        )
+
+    @destination_arrival_actual_datetime.expression
+    def destination_arrival_actual_datetime(cls):
+        return (
+            cls.destination_arrival_actual_date
+            + db.func.cast(
+                self.destination_arrival_actual_time,
+                db.func.Interval(second_precision=True),
+            )
+        )
 
     def origin_diff_minutes(self):
         """

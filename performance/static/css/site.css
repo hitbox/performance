@@ -4,6 +4,7 @@
 :root {
     --color: black;
     --header-separation: 1.5rem;
+    --flash-width: 720px;
     /* tables */
     --th-color: var(--color);
     --th-background-color: LightGray;
@@ -34,6 +35,18 @@ body {
     flex-direction: column;
     font-family: sans-serif;
     margin: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+.rows-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
 }
 
 main {
@@ -119,7 +132,7 @@ td {
 /* flash messages */
 #flashes {
     color: White;
-    width: 720px;
+    width: var(--flash-width);
     margin: 0 auto;
 }
 
@@ -190,6 +203,17 @@ a.nav.active {
     background-color: var(--active-row-background-color);
 }
 
+.report-buttons {
+    /* "buttons" at the top of performance reports */
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    /* default font-size: https://www.w3schools.com/cssref/css_default_values.asp */
+    font-size: 1.17em;
+    font-weight: bold;
+    justify-content: space-between;
+}
+
 #calendar-nav,
 #report-nav,
 #flight-form-back,
@@ -199,7 +223,6 @@ a.nav.active {
 }
 
 #calendar-nav, /* the daily date selector for reports */
-#report-nav,
 #flight-form-back {
     width: 900px;
 }
@@ -225,6 +248,12 @@ a.nav.active {
 .data {
     font-family: monospace;
     font-size: 1rem;
+}
+
+.reference {
+    /* class to refer to something else on the same page */
+    padding: 4px;
+    border: 1px solid grey;
 }
 
 .data.number {
@@ -307,14 +336,6 @@ h4.select-month {
     /* (1) */
     /* want some space after the configuration settings list */
     margin-bottom: 2.5rem;
-}
-
-.print-button {
-    font-size: 1.17em; /* default font-size: https://www.w3schools.com/cssref/css_default_values.asp */
-    font-weight: bold;
-    margin: .67em 0;
-    display: block;
-    width: fit-content;
 }
 
 .report-title {
@@ -504,7 +525,7 @@ select {
     padding: .3rem;
 }
 
-/* inputs besides buttons */
+/* inputs besides buttons and checkboxes */
 input:not([type=submit,type=checkbox]),
 select {
     font-family: monospace;
@@ -512,15 +533,11 @@ select {
 }
 
 input[type=checkbox] {
-    min-width: 1rem;
-}
-
-input[type=checkbox] {
     /* makes the checkboxes line up with their labels in the next column */
-    min-height: 35px;
+    min-height: 28px;
 }
 
-input[type=submit] {
+button, input[type=submit] {
     min-width: 8rem;
     padding: .5rem;
 }
@@ -561,7 +578,7 @@ h3 > label {
     margin-left: 0;
 }
 
-input[type=submit].danger {
+button.danger, input[type=submit].danger {
     background: #a03934;
     color: white;
 }
@@ -569,10 +586,10 @@ input[type=submit].danger {
 form > .buttons {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 0;
 }
-
-/* TODO source: flight_form.css */
 
 /* classes included because these same identities exist for scheduled flights */
 form #flight_type.flight {
@@ -647,6 +664,11 @@ form.user-admin .buttons,
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-between;
+    gap: 10px;
+}
+
+.buttons-2 {
+    padding: 0 10px;
 }
 
 /* performance stats at top of report */
@@ -776,6 +798,10 @@ form .performance-tiers {
     margin: 0 auto;
 }
 
+.row-container {
+    display: flex;
+}
+
 .page {
     text-align: center;
 }
@@ -805,4 +831,8 @@ input[value="Update System Detail"] {
 
 form.delay-code #description {
     font-family: arial;
+}
+
+.external.fn_number {
+    width: 100px;
 }

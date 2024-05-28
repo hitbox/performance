@@ -89,7 +89,13 @@
 {% macro render_form(form) %}
 {{ render_form_fields_part(form) }}
 {{ render_form_buttons(form, **kwargs) }}
-{% endmacro %}{# render_form #}
+{% endmacro %}
+
+
+{% macro render_form_grid(form) %}
+    {# TODO #}
+    {# simpler, better-er grid style form layout #}
+{% endmacro %}
 
 
 {% macro render_form_buttons(form) %}
@@ -164,7 +170,10 @@
 {% macro render_nav_item(endpoint, text) %}{# site top nav #}<a class="nav{% if 'active_prefix' in kwargs and request.endpoint and request.endpoint.startswith(kwargs.active_prefix or '') %} active{% endif %}" href="{{ url_for(endpoint) }}" title="{{ request.endpoint }}">{{ text }}</a>{% endmacro %}
 
 
-{% macro render_number(value) %}{% if value is number %}{{ value }}{% endif %}{% endmacro %}
+{% macro render_number(value) %}{% if value is number %}{{ '{:,}'.format(value) }}{% endif %}{% endmacro %}
+
+
+{% macro render_weight(value) %}{% if value is number %}{{ '{:,}'.format(value) }}{% endif %}{% endmacro %}
 
 
 {% macro render_pagination(pagination, endpoint) %}

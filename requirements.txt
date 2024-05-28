@@ -10,6 +10,7 @@ humanize
 jsmin
 marshmallow-sqlalchemy
 openpyxl
+oracledb
 passlib
 psycopg
 pytest

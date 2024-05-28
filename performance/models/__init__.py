@@ -2,6 +2,8 @@ from .assumed_best import AssumedBest
 from .contract import Contract
 from .contract import PerformanceTier
 from .delay import Delay
+from .external import Leg
+from .external import LegPax
 from .flight import Flight
 from .flight_delay import DestinationDelay
 from .flight_delay import OriginDelay

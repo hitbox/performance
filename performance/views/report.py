@@ -1,6 +1,8 @@
 import datetime
 
+from collections import defaultdict
 from decimal import Decimal
+from types import SimpleNamespace
 
 import click
 import sqlalchemy as sa
@@ -13,13 +15,13 @@ from flask import render_template
 from flask import request
 from flask import url_for
 
-from .. import business
-from ..authorization import basic_check
-from ..authorization import edit_check
-from ..extensions import db
-from ..models import Delay
-from ..models import Report
-from ..models import ScheduledReport
+from performance import business
+from performance import forms
+from performance import models
+from performance import settings
+from performance.authorization import basic_check
+from performance.authorization import edit_check
+from performance.extensions import db
 
 report_bp = Blueprint('report', __name__)
 
@@ -45,10 +47,10 @@ def get_context(report):
     contract = business.performance_contract_for_date(report.date)
     context['contract'] = contract
 
-    context['controllable_delay_codes'] = Delay.query.filter(
-        Delay.is_controllable,
+    context['controllable_delay_codes'] = models.Delay.query.filter(
+        models.Delay.is_controllable,
     ).order_by(
-        Delay.code,
+        models.Delay.code,
     ).all()
 
     context.update(business.performance_summary(report.date, contract))
@@ -66,14 +68,11 @@ def view_report_for_date(report_date):
     """
     Redirect from report date to id.
     """
-    report = Report.query.filter(Report.date == report_date).one_or_none()
+    report = models.Report.query.filter(models.Report.date == report_date).one_or_none()
 
     if report is None:
         # Alert and redirect to new report
-        if 'DATEFMT' in current_app.config:
-            date_str = report_date.strftime(current_app.config['DATEFMT'])
-        else:
-            date_str = str(report_date)
+        date_str = report_date.strftime(settings.datefmt())
         return redirect(url_for('.prompt_new', report_date=report_date))
 
     return redirect(url_for('.view_report', id=report.id))
@@ -85,7 +84,7 @@ def view_report(id):
     View Report object.
     """
     ReportForm = get_report_form_class()
-    report = Report.query.get_or_404(id)
+    report = models.Report.query.get_or_404(id)
     form = ReportForm(obj=report)
 
     # only updating the comments (system detail)
@@ -101,8 +100,8 @@ def view_report(id):
 
     context = get_context(report)
     context.update(get_prev_next_context(report.date))
-
-    return render_template('report/print-with-edit.html', form=form, **context)
+    context.setdefault('form', form)
+    return render_template('report/print-with-edit.html', **context)
 
 @report_bp.route('/delete/<int:report_id>')
 @edit_check
@@ -111,7 +110,7 @@ def delete_report(report_id):
     Delete Report
     """
     # confirm through javascript baked into template
-    report = Report.query.get_or_404(report_id)
+    report = models.Report.query.get_or_404(report_id)
     db.session.delete(report)
     db.session.commit()
     return redirect(url_for('select_date.goto_today'))
@@ -122,7 +121,7 @@ def create_report_from_schedule(report_date, schedule_id):
     """
     Create new report from scheduled report.
     """
-    scheduled_report = ScheduledReport.query.get_or_404(schedule_id)
+    scheduled_report = models.ScheduledReport.query.get_or_404(schedule_id)
     report = scheduled_report.as_report(report_date)
     db.session.add(report)
     db.session.commit()
@@ -134,7 +133,7 @@ def create_report_blank(report_date):
     """
     Create a new blank report.
     """
-    report = Report(date=report_date)
+    report = models.Report(date=report_date)
     db.session.add(report)
     db.session.commit()
     return redirect(url_for('.view_report', id=report.id))
@@ -145,16 +144,15 @@ def prompt_new(report_date):
     """
     Prompt to create new report.
     """
-    scheduled_reports_onlyone = current_app.config.get('SCHEDULED_REPORTS_ONLYONE', False)
-    if scheduled_reports_onlyone:
-        scheduled_report = ScheduledReport.query.one()
+    if settings.scheduled_reports_onlyone():
+        scheduled_report = models.ScheduledReport.query.one()
         context = dict(
             scheduled_report = scheduled_report
         )
     else:
         # all scheduled reports
-        scheduled_reports = ScheduledReport.query.order_by(
-                ScheduledReport.display_order
+        scheduled_reports = models.ScheduledReport.query.order_by(
+                models.ScheduledReport.display_order
             ).all()
         context = dict(
             scheduled_reports = scheduled_reports,
@@ -169,8 +167,11 @@ def prompt_new(report_date):
 @click.argument('start', type=click.DateTime(['%Y-%m-%d']))
 @click.argument('end', type=click.DateTime(['%Y-%m-%d']))
 def performance_summary(start, end):
+    """
+    Performance summary for the command line.
+    """
     start = start.date()
     end = end.date()
-    date_criteria = Report.date.between(start, end)
+    date_criteria = models.Report.date.between(start, end)
     lanes = business.performance_summary(date_criteria, '')
     print(lanes)

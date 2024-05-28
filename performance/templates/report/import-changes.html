@@ -1,0 +1,62 @@
+{% extends "report/import-base.html" %}
+
+
+{% from "macros.html" import render_form %}
+
+
+{% block content %}
+    <h1>Update From External Database</h1>
+    {{ super() }}
+{% endblock content %}
+
+
+{% block import_content %}
+    <div class="rows-container">
+        <div>
+            {% if results_form %}
+            {# results of query #}
+            {# give the user a form to select changes to update #}
+            <h1>Differences</h1>
+            <p>Check the <span class="reference">Update?</span> to import change.</p>
+            <form class="external" method="POST">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Flight</th>
+                            <th>Field Name</th>
+                            <th>Old</th>
+                            <th>New</th>
+                            <th>Update?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight_change_form in results_form.flight_changes %}
+                        {% set changes = flight_change_form._matched_fields(param_form)|list %}
+                        {% for attrname, isdiff, newfield, oldfield, update_field in changes %}
+                        <tr>
+                            {% if loop.first %}
+                            {# show flight number across all the changes rows #}
+                            <td class="data" rowspan="{{ loop.length }}">{{ flight_change_form.flight.flight_number.data }}</td>
+                            {% endif %}
+                            <td>{{ attrname }}</td>
+                            <td>
+                                {{ newfield }}
+                                {% if param_form.show_kg and attrname == 'Weight' %}
+                                    {{ flight_change_form.baggage_weight_kg.data }}kg
+                                {% endif %}
+                            </td>
+                            <td>{{ oldfield }}</td>
+                            <td>{{ update_field }}</td>
+                        </tr>
+                        {% endfor %}{# ... in changes #}
+                        {% endfor %}{# in results_form.flight_changes #}
+                    </tbody>
+                </table>
+                <div class="buttons">
+                    {{ results_form.submit }}
+                </div>
+            </form>
+            {% endif %}{# results_form #}
+        </div>
+    </div>
+{% endblock import_content %}

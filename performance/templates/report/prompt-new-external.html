@@ -1,0 +1,53 @@
+{% extends "report/import-base.html" %}
+
+
+{% from "macros.html" import render_date with context %}
+{% from "macros.html" import render_form %}
+{% from "macros.html" import render_form_buttons %}
+{% from "macros.html" import render_weight with context %}
+
+
+{% macro _render_datetime(dt) %}{% if dt and dt.date() != request.view_args.report_date %}{{ render_date(dt.date()) }} {% endif %}{% if dt %}{{ dt.strftime('%H:%M') }}{% endif %}{% endmacro %}
+
+
+{% block content %}
+    <h1>External Import For {{ render_date(request.view_args.report_date) }}</h1>
+    {{ super() }}
+{% endblock content %}
+
+
+{% block import_content %}<div class="rows-container">
+    {% if results_form %}
+    <div>
+        <form method="POST">
+            {{ results_form.hidden_tag() }}
+            <table>
+                {% set show_kg = param_form.show_kg.data %}
+                <h3>Results</h3>
+                <thead>{% set colspan = 4 + show_kg %}
+                    <tr>
+                        <th>Flight #</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                        {% if show_kg %}<th>Baggage (kg)</th>{% endif %}
+                        <th>Baggage (lbs)</th>
+                    </tr>
+                </thead>
+                <tbody>{% for row_form in results_form.rows %}
+                    <tr>
+                        <td class="data">{{ row_form.fn_number.data }}<span class="hidden">{{ row_form.fn_number }}</span></td>
+                        <td class="data">{{ _render_datetime(row_form.dep_dt.data) }}<span class="hidden">{{ row_form.dep_dt }}</span></td>
+                        <td class="data">{{ _render_datetime(row_form.arr_dt.data) }}<span class="hidden">{{ row_form.arr_dt }}</span></td>
+                        {% if show_kg %}<td class="data number">{{ render_weight(row_form.baggage_weight_kg.data) }}<span class="hidden">{{ row_form.baggage_weight_kg }}</span></td>{% endif %}
+                        <td class="data number">{{ render_weight(row_form.baggage_weight_lbs.data) }}<span class="hidden">{{ row_form.baggage_weight_lbs }}</span></td>
+                        </tr>{% else %}
+                        <tr>
+                            <td colspan="{{ colspan }}">No results</td>
+                        </tr>{% endfor %}
+                </tbody>
+            </table>
+            {{ render_form_buttons(results_form) }}
+        </form>
+    </div>
+    {% endif %}
+{% endblock import_content %}

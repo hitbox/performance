@@ -2,6 +2,9 @@ from .assumed_best import AssumedBestForm
 from .contract import ContractForm
 from .contract import PerformanceTierForm
 from .delay import DelayForm
+from .external import ChangesForm
+from .external import QueryParametersForm
+from .external import ResultsForm
 from .flight import FlightForm
 from .flight_type import FlightTypeForm
 from .report import ReportForm
