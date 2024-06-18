@@ -27,7 +27,7 @@
         <div class="noprint report-buttons">
             <a href="javascript:;" onclick="window.print(); return false">Print</a>
             {#- import new report from external source -#}
-            {% if config.PERFORMANCE_EXTERNAL_IMPORT %}<a href="{{ url_for('external.update_report_from_external', report_id=report.id) }}">Update From External</a>{% endif %}
+            {% if config.PERFORMANCE_EXTERNAL_UPDATE %}<a href="{{ url_for('external.update_report_from_external', report_id=report.id) }}">Update From External</a>{% endif %}
         </div>
 
         {# performance numbers #}
