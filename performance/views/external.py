@@ -41,6 +41,10 @@ def update_report_from_external(report_id):
         results_form = forms.ChangesForm(formdata=request.form)
         if results_form.validate():
             business.update_report_from_external(results_form.data)
+            # TODO
+            # - not being redirected
+            # - despite update, always showing changes
+            # - breakpoint in update_report_from_external
             return redirect(url_for('report.view_report', id=report.id))
 
     param_form = forms.QueryParametersForm(data=request.args)
