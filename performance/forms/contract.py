@@ -77,13 +77,13 @@ class ContractForm(
             date_range_start = dict(
                 label = 'Start',
                 render_kw = dict(
-                    pattern = '\d{4}-\d{2}-\d{2}'
+                    pattern = r'\d{4}-\d{2}-\d{2}'
                 ),
             ),
             date_range_end = dict(
                 label = 'End',
                 render_kw = dict(
-                    pattern = '\d{4}-\d{2}-\d{2}'
+                    pattern = r'\d{4}-\d{2}-\d{2}'
                 ),
             ),
         )
