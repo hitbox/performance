@@ -36,10 +36,15 @@ def update_report_from_external(report_id):
     # - maybe just one form with the query params *and* results
     # - and then detect which button pressed
 
+    # THINKING
+    # - form with integer step hidden field
+    # - attribute button named next whose action is determined python side and labelled
+
     if request.method == 'POST':
         # POST submit is only for doing final import of results
         results_form = forms.ChangesForm(formdata=request.form)
         if results_form.validate():
+            # XXX: update_report_from_external is a name but not getting an exception
             business.update_report_from_external(results_form.data)
             # TODO
             # - not being redirected
