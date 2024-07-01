@@ -88,6 +88,7 @@ def external_stmt(report_date):
     """
     stmt = (
         db.select(
+            # flight number is string on this application's side
             sa.cast(models.Leg.fn_number, sa.String(4)).label('fn_number'),
             # datetimes broken apart into date and time, on the python side
             models.Leg.dep_dt,
@@ -102,13 +103,20 @@ def external_stmt(report_date):
         .where(
             models.Leg.fn_carrier == settings.external_fn_carrier(),
             models.LegPax.usage == settings.external_usage(),
-            sa.func.trunc(models.Leg.dep_dt) == report_date,
         )
         .order_by(
-            models.Leg.dep_dt,
             models.Leg.fn_number,
+            models.Leg.dep_dt,
         )
     )
+    if db.engine.dialect.name == 'postgresql':
+        stmt = stmt.where(
+            sa.func.cast(models.Leg.dep_dt, sa.Date) == report_date,
+        )
+    elif db.engine.dialect.name == 'oracle':
+        stmt = stmt.where(
+            sa.func.trunc(models.Leg.dep_dt) == report_date,
+        )
     return stmt
 
 def external_results(report_date):

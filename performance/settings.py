@@ -1,5 +1,18 @@
 from flask import current_app
 
+def contracts_use_date_range():
+    # XXX
+    # - not sure what this is anymore
+    # - all the contracts should use date ranges
+    # - existing production config explicitly set this to false in one place,
+    #   for dhl operations
+    # - so this is always false as it is now?
+    # - macro render_arrival_performance_contract_tier_table is really weird.
+    #   it fallsback to this default *AND* it defaults, if not defined, to
+    #   true.
+    key = 'PERFORMANCE_CONTRACTS_USE_DATE_RANGE'
+    return current_app.config.get(key, False)
+
 def datefmt():
     key = 'DATEFMT'
     return current_app.config.get(key, '%Y-%m-%d')

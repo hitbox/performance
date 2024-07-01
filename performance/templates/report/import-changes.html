@@ -10,6 +10,32 @@
 {% endblock content %}
 
 
+{% block table_body %}
+{%- for flight_change_form in results_form.flight_changes -%}
+{%- set changes = flight_change_form._matched_fields(param_form)|list -%}
+{%- for attrname, isdiff, newfield, oldfield, update_field in changes -%}
+<tr>
+    {% if loop.first %}
+    {# show flight number across all the changes rows #}
+    <td class="data" rowspan="{{ loop.length }}">
+        {{- flight_change_form.flight.flight_number.data -}}
+    </td>
+    {% endif %}
+    <td>{{ attrname }}</td>
+    <td>
+        {{ newfield }}
+        {% if param_form.show_kg and attrname == 'Weight' %}
+            {{ flight_change_form.baggage_weight_kg.data }}kg
+        {% endif %}
+    </td>
+    <td>{{ oldfield }}</td>
+    <td>{{ update_field }}</td>
+</tr>
+{%- endfor -%}{# ... in changes #}
+{%- endfor -%}{# in results_form.flight_changes #}
+{% endblock table_body %}
+
+
 {% block import_content %}
     <div class="rows-container">
         <div>
@@ -29,30 +55,7 @@
                             <th>Update?</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {%- for flight_change_form in results_form.flight_changes -%}
-                        {%- set changes = flight_change_form._matched_fields(param_form)|list -%}
-                        {%- for attrname, isdiff, newfield, oldfield, update_field in changes -%}
-                        <tr>
-                            {% if loop.first %}
-                            {# show flight number across all the changes rows #}
-                            <td class="data" rowspan="{{ loop.length }}">
-                                {{- flight_change_form.flight.flight_number.data -}}
-                            </td>
-                            {% endif %}
-                            <td>{{ attrname }}</td>
-                            <td>
-                                {{ newfield }}
-                                {% if param_form.show_kg and attrname == 'Weight' %}
-                                    {{ flight_change_form.baggage_weight_kg.data }}kg
-                                {% endif %}
-                            </td>
-                            <td>{{ oldfield }}</td>
-                            <td>{{ update_field }}</td>
-                        </tr>
-                        {%- endfor -%}{# ... in changes #}
-                        {%- endfor -%}{# in results_form.flight_changes #}
-                    </tbody>
+                    <tbody>{{ self.table_body() }}</tbody>
                 </table>
                 <div class="buttons">
                     {{ results_form.submit }}

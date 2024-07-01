@@ -21,7 +21,6 @@ def create_app(silent_config=False):
     app.config.from_envvar('PERFORMANCE_CONFIG', silent=silent_config)
     config.raise_for_config(app)
 
-    app.config.setdefault('PERFORMANCE_CONTRACTS_USE_DATE_RANGE', True)
     app.config.setdefault('LATE_GT', 0)
     app.config.setdefault('EARLY_LT', 0)
     # if diff minutes do not meet threshold, always show these delay codes

@@ -1,4 +1,7 @@
+import csv
 import datetime
+
+import click
 
 from flask import Blueprint
 from flask import abort
@@ -125,3 +128,56 @@ def import_for_new(report_date):
     )
     template = 'report/prompt-new-external.html'
     return render_template(template, **context)
+
+@external_bp.cli.command('load')
+@click.argument('type_', type=click.Choice(['csv']))
+@click.argument('file', type=click.File('r'))
+@click.argument('class_')
+@click.option(
+    '--lower-keys/--no-lower-keys',
+    default = True,
+    help = 'Lower case the keys.',
+)
+@click.option(
+    '--ignore-unknown/--no-ignore-unknown',
+    default = True,
+    help = 'Ignore the keys from CSV that the mapper doesn\' take.',
+)
+@click.option(
+    '--commit/--no--commit',
+    help = 'Commit added instances.',
+)
+def load(type_, file, class_, lower_keys, ignore_unknown, commit):
+    """
+    Load data from CSV.
+    """
+    class_ = getattr(models, class_)
+    coerce = None
+    for data in csv.DictReader(file):
+        if lower_keys:
+            data = {k.lower(): v for k, v in data.items()}
+        if ignore_unknown:
+            data = {k: v for k, v in data.items() if k in class_.__mapper__.columns}
+
+        if coerce is None:
+            coerce = {}
+            for key in data:
+                attr = getattr(class_, key)
+                python_type = attr.type.python_type
+                if python_type is datetime.datetime:
+                    python_type = datetime.datetime.fromisoformat
+                coerce[key] = python_type
+
+        instance = class_()
+        for key, string_value in data.items():
+            try:
+                value = coerce[key](string_value)
+            except (TypeError, ValueError):
+                # TODO
+                # - optional None for type conversion failure?
+                value = None
+            setattr(instance, key, value)
+        db.session.add(instance)
+
+    if commit:
+        db.session.commit()

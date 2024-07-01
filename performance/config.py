@@ -8,7 +8,9 @@ class ConfigError(PerformanceError):
 
 
 class String:
-    "Is string"
+    """
+    Is string callable? With optional minimum length.
+    """
 
     def __init__(self, min=None):
         self.min = min
@@ -46,7 +48,9 @@ def exists_and_truthy(config, key):
     return key in config and config[key]
 
 def isint(value):
-    "An integer"
+    """
+    Is an integer?
+    """
     return isinstance(value, int)
 
 def require(key, validator, is_development=False):

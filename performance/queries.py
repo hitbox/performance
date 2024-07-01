@@ -2,6 +2,7 @@ import sqlalchemy as sa
 
 from flask import current_app
 
+from . import settings
 from .extensions import db
 from .models import Contract
 from .models import Delay
@@ -84,7 +85,7 @@ def performance_contract_query(date):
     stmt = sa.select(
         Contract
     )
-    if current_app.config.get('PERFORMANCE_CONTRACTS_USE_DATE_RANGE' ):
+    if settings.contracts_use_date_range():
         stmt = stmt.where(
             date >= Contract.date_range_start,
             date <= Contract.date_range_end,

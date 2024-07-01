@@ -1,6 +1,7 @@
 from flask import current_app
 from wtforms import HiddenField
 
+from .. import settings
 from ..models import Contract
 from ..models import PerformanceTier
 from ..models.contract import Operator
@@ -89,9 +90,6 @@ class ContractForm(
         )
 
     def _update_for_app_config(self):
-        use_date_range = current_app.config.get(
-            'PERFORMANCE_CONTRACTS_USE_DATE_RANGE'
-        )
-        if not use_date_range:
+        if not settings.contracts_use_date_range():
             del self.date_range_start
             del self.date_range_end

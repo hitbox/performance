@@ -20,6 +20,12 @@ class Leg(db.Model):
         comment = 'Number of Leg',
     )
 
+    what_if = sa.Column(
+        sa.String,
+        primary_key = True,
+        comment = 'Name of What-If',
+    )
+
     fn_carrier = sa.Column(
         sa.String,
         nullable = False,
