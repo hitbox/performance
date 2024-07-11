@@ -9,10 +9,12 @@ from wtforms import IntegerField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms import TimeField
+from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 from wtforms.widgets import TextInput
 
 from performance import models
+from performance.utils import deep_getattr
 
 from .base import BaseFlaskForm
 from .base import BaseForm
@@ -38,8 +40,6 @@ class QueryParametersForm(Form):
         label = 'Query...',
         name = 's',
     )
-
-    clear = SubmitField()
 
 
 class LegPaxForm(ModelForm):
@@ -104,111 +104,160 @@ class ResultsForm(BaseFlaskForm):
     )
 
 
-class PartialFlightForm(Form):
+class InternalFlightForm(BaseFlaskForm):
     """
     Internal flight data matching some data from external database.
     """
 
-    id = IntegerField()
-    flight_number = StringField()
-    origin_departure_actual_date = DateField()
-    origin_departure_actual_time = TimeField()
-    destination_arrival_actual_date = DateField()
-    destination_arrival_actual_time = TimeField()
-    weight = IntegerField()
+    id = IntegerField(
+        render_kw = dict(
+            class_ = 'hidden',
+        ),
+    )
+
+    origin_departure_actual_date = DateField(
+        validators = [
+            Optional(),
+        ],
+        render_kw = dict(
+            class_ = 'hidden',
+        )
+    )
+
+    origin_departure_actual_time = TimeField(
+        validators = [
+            Optional(),
+        ],
+        render_kw = dict(
+            class_ = 'hidden',
+        )
+    )
+
+    destination_arrival_actual_date = DateField(
+        validators = [
+            Optional(),
+        ],
+        render_kw = dict(
+            class_ = 'hidden',
+        )
+    )
+
+    destination_arrival_actual_time = TimeField(
+        validators = [
+            Optional(),
+        ],
+        render_kw = dict(
+            class_ = 'hidden',
+        )
+    )
+
+    weight = IntegerField(
+        validators = [
+            Optional(),
+        ],
+        render_kw = dict(
+            class_ = 'hidden',
+        )
+    )
 
 
-class FlightChangesForm(Form):
+class ExternalFlightForm(BaseFlaskForm):
+
+    dep_dt_date = DateField(
+        validators = [Optional()],
+        render_kw = dict(
+            class_ = 'hidden',
+        ),
+    )
+
+    dep_dt_time = TimeField(
+        validators = [Optional()],
+        render_kw = dict(
+            class_ = 'hidden',
+        ),
+    )
+
+    arr_dt_date = DateField(
+        validators = [Optional()],
+        render_kw = dict(
+            class_ = 'hidden',
+        ),
+    )
+
+    arr_dt_time = TimeField(
+        validators = [Optional()],
+        render_kw = dict(
+            class_ = 'hidden',
+        ),
+    )
+
+    baggage_weight_kg = IntegerField(
+        validators = [Optional()],
+        render_kw = dict(
+            class_ = 'hidden',
+        ),
+    )
+
+    baggage_weight_lbs = IntegerField(
+        validators = [Optional()],
+        render_kw = dict(
+            class_ = 'hidden',
+        ),
+    )
+
+
+class DiffForm(BaseFlaskForm):
     """
-    Some fields for flights that match against an external database showing the
-    internal value against the external. Also giving an *_update checkbox for
-    selecting which changes to keep.
+    Single difference between flights.
     """
 
-    dep_dt_date = DateField()
-    dep_dt_date_is_diff = BooleanField()
-    dep_dt_date_update = BooleanField(
+    internal_attr = StringField()
+    internal_label = StringField()
+
+    external_attr = StringField()
+    external_label = StringField()
+
+    do_update = BooleanField(
+        # user checkbox to choose to do this update
         default = True,
+        render_kw = dict(
+            class_ = 'flight-changes',
+        ),
     )
 
-    dep_dt_time = TimeField()
-    dep_dt_time_is_diff = BooleanField()
-    dep_dt_time_update = BooleanField(
-        default = True,
+
+class FlightChangesForm(BaseFlaskForm):
+    """
+    Contain a list of diffs between internal and external flights.
+    """
+
+    internal_flight = FormField(
+        InternalFlightForm,
     )
 
-    arr_dt_date = DateField()
-    arr_dt_date_is_diff = BooleanField()
-    arr_dt_date_update = BooleanField(
-        default = True,
+    external_flight = FormField(
+        ExternalFlightForm,
     )
 
-    arr_dt_time = TimeField()
-    arr_dt_time_is_diff = BooleanField()
-    arr_dt_time_update = BooleanField(
-        default = True,
+    diffs = FieldList(
+        FormField(
+            DiffForm,
+        ),
     )
 
-    baggage_weight_kg = IntegerField()
+    # - {internal,external}_field methods serve to remind us that only the
+    #   fields off the two flight forms, that are being changed, can be
+    #   rendered.
+    # - If we render them all, they are sent back and fail validation.
+    # - Also they must be rendered.
 
-    baggage_weight_lbs = IntegerField()
-    baggage_weight_lbs_is_diff = BooleanField()
-    baggage_weight_lbs_update = BooleanField(
-        default = True,
-    )
+    def internal_field(self, attrname):
+        if attrname:
+            return getattr(self.internal_flight, attrname)
 
-    flight = FormField(
-        PartialFlightForm,
-    )
-
-    def _matched_fields(self, param_form):
-        """
-        Generate field data tuples which relate data from external to internal
-        database.
-        """
-        # NOTE
-        # - passing param_form for option to show all
-        show_all_fields = param_form.show_all_fields.data
-        if show_all_fields or self.dep_dt_date_is_diff.data:
-            yield (
-                'ATD Date',
-                bool(self.dep_dt_date_is_diff.data),
-                self.dep_dt_date,
-                self.flight.origin_departure_actual_date,
-                self.dep_dt_date_update,
-            )
-        if show_all_fields or self.dep_dt_time_is_diff.data:
-            yield (
-                'ATD Time',
-                bool(self.dep_dt_time_is_diff.data),
-                self.dep_dt_time,
-                self.flight.origin_departure_actual_time,
-                self.dep_dt_time_update,
-            )
-        if show_all_fields or self.arr_dt_date_is_diff.data:
-            yield (
-                'ATA Date',
-                bool(self.arr_dt_date_is_diff),
-                self.arr_dt_date,
-                self.flight.destination_arrival_actual_date,
-                self.arr_dt_date_update,
-            )
-        if show_all_fields or self.arr_dt_date_is_diff.data:
-            yield (
-                'ATA Time',
-                bool(self.arr_dt_time_is_diff),
-                self.arr_dt_time,
-                self.flight.destination_arrival_actual_time,
-                self.arr_dt_time_update,
-            )
-        if show_all_fields or self.baggage_weight_lbs_is_diff.data:
-            yield (
-                'Weight (lbs)',
-                bool(self.baggage_weight_lbs_is_diff),
-                self.baggage_weight_lbs,
-                self.flight.weight,
-                self.baggage_weight_lbs_update,
-            )
+    def external_field(self, attrname):
+        if attrname:
+            return getattr(self.external_flight, attrname)
 
 
 class ChangesForm(BaseFlaskForm):
@@ -216,6 +265,8 @@ class ChangesForm(BaseFlaskForm):
     flight_changes = FieldList(
         FormField(FlightChangesForm),
     )
+
+    clear = SubmitField()
 
     submit = SubmitField(
         label = 'Import...',

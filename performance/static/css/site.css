@@ -793,6 +793,20 @@ form .performance-tiers {
     justify-self: right;
 }
 
+.col-3 {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+}
+
+.col-4 {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+}
+
+.full-span {
+    grid-column: 1 / -1;
+}
+
 .row {
     width: min-content;
     margin: 0 auto;
@@ -835,4 +849,35 @@ form.delay-code #description {
 
 .external.fn_number {
     width: 100px;
+}
+
+.flight-changes-grid {
+    align-items: center;
+}
+
+.field-header {
+    text-align: center;
+}
+
+.flight-info-group {
+    border-bottom: 1px solid var(--color);
+    margin-bottom: 0.5rem;
+}
+
+.flight-info-not-first {
+    margin-top: 2rem;
+}
+
+.flight-info + .flight-info {
+    /* more space between the flight identification info */
+    margin-left: 1rem;
+}
+
+.buttons.flight-changes {
+    margin-top: 2rem;
+}
+
+.flight-changes.label {
+    /* "indent" the changed fields rows */
+    padding-left: 1rem;
 }

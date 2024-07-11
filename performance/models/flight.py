@@ -33,10 +33,33 @@ class Flight(
         back_populates = 'flights',
     )
 
-    origin_departure_actual_date = db.Column(db.Date)
-    origin_departure_actual_time = db.Column(db.Time)
-    destination_arrival_actual_date = db.Column(db.Date)
-    destination_arrival_actual_time = db.Column(db.Time)
+    origin_departure_actual_date = db.Column(
+        db.Date,
+        info = dict(
+            label = 'ATD Date',
+        ),
+    )
+
+    origin_departure_actual_time = db.Column(
+        db.Time,
+        info = dict(
+            label = 'ATD Time',
+        ),
+    )
+
+    destination_arrival_actual_date = db.Column(
+        db.Date,
+        info = dict(
+            label = 'ATA Date',
+        ),
+    )
+
+    destination_arrival_actual_time = db.Column(
+        db.Time,
+        info = dict(
+            label = 'ATA Time',
+        ),
+    )
 
     origin_delays = db.relationship(
         'OriginDelay',
@@ -81,6 +104,23 @@ class Flight(
         SQL side of origin_delays_string
         """
         return sql_delays_string(cls, OriginDelay)
+
+    @hybrid_property
+    def origin_departure_estimated_datetime(self):
+        return datetime.datetime.combine(
+            self.origin_departure_estimated_date or self.report.date,
+            self.origin_departure_estimated_time,
+        )
+
+    @origin_departure_estimated_datetime.expression
+    def origin_departure_estimated_datetime(cls):
+        return (
+            cls.origin_departure_estimated_date
+            + db.func.cast(
+                self.origin_departure_estimated_time,
+                db.func.Interval(second_precision=True),
+            )
+        )
 
     @hybrid_property
     def origin_departure_actual_datetime(self):

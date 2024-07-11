@@ -2,41 +2,31 @@
 
 
 {% from "macros.html" import render_date %}
-{% from "macros.html" import render_form %}
 
 
-{# we might not have a report object #}
-{% set report_date = request.view_args.date %}
-
-
-{% block content %}
+{% block import_nav %}
     <div class="rows-container">
         <div>
             {# report title and nagivation if exists #}
             {% if report %}
             <nav id="report-nav">
-                <h3 id="report-title" title="{{ report_date }}">
-                    {{ config.PERFORMANCE_REPORT_TITLE }}: {{ render_date(report_date) }}
+                <h3>
+                    Back to <a href="{{ url_for('report.view_report', id=report.id) }}">{{ config.PERFORMANCE_REPORT_TITLE }}: {{ render_date(report.date) }}</a>
                 </h3>
             </nav>
-            <div class="noprint report-buttons">
-                <a href="{{ url_for('report.view_report', id=report.id) }}">Back to report</a>
-            </div>
             {% endif %}
-            <p>Report date matched against departure date.</p>
-            <p>Sorted by departure date and flight number.</p>
-            <p>Departure date part hidden for same as report.</p>
-            <p class="data">1 kg = {{ kg_conversion_factor }} lbs</p>
-            <p>External database uses three-digit decimal precision which is lost here.</p>
+            {% block import_more_nav %}{# motivated by possibly different links to help page #}{% endblock import_more_nav %}
         </div>
     </div>
-    {% if param_form %}
+{% endblock import_nav %}
+
+
+{% block content %}
     <div class="rows-container">
-        <div>
-            <h2>Query Options</h2>
-            <form>{{ render_form(param_form) }}</form>
-        </div>
+        <h3>{% block import_title %}{% endblock import_title %}</h3>
     </div>
-    {% endif %}
+    {{ self.import_nav() }}
     {% block import_content %}{% endblock import_content %}
+    {% block import_parameter_form %}{% endblock import_parameter_form %}
+    {% block import_results %}{% endblock import_results %}
 {% endblock content %}

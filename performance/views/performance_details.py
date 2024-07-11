@@ -12,7 +12,7 @@ performance_details_bp = Blueprint(
 )
 
 DATE_RANGE_KEYS = ', '.join(
-    business.PERFORMANCE_DATE_RANGE_KEYS
+    business.summary.PERFORMANCE_DATE_RANGE_KEYS
     + ['contract_range']
 )
 
@@ -47,9 +47,9 @@ def for_range(
 ):
     # Report.date is enforced unique
     report = Report.query.filter(Report.date == report_date).first_or_404()
-    contract = business.performance_contract_for_date(report_date)
+    contract = business.summary.performance_contract_for_date(report_date)
 
-    nested_queries = business._performance_queries(report_date, contract)
+    nested_queries = business.summary._performance_queries(report_date, contract)
 
     flight_query = nested_queries[date_range_key][performance_key]
     flight_query = flight_query.order_by(

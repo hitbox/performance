@@ -82,6 +82,23 @@ def get_form_redirect(form):
     elif is_field_populated(form, 'backurl'):
         return redirect(form.backurl.data)
 
+_raise = object()
+
+def deep_getattr(obj, names, default=_raise):
+    for name in names.split('.'):
+        try:
+            obj = getattr(obj, name)
+        except AttributeError:
+            if default is not _raise:
+                return default
+            raise
+    return obj
+
+def popitem(dict_):
+    key = next(iter(dict_))
+    value = dict_.pop(key)
+    return (key, value)
+
 def sortfunc_by_type(obj):
     """
     Return function to sort 2-tuple items in an object according to the

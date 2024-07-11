@@ -1,3 +1,7 @@
+import datetime
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from ..extensions import db
 
 class FlightMixin:

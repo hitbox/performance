@@ -1,0 +1,31 @@
+{% extends "report/import-base.html" %}
+
+
+{% from "macros.html" import render_form %}
+{% from "macros.html" import render_date %}
+
+
+{% block import_title %}Update From External Database Help{% endblock import_title %}
+
+
+{% block import_more_nav %}
+    <h3>
+        <a href="{{ url_for('.update_report_from_external', report_id=report_id) }}">Back to Update From External Database</a>
+    </h3>
+{% endblock import_more_nav %}
+
+
+{% block import_content %}
+    <div>
+        <p>How data is matched:</p>
+        <ol>
+            <li>Report date to departure date.</li>
+            <li>Flight number.</li>
+            <li>Origin and destination stations.</li>
+        </ol>
+        <p>Sorted by departure date and flight number.</p>
+        <p>Departure date part hidden for same as report.</p>
+        <p class="data">1 kg = {{ kg_conversion_factor }} lbs</p>
+        <p>External database uses three-digit precision which is lost.</p>
+    </div>
+{% endblock import_content %}

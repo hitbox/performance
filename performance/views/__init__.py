@@ -3,7 +3,7 @@ from flask import render_template
 from flask import url_for
 from werkzeug.exceptions import HTTPException
 
-from ..authorization import redirect_password_reset
+from performance.authorization import redirect_password_reset
 
 from .admin import admin_bp
 from .assumed_best import assumed_best_bp

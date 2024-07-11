@@ -28,6 +28,29 @@
 {% endmacro %}
 
 
+{% macro render_time(value) %}{{ value.strftime(config.TIMEFMT) }}{% endmacro %}
+
+
+{% macro render_date(value) %}{{ value.strftime(config.DATEFMT) }}{% endmacro %}
+
+
+{% macro render_by_type(value, show_none=none) %}
+    {% if value is number %}
+        {{ render_integer(value) }}
+    {% elif value.__class__.__name__ == 'time' %}
+        {{ render_time(value) }}
+    {% elif value.__class__.__name__ == 'date' %}
+        {{ render_date(value) }}
+    {% elif value is none %}
+        {% if show_none is not none %}
+            {{ show_none }}
+        {% endif %}
+    {% else %}
+        {{ value }}
+    {% endif %}
+{% endmacro %}
+
+
 {% macro render_delay(delay) %}
 {# render individual delay code object #}
 {# similar: parse.py:formatdelays #}
@@ -46,7 +69,6 @@
 {# NOTE: delay.minutes can be None #}
 {# NOTE: the only type of XLD observed: {Delay(code='XLD', minutes=None, cancelled=True)} #}
 {# NOTE: can't do a filter here because of complicated rules for showing #}
-{% set debug = kwargs.get('debug', config.TEMPLATE_DEBUG_DELAY_CODES) %}
 <ol class="delay-codes">{% for delay in delays %}
     <li>
         {{ render_delay(delay, **kwargs) }}

@@ -44,7 +44,7 @@ def get_context(report):
     """
     context = dict(report=report)
 
-    contract = business.performance_contract_for_date(report.date)
+    contract = business.summary.performance_contract_for_date(report.date)
     context['contract'] = contract
 
     context['controllable_delay_codes'] = models.Delay.query.filter(
@@ -53,7 +53,7 @@ def get_context(report):
         models.Delay.code,
     ).all()
 
-    context.update(business.performance_summary(report.date, contract))
+    context.update(business.summary.performance_summary(report.date, contract))
     return context
 
 def get_prev_next_context(report_date):
@@ -173,5 +173,5 @@ def performance_summary(start, end):
     start = start.date()
     end = end.date()
     date_criteria = models.Report.date.between(start, end)
-    lanes = business.performance_summary(date_criteria, '')
+    lanes = business.summary.performance_summary(date_criteria, '')
     print(lanes)

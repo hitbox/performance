@@ -1,67 +1,96 @@
 {% extends "report/import-base.html" %}
 
 
+{% from "macros.html" import render_by_type %}
+{% from "macros.html" import render_date %}
 {% from "macros.html" import render_form %}
 
 
-{% block content %}
-    <h1>Update From External Database</h1>
-    {{ super() }}
-{% endblock content %}
+{% block import_title %}<h3>Update From External Database</h3>{% endblock import_title %}
 
 
-{% block table_body %}
-{%- for flight_change_form in results_form.flight_changes -%}
-{%- set changes = flight_change_form._matched_fields(param_form)|list -%}
-{%- for attrname, isdiff, newfield, oldfield, update_field in changes -%}
-<tr>
-    {% if loop.first %}
-    {# show flight number across all the changes rows #}
-    <td class="data" rowspan="{{ loop.length }}">
-        {{- flight_change_form.flight.flight_number.data -}}
-    </td>
-    {% endif %}
-    <td>{{ attrname }}</td>
-    <td>
-        {{ newfield }}
-        {% if param_form.show_kg and attrname == 'Weight' %}
-            {{ flight_change_form.baggage_weight_kg.data }}kg
-        {% endif %}
-    </td>
-    <td>{{ oldfield }}</td>
-    <td>{{ update_field }}</td>
-</tr>
-{%- endfor -%}{# ... in changes #}
-{%- endfor -%}{# in results_form.flight_changes #}
-{% endblock table_body %}
+{% block import_more_nav %}<h3><a href="{{ url_for('.update_report_from_external_help', report_id=report.id) }}">Help</a></h3>{% endblock import_more_nav %}
 
 
-{% block import_content %}
+{% block import_parameter_form %}
+    {% if param_form %}
     <div class="rows-container">
         <div>
-            {% if results_form %}
-            {# results of query #}
-            {# give the user a form to select changes to update #}
-            <h1>Differences</h1>
-            <p>Check the <span class="reference">Update?</span> to import change.</p>
-            <form class="external" method="POST">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Flight</th>
-                            <th>Field Name</th>
-                            <th>Old</th>
-                            <th>New</th>
-                            <th>Update?</th>
-                        </tr>
-                    </thead>
-                    <tbody>{{ self.table_body() }}</tbody>
-                </table>
-                <div class="buttons">
-                    {{ results_form.submit }}
-                </div>
-            </form>
-            {% endif %}{# results_form #}
+            <p>Download external data and match.</p>
+            {% if show_param_form_title %}<h2>Query Options</h2>{% endif %}
+            <form>{{ render_form(param_form) }}</form>
         </div>
     </div>
-{% endblock import_content %}
+    {% endif %}
+{% endblock import_parameter_form %}
+
+
+{% block import_results %}
+    {% if results_form %}
+    {% set show_none = '(None)' %}{# what to show for None #}
+    <h3>External Match Results</h3>
+    <form action="{{ url_for('.update_report_from_external', report_id=report.id) }}" method="POST">
+        {{ results_form.hidden_tag() }}
+
+        {% if results_form.errors %}{{ results_form.errors }}{% endif %}
+
+        <div class="col-4 flight-changes-grid">{% for flight_changes_form in results_form.flight_changes %}
+            {{ flight_changes_form.hidden_tag() }}
+            <div class="hidden">
+                {{ flight_changes_form.internal_flight.hidden_tag() }}
+                {{ flight_changes_form.internal_flight._fields['id'] }}
+            </div>
+
+            {% if loop.first %}
+                <h3 class="field-header">Field</h3>
+                <h3 class="field-header">Old</h3>
+                <h3 class="field-header">New</h3>
+                <h3 class="field-header">Update?</h3>
+            {% endif %}
+            {% set internal_flight = flight_changes_form.internal_flight.object_data %}
+            {% set external_flight = flight_changes_form.external_flight.object_data %}
+            {# flight info header row #}
+            <div class="full-span flight-info-group{% if not loop.first %} flight-info-not-first{% endif %}">
+                <span class="data flight-info" title="Tail">{{ internal_flight.tail_number }}</span>
+                <span class="data flight-info" title="Flight">{{ internal_flight.flight_number }}</span>
+                <span class="data flight-info" title="Orgin">{{ internal_flight.origin_station }}</span>
+                <span class="data flight-info" title="Destination">{{ internal_flight.destination_station }}</span>
+                <span class="data flight-info" title="ETD">{{ render_by_type(internal_flight.origin_departure_estimated_time) }}</span>
+            </div>
+            {# changes rows #}
+            {% for diff_form in flight_changes_form.diffs|sort(attribute='internal_attr_order') %}
+                {# minimally render the actual form fields #}
+                <div class="hidden">
+                    {{ diff_form.hidden_tag() }}
+                    {{ flight_changes_form.internal_flight.hidden_tag() }}
+                    {{ flight_changes_form.external_flight.hidden_tag() }}
+                </div>
+                <div class="flight-changes label">{{ diff_form.internal_label.data }}</div>
+                {# NOTES #}
+                {# - Cannot render all the fields from the internal and external flights forms. #}
+                {# - Must render the two fields to post. #}
+                {# - No clear way to have a dynamic field that would become one of the many types we need on form creation. #}
+                {# - So, we depend on the nested loop to lookup the input field from the attribute name here. #}
+                {% set internal_attr = diff_form.internal_attr.data %}
+                {% set internal_val = internal_flight[internal_attr] %}
+                {% set internal_field = flight_changes_form.internal_field(internal_attr) %}
+
+                {% set external_attr = diff_form.external_attr.data %}
+                {% set external_val = external_flight[external_attr] %}
+                {% set external_field = flight_changes_form.external_field(external_attr) %}
+
+                <div class="hidden">
+                    {{ diff_form.internal_attr }}
+                    {{ diff_form.external_attr }}
+                    {{ internal_field }}
+                    {{ external_field }}
+                </div>
+                <div class="data">{{ render_by_type(internal_val, show_none) }}</div>
+                <div class="data">{{ render_by_type(external_val, show_none) }}</div>
+                <div>{{ diff_form.do_update }}</div>
+            {% endfor %}
+        {% endfor %}</div>
+        <div class="buttons flight-changes">{% for button in results_form|selectattr('type', 'in', ('SubmitField', )) %}{{ button }}{% endfor %}</div>
+    </form>
+    {% endif %}
+{% endblock import_results %}

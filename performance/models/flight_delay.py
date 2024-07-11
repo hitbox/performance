@@ -1,8 +1,8 @@
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from .. import parse
-from ..extensions import db
+from performance import parse
+from performance.extensions import db
 
 from .delay import Delay
 from .mixin import UniqueMixin

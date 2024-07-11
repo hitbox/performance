@@ -1,11 +1,14 @@
 import csv
 import datetime
 
+from pprint import pprint
+
 import click
 
 from flask import Blueprint
 from flask import abort
 from flask import current_app
+from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -14,12 +17,25 @@ from flask import url_for
 from performance import business
 from performance import forms
 from performance import models
+from performance import queries
 from performance import settings
 from performance.authorization import basic_check
 from performance.authorization import edit_check
 from performance.extensions import db
 
 external_bp = Blueprint('external', __name__)
+
+@external_bp.route('/update/<int:report_id>/help', methods=['GET', 'POST'])
+@basic_check
+def update_report_from_external_help(report_id):
+    """
+    Helpful information about how the update from external works.
+    """
+    context = dict(
+        kg_conversion_factor = settings.kilogram_conversion_factor(),
+        report_id = report_id,
+    )
+    return render_template('report/import-changes-help.html', **context)
 
 @external_bp.route('/update/<int:report_id>', methods=['GET', 'POST'])
 @basic_check
@@ -34,54 +50,56 @@ def update_report_from_external(report_id):
 
     param_form = None
     results_form = None
-    # XXX
-    # - two forms is really hard to manage
-    # - maybe just one form with the query params *and* results
-    # - and then detect which button pressed
-
-    # THINKING
-    # - form with integer step hidden field
-    # - attribute button named next whose action is determined python side and labelled
 
     if request.method == 'POST':
-        # POST submit is only for doing final import of results
+        # POST is only for doing final import of results
         results_form = forms.ChangesForm(formdata=request.form)
         if results_form.validate():
-            # XXX: update_report_from_external is a name but not getting an exception
-            business.update_report_from_external(results_form.data)
-            # TODO
-            # - not being redirected
-            # - despite update, always showing changes
-            # - breakpoint in update_report_from_external
-            return redirect(url_for('report.view_report', id=report.id))
+            # result form is valid
+            if results_form.clear.data:
+                # user clicked to clear results form
+                url = url_for(request.endpoint, report_id=report_id)
+                return redirect(url)
+            else:
+                # user clicked to apply changes
+                flight_changes = results_form.data['flight_changes']
+                business.external.update_from_flight_changes(flight_changes)
+                db.session.commit()
+                return redirect(url_for('report.view_report', id=report.id))
 
     param_form = forms.QueryParametersForm(data=request.args)
-    if param_form.clear.data:
-        # redirect to clear query arguments
-        return redirect(url_for(request.endpoint, report_id=report.id))
+    del param_form.show_kg
+    del param_form.show_all_fields
 
-    if param_form.submit.name not in request.args:
-        # initial page load, no query yet, remove clear button
-        del param_form.clear
-    elif results_form is None:
+    javascript_injection = {}
+    if (
+        param_form.submit.name in request.args
+        and
+        results_form is None
+    ):
+        # user clicked to query external database
         # only create results_form if it has not already been created
         # it may have been created and failed validation
-        # user clicked to query external database
-        results = business.external_results(report.date)
-        changes = list(
-            business.get_changes_for_report_from_external(report, results)
-        )
+        joined = business.external.joined_external_flights(report.date)
+        flight_changes = business.external.make_diffs(report.date, joined)
+        flight_changes = sorted(flight_changes, key=business.external.changes_sort_key)
         results_form = forms.ChangesForm(
             data = dict(
-                flight_changes = changes,
+                flight_changes = flight_changes,
             ),
         )
+        # push an anchor to javascript
+        javascript_injection['anchor'] = 'updates'
+        # hide query parameters form
+        param_form = None
 
     context = dict(
         kg_conversion_factor = settings.kilogram_conversion_factor(),
         param_form = param_form,
         report = report,
         results_form = results_form,
+        show_param_form_title = False,
+        javascript_injection = javascript_injection,
     )
     return render_template('report/import-changes.html', **context)
 
@@ -97,7 +115,7 @@ def import_for_new(report_date):
     if request.method == 'POST':
         results_form = forms.ResultsForm(formdata=request.form)
         if results_form.validate():
-            report = business.new_report_from_external(
+            report = business.external.new_report_from_external(
                 report_date,
                 results_form.data,
             )
@@ -109,11 +127,14 @@ def import_for_new(report_date):
     # remove field that makes no sense here
     del param_form.show_all_fields
     if param_form.clear.data:
+        # TODO
+        # - moved clear to the result form
+        # - remove this
         # redirect to clear query args
         return redirect(url_for(request.endpoint, report_date=report_date))
 
     if param_form.submit.name in request.args:
-        results = business.external_results(report_date).mappings()
+        results = business.external.external_results(report_date).mappings()
         results_form = forms.ResultsForm(data=dict(rows=results))
     else:
         del param_form.clear
@@ -129,6 +150,24 @@ def import_for_new(report_date):
     template = 'report/prompt-new-external.html'
     return render_template(template, **context)
 
+@external_bp.cli.command('query')
+@click.argument('report_date', type=click.DateTime(formats=['%Y-%m-%d']))
+@click.option(
+    '--changes/--no-changes',
+    default = True,
+    show_default = True,
+    help = 'Show changes against internal flights.',
+)
+def query(report_date, changes):
+    """
+    Display the results of the external query for a given report date.
+    """
+    report_date = report_date.date()
+    data = business.external.joined_external_flights(report_date)
+    if changes:
+        data = business.external.make_diffs(report_date, data)
+    pprint(data)
+
 @external_bp.cli.command('load')
 @click.argument('type_', type=click.Choice(['csv']))
 @click.argument('file', type=click.File('r'))
@@ -136,11 +175,13 @@ def import_for_new(report_date):
 @click.option(
     '--lower-keys/--no-lower-keys',
     default = True,
+    show_default = True,
     help = 'Lower case the keys.',
 )
 @click.option(
     '--ignore-unknown/--no-ignore-unknown',
     default = True,
+    show_default = True,
     help = 'Ignore the keys from CSV that the mapper doesn\' take.',
 )
 @click.option(

@@ -65,10 +65,27 @@ function initScrollToActive() {
     }
 }
 
+function push_anchor() {
+    // anchor variable pushed through templates
+    if (typeof anchor === 'string') {
+        if (window.location.hash !== anchor) {
+            window.location.assign('#' + anchor);
+        }
+    }
+}
+
+function init_clicks() {
+    // an element with data-clicks="elemid1,elemid2,...,elemidN" repeats the
+    // click event for all the element ids
+    // need ids and could use classes
+}
+
 document.addEventListener("DOMContentLoaded", function(event) {
     initDataHref();
     initCloseButton();
     initDatePickers();
     initDangerButtons();
     initScrollToActive();
+    push_anchor();
+    init_clicks();
 });

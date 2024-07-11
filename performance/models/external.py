@@ -7,6 +7,24 @@ from performance.extensions import db
 
 BINDKEY = 'schedops'
 
+def date_part_expression(column):
+    """
+    Wrap the column in an expression to get the date part of a datetime
+    appropriate for the dialect.
+    """
+    if db.engine.dialect.name == 'postgresql':
+        expression = sa.func.cast(column, sa.Date)
+    elif db.engine.dialect.name == 'oracle':
+        expression = sa.func.trunc(column)
+    return expression
+
+def time_part_expression(column):
+    if db.engine.dialect.name == 'postgresql':
+        expression = sa.func.cast(column, sa.Time)
+    elif db.engine.dialect.name == 'oracle':
+        expression = sa.func.to_char(column, 'HH24:MI:SS')
+    return expression
+
 class Leg(db.Model):
     """
     Leg Basic Data
@@ -38,16 +56,68 @@ class Leg(db.Model):
         comment = 'Flight designator: number',
     )
 
+    @hybrid_property
+    def fn_number_as_string(self):
+        return str(self.fn_number)
+
+    @fn_number_as_string.expression
+    def fn_number_as_string(cls):
+        return sa.cast(cls.fn_number, sa.String(4)).label('fn_number_as_string')
+
     ac_registration = sa.Column(
         sa.String,
         nullable = True,
         comment = 'Registration of the aircraft', # tail number
     )
 
+    dep_ap_sched = sa.Column(
+        sa.String,
+        nullable = False,
+        comment = 'Scheduled airport of departure   (IATA)',
+    )
+
+    dep_ap_actual = sa.Column(
+        sa.String,
+        nullable = False,
+        comment = 'Actual airport of departure',
+    )
+
     dep_dt = sa.Column(
         sa.DateTime,
         nullable = False,
         comment = 'Actual time of departure  (ATA)',
+        info = dict(
+            label = 'ATA',
+        ),
+    )
+
+    @hybrid_property
+    def dep_dt_date(self):
+        return self.dep_dt.date()
+
+    @dep_dt_date.expression
+    def dep_dt_date(cls):
+        return date_part_expression(cls.dep_dt).label('dep_dt_date')
+
+    @hybrid_property
+    def dep_dt_time(self):
+        return self.dep_dt.time()
+
+    @dep_dt_time.expression
+    def dep_dt_time(cls):
+        return time_part_expression(cls.dep_dt).label('dep_dt_time')
+
+    arr_ap_sched = sa.Column(
+        sa.String,
+        nullable = False,
+        comment = 'Scheduled airport of arrival',
+        # mistake in the database's comment field calls this departure
+    )
+
+    arr_ap_actual = sa.Column(
+        sa.String,
+        nullable = False,
+        comment = 'Actual airport of arrival',
     )
 
     arr_dt = sa.Column(
@@ -55,6 +125,22 @@ class Leg(db.Model):
         nullable = False,
         comment = 'Actual time of arrival',
     )
+
+    @hybrid_property
+    def arr_dt_date(self):
+        return self.arr_dt.date()
+
+    @arr_dt_date.expression
+    def arr_dt_date(cls):
+        return date_part_expression(cls.arr_dt).label('arr_dt_date')
+
+    @hybrid_property
+    def arr_dt_time(self):
+        return self.arr_dt.time()
+
+    @arr_dt_time.expression
+    def arr_dt_time(cls):
+        return time_part_expression(cls.arr_dt).label('arr_dt_time')
 
 
 class LegPax(db.Model):
@@ -74,7 +160,9 @@ class LegPax(db.Model):
         sa.String,
         primary_key = True,
         comment = (
-            'Entry usage:   E=Estimated (Demand forcasted for the flight leg)  B=Booked (Bookings for the flight leg)  F=Flown (Flown Passengers for the flight leg)'
+            'Entry usage:   E=Estimated (Demand forcasted for the flight leg)'
+            '  B=Booked (Bookings for the flight leg)  F=Flown (Flown'
+            ' Passengers for the flight leg)'
         ),
     )
 
@@ -102,7 +190,12 @@ class LegPax(db.Model):
 
     @baggage_weight_integer.expression
     def baggage_weight_integer(cls):
-        return sa.func.round(cls.baggage_weight)
+        return sa.cast(
+            sa.func.round(
+                cls.baggage_weight
+            ),
+            sa.Integer,
+        ).label('baggage_weight_integer')
 
     @hybrid_property
     def baggage_weight_lbs(self):
@@ -112,7 +205,9 @@ class LegPax(db.Model):
     @baggage_weight_lbs.expression
     def baggage_weight_lbs(cls):
         kg_to_lbs_factor = settings.kilogram_conversion_factor()
-        return cls.baggage_weight * kg_to_lbs_factor
+        return (
+            cls.baggage_weight * kg_to_lbs_factor
+        ).label('baggage_weight_lbs')
 
     @hybrid_property
     def baggage_weight_lbs_integer(self):
@@ -122,4 +217,9 @@ class LegPax(db.Model):
     @baggage_weight_lbs.expression
     def baggage_weight_lbs_integer(cls):
         kg_to_lbs_factor = settings.kilogram_conversion_factor()
-        return sa.func.round(cls.baggage_weight * kg_to_lbs_factor)
+        return sa.cast(
+            sa.func.round(
+                cls.baggage_weight * kg_to_lbs_factor
+            ),
+            sa.Integer,
+        ).label('baggage_weight_lbs_integer')
