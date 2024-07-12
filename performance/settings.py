@@ -1,5 +1,7 @@
 from flask import current_app
 
+from . import constants
+
 def contracts_use_date_range():
     # XXX
     # - not sure what this is anymore
@@ -10,32 +12,64 @@ def contracts_use_date_range():
     # - macro render_arrival_performance_contract_tier_table is really weird.
     #   it fallsback to this default *AND* it defaults, if not defined, to
     #   true.
-    key = 'PERFORMANCE_CONTRACTS_USE_DATE_RANGE'
+    key = constants.PERFORMANCE_CONTRACTS_USE_DATE_RANGE
     return current_app.config.get(key, False)
 
 def datefmt():
-    key = 'DATEFMT'
+    """
+    Python side access to date format. Templates just use config context
+    variable.
+    """
+    key = constants.DATEFMT
     return current_app.config.get(key, '%Y-%m-%d')
 
+def timefmt():
+    """
+    Python side access to time format. Templates just use config context
+    variable.
+    """
+    key = constants.TIMEFMT
+    return current_app.config.get(key, '%H:%M')
+
 def external_import():
-    key = 'PERFORMANCE_EXTERNAL_IMPORT'
+    """
+    Enable external importing for new reports.
+    """
+    key = constants.PERFORMANCE_EXTERNAL_IMPORT
+    return current_app.config.get(key, False)
+
+def external_update():
+    """
+    Enable external update existing report.
+    """
+    key = constants.PERFORMANCE_EXTERNAL_UPDATE
     return current_app.config.get(key, False)
 
 def external_fn_carrier():
-    key = 'PERFORMANCE_EXTERNAL_QUERY_CARRIER'
+    """
+    Query value required for external importing.
+    """
+    key = constants.PERFORMANCE_EXTERNAL_QUERY_CARRIER
     return current_app.config[key]
 
 def external_usage():
-    key = 'PERFORMANCE_EXTERNAL_QUERY_USAGE'
+    """
+    Query value for external importing. See
+    performance.models.external:LegPax.usage
+    """
+    key = constants.PERFORMANCE_EXTERNAL_QUERY_USAGE
     return current_app.config[key]
 
 def kilogram_conversion_factor():
-    key = 'KG_CONVERSION_FACTOR'
+    """
+    Conversion factor taking lbs to kg.
+    """
+    key = constants.KG_CONVERSION_FACTOR
     return current_app.config[key]
 
 def scheduled_reports_onlyone():
     """
     Enforce at the app level, only one scheduled report.
     """
-    key = 'SCHEDULED_REPORTS_ONLYONE'
+    key = constants.SCHEDULED_REPORTS_ONLYONE
     return current_app.config.get(key, False)

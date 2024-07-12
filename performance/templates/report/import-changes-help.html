@@ -17,14 +17,21 @@
 
 {% block import_content %}
     <div>
-        <p>How data is matched:</p>
+        <h3>Delay Codes</h3>
+        <p class="danger">Delay codes are cleared on update to dates or times.</p>
+        <h3>Matching Flights</h3>
+        <p>How flights are matched:</p>
         <ol>
-            <li>Report date to departure date.</li>
-            <li>Flight number.</li>
-            <li>Origin and destination stations.</li>
+            <li>Flight number</li>
+            <li>Origin station</li>
+            <li>Destination station</li>
         </ol>
-        <p>Sorted by departure date and flight number.</p>
-        <p>Departure date part hidden for same as report.</p>
+        <h3>Sorting</h3>
+        <ol>
+            <li>Estimated departure date</li>
+            <li>Flight number</li>
+        </ol>
+        <h3>Notes</h3>
         <p class="data">1 kg = {{ kg_conversion_factor }} lbs</p>
         <p>External database uses three-digit precision which is lost.</p>
     </div>

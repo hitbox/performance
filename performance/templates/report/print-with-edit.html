@@ -26,8 +26,6 @@
         {# report buttons #}
         <div class="noprint report-buttons">
             <a href="javascript:;" onclick="window.print(); return false">Print</a>
-            {#- import new report from external source -#}
-            {% if config.PERFORMANCE_EXTERNAL_UPDATE %}<a href="{{ url_for('external.update_report_from_external', report_id=report.id) }}">Update From External</a>{% endif %}
         </div>
 
         {# performance numbers #}
@@ -58,6 +56,16 @@
             </div>{% endif %}{# contract #}
         {% endif %}{# config.PERFORMANCE_CONTRACTS #}
     </div>
+
+
+{# update report from external source #}
+{% if config.PERFORMANCE_EXTERNAL_UPDATE %}
+    <div class="row-container noprint">
+        <h3 class="update-external">
+            <a href="{{ url_for('external.update_report_from_external', report_id=report.id) }}">Update From External</a>
+        </h3>
+    </div>
+{% endif %}
 
 {# flights tables by type #}
 {% for flight_type, flights in report.flights_by_type() %}{% include "report/flight-table.html" %}{% endfor %}

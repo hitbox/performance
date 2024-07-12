@@ -263,7 +263,9 @@ class FlightChangesForm(BaseFlaskForm):
 class ChangesForm(BaseFlaskForm):
 
     flight_changes = FieldList(
-        FormField(FlightChangesForm),
+        FormField(
+            FlightChangesForm,
+        ),
     )
 
     clear = SubmitField()

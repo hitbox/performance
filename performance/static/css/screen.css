@@ -39,6 +39,8 @@
     /* tables */
     --th-color: #ccc;
     --th-background-color: #444;
+
+    --danger-color: #ff6969;
 }
 
 body {

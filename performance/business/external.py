@@ -41,6 +41,14 @@ internal_diff_attrs = [
     'weight',
 ]
 
+# on update to flight attribute .clear() the other
+clear_attributes = {
+    'origin_departure_actual_date': 'origin_delays',
+    'origin_departure_actual_time': 'origin_delays',
+    'destination_arrival_actual_date': 'destination_delays',
+    'destination_arrival_actual_time': 'destination_delays',
+}
+
 def external_label(attrname):
     for class_ in [models.Leg, models.LegPax]:
         attr = getattr(class_, attrname, None)
@@ -204,17 +212,24 @@ def new_report_from_external(report_date, results_data):
     return report
 
 def update_from_flight_changes(flight_changes_list):
+    """
+    Update flights' attributes from a list of differences.
+    """
     for flight_changes in flight_changes_list:
         internal_flight_data = flight_changes['internal_flight']
         internal_flight = db.session.get(models.Flight, internal_flight_data['id'])
         external_flight = flight_changes['external_flight']
         for diff in flight_changes['diffs']:
-            # XXX
-            # - clear associated delay codes if time or date changes?
+            if not diff['do_update']:
+                # user selected not to update this diff
+                continue
             internal_attr = diff['internal_attr']
             external_attr = diff['external_attr']
             value = external_flight[external_attr]
             setattr(internal_flight, internal_attr, value)
+            if internal_attr in clear_attributes:
+                clear_attr = clear_attributes[internal_attr]
+                getattr(internal_flight, clear_attr).clear()
 
 diff_funcs = {
     'dep_dt_date': date_is_changed,

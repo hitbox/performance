@@ -1,5 +1,5 @@
 /* always applied styling */
-/* the way everything should alway look */
+/* the way everything should always look */
 
 :root {
     --color: black;
@@ -18,6 +18,8 @@
     --this-weekday-color: White;
     --this-weekday-background-color: ForestGreen;
     --day-border-color: #999;
+
+    --danger-color: #a03934;
 }
 
 /* https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/ */
@@ -352,6 +354,12 @@ h4.select-month {
     margin-top: 2rem;
 }
 
+h3.update-external {
+    /* hack around .flight-table for external update link */
+    margin-top: 2rem;
+    margin-bottom: 0;
+}
+
 .flight-type-name {
     text-align: left;
     font-size: 1.05rem;
@@ -579,8 +587,14 @@ h3 > label {
 }
 
 button.danger, input[type=submit].danger {
-    background: #a03934;
+    /*background: #a03934;*/
+    background: var(--danger-color);
     color: white;
+}
+
+p.danger {
+    color: var(--danger-color);
+    font-weight: bold;
 }
 
 form > .buttons {

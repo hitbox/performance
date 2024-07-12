@@ -1,3 +1,4 @@
+from . import constants
 from .exceptions import PerformanceError
 
 _required_registry = {}
@@ -72,7 +73,35 @@ def require_all(validator, keys, is_development=False):
     for key in keys:
         require(key, validator, is_development=is_development)
 
+def validate_external(app):
+    # external import/update config and their requirements
+    external_keys = [
+        constants.PERFORMANCE_EXTERNAL_IMPORT,
+        constants.PERFORMANCE_EXTERNAL_UPDATE,
+    ]
+    required_for_external_import = [
+        constants.PERFORMANCE_EXTERNAL_QUERY_CARRIER,
+        constants.PERFORMANCE_EXTERNAL_QUERY_USAGE,
+        constants.KG_CONVERSION_FACTOR,
+    ]
+    for external_key in external_keys:
+        if not app.config.get(external_key, False):
+            continue
+        # external import enabled, other config required
+        for dependency_key in required_for_external_import:
+            if dependency_key not in app.config:
+                raise ConfigError(
+                    f'{dependency_key} required for {external_key}')
+
+            value = app.config[dependency_key]
+            if not value:
+                raise ConfigError(
+                    f'{dependency_key} must have a value')
+
 def raise_for_config(app):
+    """
+    Main entry for app creation configuration validation.
+    """
     def _raise_for_config(app, registry, prefix=''):
         for key, validator in registry.items():
             try:
@@ -83,26 +112,29 @@ def raise_for_config(app):
                 if not validator(value):
                     raise ConfigError(
                         f'{prefix}Invalid config value {value!r} for {key!r}.'
-                        f'Expected {validator}')
+                        f' Expected {validator}')
+
     if app.debug:
         _raise_for_config(app, _development_registry, prefix='Development: ')
     _raise_for_config(app, _required_registry)
+
+    validate_external(app)
 
 # universal requirements
 require_all(String(min=1), [
     'SESSION_COOKIE_PATH',
     'REMEMBER_COOKIE_PATH',
-    'DATEFMT',
-    'TIMEFMT',
-    'PERFORMANCE_HEAD_TITLE',
-    'PERFORMANCE_REPORT_TITLE',
+    constants.DATEFMT,
+    constants.TIMEFMT,
+    constants.PERFORMANCE_HEAD_TITLE,
+    constants.PERFORMANCE_REPORT_TITLE,
 ])
 
 require('PERFORMANCE_JAVASCRIPT_INJECTION', Dictionary())
 
 require_all(List(is_populated=True), [
-    'PERFORMANCE_CONTROLLABLE',
-    'PERFORMANCE_LANES_FLIGHTTYPES',
+    constants.PERFORMANCE_CONTROLLABLE,
+    constants.PERFORMANCE_LANES_FLIGHTTYPES,
 ])
 
 require('PREFIX', String(min=1), is_development=True)
