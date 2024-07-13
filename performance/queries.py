@@ -12,16 +12,20 @@ def get_external_stmt(report_date):
     Query statement to get baggage weight from external source matching
     departure date against report date.
     """
+    # NOTES
+    # - before this mistake is made again, oracle does not have separate date
+    #   and time types.
     external_stmt = (
         db.select(
             # flight number is string on this application's side
             models.Leg.fn_number_as_string,
             # datetimes broken apart into date and time, on the python side
-            models.Leg.dep_dt_date,
-            models.Leg.dep_dt_time,
+            # dates and times and strings on the database side
+            models.Leg.dep_dt_date_string,
+            models.Leg.dep_dt_time_string,
             models.Leg.dep_ap_actual,
-            models.Leg.arr_dt_date,
-            models.Leg.arr_dt_time,
+            models.Leg.arr_dt_date_string,
+            models.Leg.arr_dt_time_string,
             models.Leg.arr_ap_actual,
             models.LegPax.baggage_weight_integer.label('baggage_weight_kg'),
             models.LegPax.baggage_weight_lbs_integer.label('baggage_weight_lbs'),
@@ -31,7 +35,7 @@ def get_external_stmt(report_date):
             models.Leg.leg_no == models.LegPax.leg_no,
         )
         .where(
-            models.Leg.dep_dt_date == report_date,
+            models.Leg.dep_dt_date_string == str(report_date),
             # filter for airline
             models.Leg.fn_carrier == settings.external_fn_carrier(),
             # entry usage estimated, booked, and flown

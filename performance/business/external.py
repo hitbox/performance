@@ -1,3 +1,5 @@
+import datetime
+
 from operator import attrgetter
 from types import SimpleNamespace
 
@@ -63,6 +65,19 @@ def internal_index(flight):
     # enumerate-like for the internal key
     return (get_internal_key(flight), flight)
 
+def post_process_external_flights(external_flights):
+    for flight in external_flights:
+        flight = SimpleNamespace(**flight._mapping)
+        flight.dep_dt_date = datetime.date.fromisoformat(flight.dep_dt_date_string)
+        flight.dep_dt_time = datetime.time.fromisoformat(flight.dep_dt_time_string)
+        flight.arr_dt_date = datetime.date.fromisoformat(flight.arr_dt_date_string)
+        flight.arr_dt_time = datetime.time.fromisoformat(flight.arr_dt_time_string)
+        del flight.dep_dt_date_string
+        del flight.dep_dt_time_string
+        del flight.arr_dt_date_string
+        del flight.arr_dt_time_string
+        yield flight
+
 def joined_external_flights(report_date):
     """
     Join flight from external database with internal flights for a given report
@@ -73,6 +88,8 @@ def joined_external_flights(report_date):
     internal_flights_stmt = queries.get_internal_stmt(report_date)
 
     external_flights = db.session.execute(external_flights_stmt)
+    external_flights = post_process_external_flights(external_flights)
+
     internal_flights = db.session.scalars(internal_flights_stmt)
 
     indexed_external_flights = dict(map(external_index, external_flights))
@@ -80,10 +97,9 @@ def joined_external_flights(report_date):
 
     joined = []
     while indexed_external_flights and indexed_internal_flights:
-        external_key, row = popitem(indexed_external_flights)
+        external_key, external_flight = popitem(indexed_external_flights)
         for internal_key, internal_flight in indexed_internal_flights.items():
             if external_key == internal_key:
-                external_flight = row._mapping
                 joined.append((external_flight, internal_flight))
                 break
         else:

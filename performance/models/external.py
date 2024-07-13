@@ -8,22 +8,12 @@ from performance.extensions import db
 BINDKEY = 'schedops'
 
 def date_part_expression(column):
-    """
-    Wrap the column in an expression to get the date part of a datetime
-    appropriate for the dialect.
-    """
-    if db.engine.dialect.name == 'postgresql':
-        expression = sa.func.cast(column, sa.Date)
-    elif db.engine.dialect.name == 'oracle':
-        expression = sa.func.trunc(column)
-    return expression
+    # return date part of an oracle datetime field
+    return sa.func.to_char(column, 'YYYY-MM-DD')
 
 def time_part_expression(column):
-    if db.engine.dialect.name == 'postgresql':
-        expression = sa.func.cast(column, sa.Time)
-    elif db.engine.dialect.name == 'oracle':
-        expression = sa.func.to_char(column, 'HH24:MI:SS')
-    return expression
+    # return time part of an oracle datetime field
+    return sa.func.to_char(column, 'HH24:MI:SS')
 
 class Leg(db.Model):
     """
@@ -92,20 +82,20 @@ class Leg(db.Model):
     )
 
     @hybrid_property
-    def dep_dt_date(self):
-        return self.dep_dt.date()
+    def dep_dt_date_string(self):
+        return str(self.dep_dt.date())
 
-    @dep_dt_date.expression
-    def dep_dt_date(cls):
-        return date_part_expression(cls.dep_dt).label('dep_dt_date')
+    @dep_dt_date_string.expression
+    def dep_dt_date_string(cls):
+        return date_part_expression(cls.dep_dt).label('dep_dt_date_string')
 
     @hybrid_property
-    def dep_dt_time(self):
-        return self.dep_dt.time()
+    def dep_dt_time_string(self):
+        return str(dep_dt.time())
 
-    @dep_dt_time.expression
-    def dep_dt_time(cls):
-        return time_part_expression(cls.dep_dt).label('dep_dt_time')
+    @dep_dt_time_string.expression
+    def dep_dt_time_string(cls):
+        return time_part_expression(cls.dep_dt).label('dep_dt_time_string')
 
     arr_ap_sched = sa.Column(
         sa.String,
@@ -127,20 +117,20 @@ class Leg(db.Model):
     )
 
     @hybrid_property
-    def arr_dt_date(self):
-        return self.arr_dt.date()
+    def arr_dt_date_string(self):
+        return str(self.arr_dt.date())
 
-    @arr_dt_date.expression
-    def arr_dt_date(cls):
-        return date_part_expression(cls.arr_dt).label('arr_dt_date')
+    @arr_dt_date_string.expression
+    def arr_dt_date_string(cls):
+        return date_part_expression(cls.arr_dt).label('arr_dt_date_string')
 
     @hybrid_property
-    def arr_dt_time(self):
+    def arr_dt_time_string(self):
         return self.arr_dt.time()
 
-    @arr_dt_time.expression
-    def arr_dt_time(cls):
-        return time_part_expression(cls.arr_dt).label('arr_dt_time')
+    @arr_dt_time_string.expression
+    def arr_dt_time_string(cls):
+        return time_part_expression(cls.arr_dt).label('arr_dt_time_string')
 
 
 class LegPax(db.Model):
