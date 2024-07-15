@@ -93,6 +93,9 @@ def update_report_from_external(report_id):
         # hide query parameters form
         param_form = None
 
+    if results_form and not results_form.flight_changes:
+        del results_form.submit
+
     context = dict(
         kg_conversion_factor = settings.kilogram_conversion_factor(),
         param_form = param_form,

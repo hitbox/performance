@@ -43,8 +43,7 @@ internal_diff_attrs = [
     'weight',
 ]
 
-# on update to flight attribute .clear() the other
-clear_attributes = {
+date_and_time_to_delays = {
     'origin_departure_actual_date': 'origin_delays',
     'origin_departure_actual_time': 'origin_delays',
     'destination_arrival_actual_date': 'destination_delays',
@@ -243,9 +242,13 @@ def update_from_flight_changes(flight_changes_list):
             external_attr = diff['external_attr']
             value = external_flight[external_attr]
             setattr(internal_flight, internal_attr, value)
-            if internal_attr in clear_attributes:
-                clear_attr = clear_attributes[internal_attr]
-                getattr(internal_flight, clear_attr).clear()
+            if internal_attr not in date_and_time_to_delays:
+                # was not a diff affecting the delay codes' minutes
+                continue
+            delays_attr = date_and_time_to_delays[internal_attr]
+            delays = getattr(internal_flight, delays_attr)
+            for delay in delays:
+                delay.minutes = None
 
 diff_funcs = {
     'dep_dt_date': date_is_changed,
