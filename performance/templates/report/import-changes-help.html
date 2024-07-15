@@ -18,9 +18,9 @@
 {% block import_content %}
     <div>
         <h3>Delay Codes</h3>
-        <p class="danger">Delay codes' minutes are cleared on update to dates or times.</p>
+        <p class="danger">Delay codes' minutes are cleared on update to times.</p>
         <h3>Matching Flights</h3>
-        <p>How flights are matched:</p>
+        <p>Flights are matched by:</p>
         <ol>
             <li>Flight number</li>
             <li>Origin station</li>
@@ -34,5 +34,8 @@
         <h3>Notes</h3>
         <p class="data">1 kg = {{ kg_conversion_factor }} lbs</p>
         <p>External database uses three-digit precision which is lost.</p>
+        <h3>Results Interface</h3>
+        <p>The "Update?" header is clickable and toggles all checkboxes.</p>
+        <p>Each flight section header is clickable if there is more than one change listed. Clicking toggles the checkboxes for that flight.</p>
     </div>
 {% endblock import_content %}

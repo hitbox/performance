@@ -75,9 +75,18 @@ function push_anchor() {
 }
 
 function init_clicks() {
-    // an element with data-clicks="elemid1,elemid2,...,elemidN" repeats the
-    // click event for all the element ids
-    // need ids and could use classes
+    // click other elements by id, on click
+    const elements = document.querySelectorAll("[data-clicks]");
+    if (elements) {
+        for (let element of elements) {
+            element.addEventListener("click", function(event) {
+                event.preventDefault();
+                for (let other_id of event.target.dataset.clicks.split(" ")) {
+                    document.getElementById(other_id).click();
+                }
+            });
+        }
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {

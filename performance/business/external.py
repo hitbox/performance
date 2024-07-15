@@ -22,23 +22,24 @@ get_internal_key = attrgetter(
 )
 
 _flight_sort_key_for_changes = attrgetter(
-    'origin_departure_estimated_date',
+    'origin_departure_estimated_datetime',
     'origin_station',
     'destination_station',
 )
 
+# *_diff_attrs drive what attributes are checked for differences
 external_diff_attrs = [
-    'dep_dt_date',
+    #'dep_dt_date',
     'dep_dt_time',
-    'arr_dt_date',
+    #'arr_dt_date',
     'arr_dt_time',
     'baggage_weight_lbs',
 ]
 
 internal_diff_attrs = [
-    'origin_departure_actual_date',
+    #'origin_departure_actual_date',
     'origin_departure_actual_time',
-    'destination_arrival_actual_date',
+    #'destination_arrival_actual_date',
     'destination_arrival_actual_time',
     'weight',
 ]

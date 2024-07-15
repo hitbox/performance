@@ -273,3 +273,11 @@ class ChangesForm(BaseFlaskForm):
     submit = SubmitField(
         label = 'Import...',
     )
+
+    def _all_do_updates(self):
+        checkboxes = []
+        for flight_changes_form in self.flight_changes:
+            for diff_form in flight_changes_form.diffs:
+                checkboxes.append(diff_form.do_update)
+        return checkboxes
+

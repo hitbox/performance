@@ -48,18 +48,31 @@
                     <h3 class="field-header">Field</h3>
                     <h3 class="field-header">Old</h3>
                     <h3 class="field-header">New</h3>
-                    <h3 class="field-header">Update?</h3>
+                    <h3 class="field-header">
+                        <input id="toggle-all" class="hidden" type="checkbox" data-clicks="{{ results_form._all_do_updates()|join(' ', attribute='id') }}" />
+                        <label for="toggle-all">Update?</label>
+                    </h3>
                 {% endif %}
                 {% set internal_flight = flight_changes_form.internal_flight.object_data %}
                 {% set external_flight = flight_changes_form.external_flight.object_data %}
                 {# flight info header row #}
-                <div class="full-span flight-info-group{% if not loop.first %} flight-info-not-first{% endif %}">
+                {% if flight_changes_form.diffs|length > 1 %}
+                    {# toggle checkboxes button for more than one diff #}
+                    {% set group_id = "flight-group-{{ loop.index }}" %}
+                    <input id="{{ group_id }}" class="hidden" type="checkbox" data-clicks="{{ flight_changes_form.diffs|join(' ', attribute="do_update.id") }}" />
+                    {% set tagname = "label" %}
+                {% else %}
+                    {% set group_id = none %}
+                    {% set tagname = "div" %}
+                    {% set extra_attrs = [] %}
+                {% endif %}
+                <{{ tagname }}{% if group_id %} for="{{ group_id }}"{% endif %} class="full-span flight-info-group{% if not loop.first %} flight-info-not-first{% endif %}">
                     <span class="data flight-info" title="Tail">{{ internal_flight.tail_number }}</span>
                     <span class="data flight-info" title="Flight">{{ internal_flight.flight_number }}</span>
                     <span class="data flight-info" title="Orgin">{{ internal_flight.origin_station }}</span>
                     <span class="data flight-info" title="Destination">{{ internal_flight.destination_station }}</span>
                     <span class="data flight-info" title="ETD">{{ render_by_type(internal_flight.origin_departure_estimated_time) }}</span>
-                </div>
+                </{{ tagname }}>
                 {# changes rows #}
                 {% for diff_form in flight_changes_form.diffs|sort(attribute='internal_attr_order') %}
                     {# minimally render the actual form fields #}
