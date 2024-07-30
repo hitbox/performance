@@ -58,7 +58,7 @@
                 {# flight info header row #}
                 {% if flight_changes_form.diffs|length > 1 %}
                     {# toggle checkboxes button for more than one diff #}
-                    {% set group_id = "flight-group-{{ loop.index }}" %}
+                    {% set group_id = "flight-group-" + loop.index|string %}
                     <input id="{{ group_id }}" class="hidden" type="checkbox" data-clicks="{{ flight_changes_form.diffs|join(' ', attribute="do_update.id") }}" />
                     {% set tagname = "label" %}
                 {% else %}
