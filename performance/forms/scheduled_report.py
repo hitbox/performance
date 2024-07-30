@@ -24,6 +24,11 @@ class ScheduledReportForm(
             },
             'display_order': {
                 'label': 'Display Order',
-                'render_kw': {'class': 'scheduled-report'},
+                'render_kw': {
+                    'class': 'scheduled-report',
+                    'title':
+                        'Scheduled report display order in editor table'
+                        ' and new report prompt.',
+                },
             },
         }
