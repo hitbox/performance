@@ -49,6 +49,12 @@ view_func = FormListView.as_view(
     context_processor = context_processor,
 )
 
-scheduled_report_bp.add_url_rule('/', view_func=view_func)
+scheduled_report_bp.add_url_rule(
+    '/',
+    view_func = view_func,
+)
 
-scheduled_report_bp.add_url_rule('/<int:id>', view_func=view_func)
+scheduled_report_bp.add_url_rule(
+    '/<int:id>',
+    view_func = view_func,
+)
