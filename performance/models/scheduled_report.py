@@ -2,6 +2,7 @@ from performance.extensions import db
 
 from .mixin import AppContextMixin
 from .mixin import MetaMixin
+from .report import Report
 
 class ScheduledReport(
     AppContextMixin,
@@ -32,7 +33,6 @@ class ScheduledReport(
         """
         Instantiate report from this scheduled report.
         """
-        from .report import Report
         return Report(
             date = report_date,
             flights = [
