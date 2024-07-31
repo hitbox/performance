@@ -9,12 +9,13 @@
         <th title="Number of active scheduled flights"># Active</th>
     </tr>
 </thead>
-<tbody>{% for scheduled_report in scheduled_reports %}
+<tbody>{% if not scheduled_reports %}
+    <tr><td colspan="4"><h4>None</h4></td></tr>{% else %}{% for scheduled_report in scheduled_reports %}
     <tr{% if 'active_id' in kwargs and scheduled_report.id == kwargs.active_id %} class="active"{% endif %}{% if 'instance_endpoint' in kwargs %} data-href="{{ url_for(kwargs.instance_endpoint, id=scheduled_report.id, backurl=kwargs.backurl) }}"{% endif %}>
         <td class="data">{{ scheduled_report.name }}</td>
         <td class="data number">{{ scheduled_report.display_order }}</td>
         <td class="data number">{{ scheduled_report.scheduled_flights | length }}</td>
         <td class="data number">{{ scheduled_report.scheduled_flights | selectattr('is_active') | list | length }}</td>
-    </tr>{% endfor %}
+    </tr>{% endfor %}{% endif %}
 </tbody>
 {% endmacro %}
