@@ -1,6 +1,12 @@
+from types import SimpleNamespace
+
 from flask import current_app
 
 from . import constants
+
+def config_as_obj():
+    ns = SimpleNamespace(**current_app.config)
+    return ns
 
 def contracts_use_date_range():
     # XXX
@@ -72,4 +78,8 @@ def scheduled_reports_onlyone():
     Enforce at the app level, only one scheduled report.
     """
     key = constants.SCHEDULED_REPORTS_ONLYONE
+    return current_app.config.get(key, False)
+
+def performance_report_title():
+    key = constants.PERFORMANCE_REPORT_TITLE
     return current_app.config.get(key, False)

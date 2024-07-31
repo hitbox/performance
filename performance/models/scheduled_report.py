@@ -23,6 +23,7 @@ class ScheduledReport(
         back_populates = 'scheduled_report',
         # ETD seems more logical but it's been flight_number for a long time.
         #order_by = 'ScheduledFlight.origin_departure_estimated_time',
+        cascade = 'all, delete-orphan',
         order_by = ','.join([
             'ScheduledFlight.flight_number',
             'ScheduledFlight.origin_departure_estimated_time',
@@ -40,4 +41,15 @@ class ScheduledReport(
                 for scheduled_flight in self.scheduled_flights
                 if scheduled_flight.is_active
             ],
+        )
+
+    def as_dict(self):
+        return dict(
+            id = self.id,
+            name = self.name,
+            display_order = self.display_order,
+            scheduled_flights = [
+                scheduled_flight.as_dict()
+                for scheduled_flight in self.scheduled_flights
+            ]
         )
