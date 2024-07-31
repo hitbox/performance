@@ -42,6 +42,9 @@ class FormListView(View):
         self.context_processor = context_processor
 
     def dispatch_request(self, **instance_identity):
+        """
+        Main function to dispatch requests for the table and forms.
+        """
         if instance_identity:
             instance = self.instance_getter(instance_identity)
         else:
