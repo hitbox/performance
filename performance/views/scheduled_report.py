@@ -39,12 +39,16 @@ def context_processor():
         form.scheduled_report_id.data = request.view_args['id']
     return dict(new_scheduled_flight_form=form)
 
+def response_for_delete(form):
+    return redirect(url_for('scheduled_report.list'))
+
 view_func = FormListView.as_view(
     'list',
     instance_getter = ScheduledReport.noapp_get_or_404,
     pagination_getter = ScheduledReport.noapp_pagination,
     form_getter = ScheduledReportForm,
     form_submitter = ScheduledReportForm.standard_submit,
+    response_for_delete = response_for_delete,
     template = 'scheduled-report/list-form.html',
     context_processor = context_processor,
 )
