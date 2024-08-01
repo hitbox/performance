@@ -40,6 +40,28 @@ class FlightType(
                 (type(self), type(other)))
         return self.report_order < other.report_order
 
+    def as_dict(self):
+        return dict(
+            id = self.id,
+            name = self.name,
+            report_order = self.report_order,
+            is_controllable = self.is_controllable,
+            is_lane = self.is_lane,
+        )
+
+    @classmethod
+    def get_or_new_from_dict(cls, data):
+        instance = db.session.get(cls, dict(id=data['id']))
+        if instance is None:
+            instance = cls(
+                id = data['id'],
+                name = data['name'],
+                report_order = data['report_order'],
+                is_controllable = data['is_controllable'],
+                is_lane = data['is_lane'],
+            )
+        return instance
+
 
 class FlightTypeRelationshipMixin:
     """

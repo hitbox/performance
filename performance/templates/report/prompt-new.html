@@ -6,7 +6,8 @@
 
 {% macro render_create_link(scheduled_report, text) %}
 {# optionally match and style matching weekday for schedule link #}
-{% set match_weekday = config.PROMPT_NEW_MATCH_SCHEDULED_WEEKDAY_NAME or False %}
+{#{% set match_weekday = config.PROMPT_NEW_MATCH_SCHEDULED_WEEKDAY_NAME or False %}#}
+{% set match_weekday = not config.SCHEDULED_REPORTS_ONLYONE or False %}
 <h4>
     <a{% if match_weekday and scheduled_report.name.lower() == report_date.strftime('%A').lower() %} class="prompt-new-weekday-match"{% endif %} href="{{ url_for('report.create_report_from_schedule', report_date=report_date, schedule_id=scheduled_report.id) }}">{{ text }}</a>
 </h4>

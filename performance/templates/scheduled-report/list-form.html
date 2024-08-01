@@ -61,7 +61,7 @@
 <h3 class="page">Scheduled Flights</h3>
 <div class="formlist">
     <div class="expand">
-        <h3>{{ scheduled_report.name }} Flights</h3>
+        <h3 title="{{ scheduled_report.scheduled_flights|length }} total flights">{{ scheduled_report.name }} Flights </h3>
         <table class="expand">
             {{ render_scheduled_flights_table(
                    scheduled_report.scheduled_flights,
@@ -76,7 +76,8 @@
     <div>
         <h4>New Scheduled Flight</h4>
         {# no backurl given so that user can stay on the scheduled flights list-form page #}
-        <form action="{{ url_for('scheduled_flight.listform', scheduled_report_id=scheduled_report.id) }}" class="tight" method="POST">
+        {% set url = url_for('scheduled_flight.listform', scheduled_report_id=scheduled_report.id) %}
+        <form action="{{ url }}" class="tight" method="POST">
             {{ render_form(new_scheduled_flight_form) }}
         </form>
     </div>
