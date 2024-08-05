@@ -78,6 +78,7 @@ class ScheduledFlight(
         """
         return dict(
             id = self.id,
+            is_active = self.is_active,
             flight_number = self.flight_number,
             leg = self.leg,
             tail_number = self.tail_number,
@@ -100,6 +101,7 @@ class ScheduledFlight(
         if instance is None:
             instance = cls(
                 id = data['id'],
+                is_active = data['is_active'],
                 flight_number = data['flight_number'],
                 leg = data['leg'],
                 tail_number = data['tail_number'],
