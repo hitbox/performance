@@ -59,6 +59,13 @@ def get_internal_stmt(report_date):
     return internal_flights_stmt
 
 def get_scheduled_flight_type_instance():
+    # TODO FIXME
+    stmt = (
+        sa.select(models.FlightType)
+        .where(
+            sa.func.lcase(models.FlightType.name) == 'scheduled',
+        )
+    )
     return models.FlightType.query.filter(models.FlightType.name == 'Scheduled').one()
 
 def date_criteria(date):

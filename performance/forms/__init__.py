@@ -10,6 +10,7 @@ from .flight_type import FlightTypeForm
 from .report import ReportForm
 from .scheduled_flight import ScheduledFlightForm
 from .scheduled_report import ScheduledReportForm
+from .settings import SettingsForm
 from .user import EditUserForm
 from .user import LoginForm
 from .user import ResetPasswordForm

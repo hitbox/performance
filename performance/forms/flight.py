@@ -6,9 +6,7 @@ from wtforms import StringField
 from wtforms_alchemy import ClassMap
 from wtforms_alchemy import QuerySelectField
 
-from ..models import Flight
-from ..models import FlightType
-from ..models import Report
+from performance import models
 
 from . import defaults
 from .base import ModelForm
@@ -34,7 +32,7 @@ class FlightForm(
     SubmitUpdateDeleteMixin,
 ):
     class Meta:
-        model = Flight
+        model = models.Flight
         presentation = True
         type_map = ClassMap({
             sa.Time: StringTimeField,
@@ -150,16 +148,18 @@ class FlightForm(
 
     report_id = HiddenField()
 
-    flight_type = QuerySelectField(
-        'Flight Type',
-        default = defaults.flight_type,
-        get_label = 'name',
-        query_factory = lambda: FlightType.query.order_by(FlightType.report_order).all(),
-        render_kw = {
-            'class': 'narrower flight',
-            'autofocus': True,
-        }
-    )
+    flight_type = models.FlightType.as_query_select_field()
+
+    #flight_type = QuerySelectField(
+    #    'Flight Type',
+    #    default = defaults.flight_type,
+    #    get_label = 'name',
+    #    query_factory = lambda: FlightType.query.order_by(FlightType.report_order).all(),
+    #    render_kw = {
+    #        'class': 'narrower flight',
+    #        'autofocus': True,
+    #    }
+    #)
 
     # NOTE:
     # *_delays_string fields are added manually to avoid wtforms_alchemy
@@ -192,11 +192,11 @@ class FlightForm(
         #       .endswith('.create') and .endswith('.edit'). figure explicit is better.
         if request.endpoint == 'flight.create':
             report_id = report_id_from_view_args()
-            report = Report.query.get(report_id)
+            report = models.Report.query.get(report_id)
             placeholder = report.date.isoformat()
         elif request.endpoint == 'flight.edit':
             flight_id = request.view_args['id']
-            flight = Flight.query.get(flight_id)
+            flight = models.Flight.query.get(flight_id)
             placeholder = flight.report.date.isoformat()
         else:
             placeholder = 'date'

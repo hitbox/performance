@@ -53,8 +53,8 @@ class SearchCriteriaMixin:
 
 class SubmitUpdateDeleteMixin(
     # order matters for button order
-    DeleteMixin,
     SubmitMixin,
+    DeleteMixin,
 ):
     """
     Add submit and delete buttons. Views handle changing text like 'Create' to 'Update'.

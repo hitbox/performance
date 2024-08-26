@@ -18,6 +18,25 @@ class FlightMixin:
             ),
         )
 
+    @hybrid_property
+    def flight_number_as_integer(self):
+        if self.flight_number:
+            try:
+                return int(self.flight_number)
+            except ValueError:
+                return self.flight_number
+
+    @flight_number_as_integer.expression
+    def flight_number_as_integer(cls):
+        column = cls.flight_number
+        expr = db.case(
+            (
+                column.regexp_match(r'^[0-9]+$'),
+                db.func.cast(column, db.Integer)
+            ),
+        )
+        return expr
+
     @db.declared_attr
     def leg(cls):
         return db.Column(
@@ -93,6 +112,21 @@ class FlightMixin:
                 ),
             ),
         )
+
+    @hybrid_property
+    def origin_departure_estimated_time_or_midnight(self):
+        if self.origin_departure_estimated_time:
+            return self.origin_departure_estimated_time
+        else:
+            return datetime.time(0,0)
+
+    @origin_departure_estimated_time_or_midnight.expression
+    def origin_departure_estimated_time_or_midnight(cls):
+        expr = db.func.coalesce(
+            cls.origin_departure_estimated_time,
+            datetime.time(0,0),
+        )
+        return expr
 
     @db.declared_attr
     def destination_station(cls):

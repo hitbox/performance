@@ -1,9 +1,15 @@
+from flask import flash
+from flask import g
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import url_for
+from markupsafe import Markup
 from werkzeug.exceptions import HTTPException
 
 from performance.authorization import redirect_password_reset
+from performance.extensions import db
+from performance.models import Performance
 
 from .admin import admin_bp
 from .assumed_best import assumed_best_bp
@@ -13,8 +19,7 @@ from .flight import flight_bp
 from .flight_type import flight_type_bp
 from .performance_details import performance_details_bp
 from .report import report_bp
-from .scheduled_flight import scheduled_flight_bp
-from .scheduled_report import scheduled_report_bp
+from .scheduled import scheduled_bp
 from .select_date import select_date_bp
 from .user import user_bp
 
@@ -45,8 +50,7 @@ def init_app(app):
     app.register_blueprint(flight_type_bp)
     app.register_blueprint(performance_details_bp)
     app.register_blueprint(report_bp, url_prefix='/report')
-    app.register_blueprint(scheduled_flight_bp, url_prefix='/scheduled/flight')
-    app.register_blueprint(scheduled_report_bp, url_prefix='/scheduled/report')
+    app.register_blueprint(scheduled_bp, url_prefix='/scheduled')
     app.register_blueprint(select_date_bp, url_prefix='/select')
     app.register_blueprint(user_bp)
 

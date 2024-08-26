@@ -162,6 +162,10 @@ td {
     background-color: DarkOrange;
 }
 
+.flash.warning a {
+    color: Snow;
+}
+
 .flash.error {
     background-color: Crimson;
 }
@@ -444,9 +448,16 @@ details:hover {
     margin-bottom: 2rem;
 }
 
-.prompt-new-weekday-match {
+.new-report-scheduled-report {
+    /* new report from schedule links */
     font-size: 1.5rem;
-    padding: 2.5rem 0;
+    margin: 1rem 0;
+}
+
+.prompt-new-weekday-match {
+    /* new report from schedule */
+    /* this element matches the day of the week */
+    font-size: 2.5rem;
 }
 
 .username {
@@ -543,6 +554,7 @@ select {
 input[type=checkbox] {
     /* makes the checkboxes line up with their labels in the next column */
     min-height: 28px;
+    width: 1.5rem;
 }
 
 button, input[type=submit] {
@@ -595,6 +607,10 @@ button.danger, input[type=submit].danger {
 p.danger {
     color: var(--danger-color);
     font-weight: bold;
+}
+
+form.list-form {
+    min-width: 350px;
 }
 
 form > .buttons {
@@ -682,7 +698,12 @@ form.user-admin .buttons,
 }
 
 .buttons-2 {
+    /* this is messing up the schedule tab alignment */
+    /* removing to see what gets messed up */
+    /* hopefully it can just be removed */
+    /*
     padding: 0 10px;
+    */
 }
 
 /* performance stats at top of report */
@@ -792,6 +813,13 @@ form .performance-tiers {
     /* style as "development-only" */
     color: red !important;
     font-weight: bold;
+}
+
+.table-form-grid {
+    /* The table on the left and form on the right editor pages */
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 1rem;
 }
 
 .col-2 {

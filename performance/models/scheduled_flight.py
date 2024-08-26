@@ -50,6 +50,7 @@ class ScheduledFlight(
         default = True,
         nullable = False,
         server_default = 'TRUE',
+        doc = 'Flight is loaded on new operation.',
     )
 
     def as_flight(self):

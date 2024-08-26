@@ -7,6 +7,7 @@
 {% block header %}
 {# show admin navigation on all admin pages #}
 <nav>
+    {{ render_nav_item('admin.settings.edit', 'Settings', active_prefix='admin.settings') }}
     {{ render_nav_item('admin.flight_type.list', 'Flight Types', active_prefix='admin.flight_type.') }}
     {{ render_nav_item('admin.delay.list', 'Delay codes', active_prefix='admin.delay.') }}
     {% if config.PERFORMANCE_CONTRACTS %}

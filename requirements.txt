@@ -18,4 +18,5 @@ pywin32; sys_platform == 'win32'
 sqlalchemy
 sqlalchemy-utils
 wtforms
-wtforms-alchemy
+wtforms-alchemy # remove this, it is dead
+wtforms-sqlalchemy

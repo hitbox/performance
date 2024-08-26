@@ -1,10 +1,8 @@
-{% extends "admin/base-list-form.html" %}
+{% extends "admin/base.html" %}
 
 
 {% from "macros.html" import render_form %}
 {% from "macros.html" import render_pagination %}
-
-
 {% from "user/macros.html" import render_user_table %}
 
 
@@ -13,38 +11,38 @@
 {% set user = instance %}{# rename #}
 
 
-{% block subpagehead %}{{ plural }}{% endblock %}
-
-
-{% block listing %}
-<table>
-    {{ render_user_table(pagination.items, active_id=user.id, instance_endpoint='admin.user.list') }}
-</table>
-{{ render_pagination(pagination, endpoint=request.endpoint) }}
-{% endblock listing %}
-
-
-{% block form %}
-{% if user %}
-<h3>Editing user "{{ user.username }}"</h3>
-{% else %}
-<h3>New User Account</h3>
-{% endif %}
-    {% if request.args.page %}
-    {% set action_url = url_for(request.endpoint, page=request.args.page, **request.view_args) %}
-    {% else %}
-    {% set action_url = url_for(request.endpoint, **request.view_args) %}
-    {% endif %}
-<form action="{{ action_url }}" method="POST">
-    {{ render_form(form) }}
-</form>
-{% if user %}
-    {# build url leaving view_args off so that an instance is not looked up #}
-    {% if request.args.page %}
-    {% set new_url = url_for(request.endpoint, page=request.args.page) %}
-    {% else %}
-    {% set new_url = url_for(request.endpoint) %}
-    {% endif %}
-<h4 class="page"><a href="{{ new_url }}">New user</a></h4>
-{% endif %}
-{% endblock form %}
+{% block content %}
+    <div class="table-form-grid">
+        <div>
+            <h3 class="page">{{ plural }}</h3>
+            <table>
+                {{ render_user_table(pagination.items, active_id=user.id, instance_endpoint='admin.user.list') }}
+            </table>
+            {{ render_pagination(pagination, endpoint=request.endpoint) }}
+        </div>
+        <div>
+            {% if user %}
+                <h3 class="page">Editing {{ singular.lower() }} "{{ user.username }}"</h3>
+            {% else %}
+                <h3 class="page">New {{ singular }} Account</h3>
+            {% endif %}
+                {% if request.args.page %}
+                {% set action_url = url_for(request.endpoint, page=request.args.page, **request.view_args) %}
+                {% else %}
+                {% set action_url = url_for(request.endpoint, **request.view_args) %}
+                {% endif %}
+            <form action="{{ action_url }}" method="POST">
+                {{ render_form(form) }}
+            </form>
+            {% if user %}
+                {# build url leaving view_args off so that an instance is not looked up #}
+                {% if request.args.page %}
+                {% set new_url = url_for(request.endpoint, page=request.args.page) %}
+                {% else %}
+                {% set new_url = url_for(request.endpoint) %}
+                {% endif %}
+            <h4 class="page"><a href="{{ new_url }}">New user</a></h4>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

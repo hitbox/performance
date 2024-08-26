@@ -3,8 +3,6 @@
 
 {% from "macros.html" import render_form %}
 {% from "macros.html" import render_pagination %}
-
-
 {% from "scheduled-flight/macros.html" import render_scheduled_flights_table %}
 {% from "scheduled-report/macros.html" import render_scheduled_reports_table %}
 
@@ -22,68 +20,49 @@
 {% block header %}{# define block to disable showing admin links #}{% endblock %}
 
 
-{# scheduled report list #}
-{% block listing %}
-<h3 class="page">{{ plural }}</h3>
-<div class="expand">
-    <table id="scheduled-report" class="expand">
-        {{ render_scheduled_reports_table(
-               pagination.items,
-               instance_endpoint=request.endpoint,
-               active_id=scheduled_report.id
-           ) }}
-    </table>
-    {{ render_pagination(pagination, endpoint=request.endpoint) }}
-</div>
-{% endblock listing %}
-
-
-{# update or create form #}
-{% block form %}
-{% if scheduled_report %}
-    <h3>Editing "{{ scheduled_report.name }}"</h3>
-{% else %}
-    <h3>New {{ singular }}</h3>
-{% endif %}{# scheduled_report #}
-<form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
-    {{ render_form(form) }}
-</form>
-{% if scheduled_report %}
-<h4 class="page">
-    <a href="{{ url_for(request.endpoint) }}">New {{ singular }}</a>
-</h4>
-{% endif %}{# scheduled_report #}
-{% endblock %}
-
-
-{% block bottom %}
-{% if scheduled_report %}
-<h3 class="page">Scheduled Flights</h3>
-<div class="formlist">
-    <div class="expand">
-        <h3 title="{{ scheduled_report.scheduled_flights|length }} total flights">{{ scheduled_report.name }} Flights </h3>
-        <table class="expand">
-            {{ render_scheduled_flights_table(
-                   scheduled_report.scheduled_flights,
-                   instance_endpoint = 'scheduled_flight.listform',
-                   backurl = thisurl,
-                   instance_kwargs = dict(
-                       scheduled_report_id = scheduled_report.id,
-                   ),
-               ) }}
-        </table>
+{% block content %}
+    <div class="table-form-grid">
+        {# scheduled reports #}
+        <div>
+            <h3 class="page">{{ plural }}</h3>
+            <div class="expand">
+                <table id="scheduled-report" class="expand">
+                    {{ render_scheduled_reports_table(pagination.items, instance_endpoint=request.endpoint, active_id=scheduled_report.id) }}
+                </table>
+                {{ render_pagination(pagination, endpoint=request.endpoint) }}
+            </div>
+        </div>
+        {# form: edit new or selected scheduled report #}
+        <div>
+            <h3 class="page">{% if scheduled_report %}Editing "{{ scheduled_report.name }}"{% else %}New {{ singular }}{% endif %}</h3>
+            {# scheduled_report #}
+            <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+                {{ render_form(form) }}
+            </form>
+            {% if scheduled_report %}
+            <h4 class="page">
+                <a href="{{ url_for(request.endpoint) }}">New {{ singular }}</a>
+            </h4>
+            {% endif %}{# scheduled_report #}
+        </div>
+        {# optional scheduled flights, if report is selected #}
+        {% if scheduled_report %}
+        <div>
+            <h3 class="page">Scheduled Flights</h3>
+            <h3 title="{{ scheduled_report.scheduled_flights|length }} total flights">{{ scheduled_report.name }} Flights</h3>
+            <table class="expand">
+                {{ render_scheduled_flights_table(scheduled_report.scheduled_flights, instance_endpoint='scheduled.flight.listform', backurl=thisurl, instance_kwargs=dict(scheduled_report_id=scheduled_report.id)) }}
+            </table>
+        </div>
+        <div>
+            <h3 class="page">New Scheduled Flight</h3>
+            {% if alert_for_default_flight_type %}{{ alert_for_default_flight_type }}{% endif %}
+            {# no backurl given so that user can stay on the scheduled flights list-form page #}
+            {% set url = url_for('scheduled.flight.listform', scheduled_report_id=scheduled_report.id) %}
+            <form action="{{ url }}" class="list-form" method="POST">
+                {{ render_form(new_scheduled_flight_form) }}
+            </form>
+        </div>
+        {% endif %}
     </div>
-    <div>
-        <h4>New Scheduled Flight</h4>
-        {# no backurl given so that user can stay on the scheduled flights list-form page #}
-        {% set url = url_for('scheduled_flight.listform', scheduled_report_id=scheduled_report.id) %}
-        <form action="{{ url }}" class="tight" method="POST">
-            {{ render_form(new_scheduled_flight_form) }}
-        </form>
-    </div>
-</div>
-{% endif %}
-{% endblock bottom %}
-
-
-
+{% endblock content %}

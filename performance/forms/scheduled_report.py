@@ -1,4 +1,4 @@
-from ..models import ScheduledReport
+from performance.models import ScheduledReport
 
 from .base import ModelForm
 from .mixins import BackLinkMixin

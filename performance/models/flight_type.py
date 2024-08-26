@@ -1,5 +1,6 @@
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
+from wtforms_alchemy import QuerySelectField
 
 from ..extensions import db
 
@@ -15,9 +16,20 @@ class FlightType(
     class Meta:
         order_by = 'report_order'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    report_order = db.Column(db.Integer, default=0)
+    id = db.Column(
+        db.Integer,
+        primary_key = True,
+    )
+
+    name = db.Column(
+        db.String,
+        nullable = False,
+    )
+
+    report_order = db.Column(
+        db.Integer,
+        default = 0,
+    )
 
     is_controllable = db.Column(
         db.Boolean,
@@ -31,6 +43,14 @@ class FlightType(
         nullable = False,
         server_default = 'false',
         doc = 'Include flights of this type in lane count.'
+    )
+
+    is_active = db.Column(
+        db.Boolean,
+        nullable = False,
+        server_default = 'true',
+        default = True,
+        doc = 'Flight type is available for reports.',
     )
 
     def __lt__(self, other):
@@ -51,6 +71,8 @@ class FlightType(
 
     @classmethod
     def get_or_new_from_dict(cls, data):
+        """
+        """
         instance = db.session.get(cls, dict(id=data['id']))
         if instance is None:
             instance = cls(
@@ -61,6 +83,41 @@ class FlightType(
                 is_lane = data['is_lane'],
             )
         return instance
+
+    @classmethod
+    def query_factory(cls):
+        """
+        """
+        stmt = (
+            db.select(FlightType)
+            .where(FlightType.is_active)
+            .order_by(FlightType.report_order)
+        )
+        return db.session.scalars(stmt)
+
+    @classmethod
+    def as_query_select_field(
+        cls,
+        label = 'Flight Type',
+        get_label = 'name',
+        query_factory = None,
+        render_kw = None,
+    ):
+        """
+        """
+        if query_factory is None:
+            query_factory = cls.query_factory
+        if render_kw is None:
+            render_kw = dict()
+        render_kw.setdefault('class', 'narrower flight')
+        render_kw.setdefault('autofocus', True)
+        field = QuerySelectField(
+            'Flight Type',
+            get_label = 'name',
+            query_factory = query_factory,
+            render_kw = render_kw,
+        )
+        return field
 
 
 class FlightTypeRelationshipMixin:

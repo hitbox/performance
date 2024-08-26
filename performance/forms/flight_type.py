@@ -1,54 +1,53 @@
 from wtforms import SubmitField
 from wtforms.validators import Optional
 from wtforms.widgets import TextArea
+from wtforms_sqlalchemy.orm import model_form
 
-from ..models import FlightType
+from performance.extensions import db
+from performance.models import FlightType
 
 from .base import ModelForm
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
+from .mixins import SubmitMixin
 
-class FlightTypeForm(
+class BaseFlightType(
     BackLinkMixin,
     ModelForm,
+    SubmitMixin,
 ):
-    """
-    FlightType object form.
-    """
     class Meta:
         model = FlightType
-        presentation = True
-        only = [
-            'name',
-            'report_order',
-            'is_controllable',
-            'is_lane',
-        ]
-        field_args = {
-            'name': {
-                'label': 'Name',
-            },
-            'report_order': {
-                'label': 'Report Order',
-            },
-            # NOTE: These flag fields are set to Optional to avoid html
-            #       required attribute.
-            'is_controllable': {
-                'label': 'Is Controllable?',
-                'validators': [Optional()],
-                'render_kw': {
-                    'title': 'Flights in this category/type are considered for'
-                             ' chargeable delays.',
-                },
-            },
-            'is_lane': {
-                'label': 'Is Lane?',
-                'validators': [Optional()],
-                'render_kw': {
-                    'title': 'Flights in this category/type are counted'
-                             ' as lanes.',
-                },
-            }
-        }
 
-    submit = SubmitField()
+
+FlightTypeForm = model_form(
+    model = FlightType,
+    db_session = db.session,
+    base_class = BaseFlightType,
+    field_args = dict(
+        is_controllable = dict(
+            label = 'Is Controllable?',
+            render_kw = dict(
+                title = FlightType.is_controllable.doc,
+            ),
+        ),
+        is_lane = dict(
+            label = 'Is Lane?',
+            render_kw = dict(
+                title = FlightType.is_lane.doc,
+            ),
+        ),
+        is_active = dict(
+            label = 'Is Active?',
+            render_kw = dict(
+                title = FlightType.is_active.doc,
+            ),
+        ),
+    )
+)
+
+# override the automatically added required validator (because column is
+# nullable=false).
+for fieldname in ['is_controllable', 'is_lane', 'is_active']:
+    field = getattr(FlightTypeForm, fieldname)
+    field.kwargs['validators'] = [Optional()]

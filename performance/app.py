@@ -46,4 +46,12 @@ def create_app(silent_config=False):
     shell.init_app(app)
     views.init_app(app)
 
+    # ensure that at least one object exists for metadata settings
+    db = extensions.db
+    with app.app_context():
+        settings = db.session.scalars(db.select(models.Performance)).one_or_none()
+        if not settings:
+            db.session.add(models.Performance())
+            db.session.commit()
+
     return app

@@ -4,12 +4,16 @@ from flask import url_for
 
 from performance import settings
 from performance.authorization import edit_schedule_check
+from performance.extensions import db
 from performance.forms import ScheduledFlightForm
 from performance.forms import ScheduledReportForm
 from performance.models import ScheduledReport
 from performance.pluggable import FormListView
 
-from . import commandline
+from ..utils import _default_flight_type
+from ..utils import update_context_for_default_flight_type
+
+from . import commandline # import for decorators
 from .blueprint import scheduled_report_bp
 
 @scheduled_report_bp.before_request
@@ -26,20 +30,31 @@ def before_request():
     ):
         # throw exception for not one
         # redirect to the flights
-        scheduled_report = ScheduledReport.query.one()
-        return redirect(url_for('scheduled_flight.listform', scheduled_report_id=scheduled_report.id))
+        stmt = db.select(ScheduledReport)
+        scheduled_report = db.session.scalars(stmt).one()
+        url = url_for(
+            'scheduled.flight.listform',
+            scheduled_report_id = scheduled_report.id,
+        )
+        return redirect(url)
 
 def context_processor():
     """
     Add a scheduled flight form instance the template can show on the same page.
     """
     form = ScheduledFlightForm()
-    if 'id' in request.view_args:
-        form.scheduled_report_id.data = request.view_args['id']
-    return dict(new_scheduled_flight_form=form)
+    # default FlightType for new scheduled flight
+    form.flight_type.data = _default_flight_type()
+
+
+    context = dict(
+        new_scheduled_flight_form = form,
+    )
+    update_context_for_default_flight_type(context)
+    return context
 
 def response_for_delete(form):
-    return redirect(url_for('scheduled_report.list'))
+    return redirect(url_for('scheduled.report.list'))
 
 view_func = FormListView.as_view(
     'list',

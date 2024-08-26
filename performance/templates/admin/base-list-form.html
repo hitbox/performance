@@ -2,16 +2,8 @@
 
 
 {% block content %}
-<div>
-    {% block top %}{% endblock top %}
-    <div class="formlist">
-        <div>
-            {% block listing %}{% endblock listing %}
-        </div>
-        <div>
-            {% block form %}{% endblock form %}
-        </div>
+    <div class="col-2">
+        {% block listing %}{% endblock listing %}
+        {% block form %}{% endblock form %}
     </div>
-    {% block bottom %}{% endblock bottom %}
-</div>
 {% endblock content %}

@@ -1,12 +1,23 @@
 from wtforms import Field
 from wtforms import HiddenField
 from wtforms import IntegerField
+from wtforms.validators import ValidationError
 from wtforms.widgets import HiddenInput
 from wtforms.widgets import TextInput
 from wtforms_components import TimeField
 
-from .. import parse
-from ..utils import massage_time
+from performance import models
+from performance import parse
+from performance.utils import massage_time
+
+class HiddenIntegerField(HiddenField):
+
+    def pre_validate(form):
+        try:
+            int(self.data)
+        except ValueError:
+            raise ValidationError('Field must be an integer')
+
 
 class StringTimeField(TimeField):
     """

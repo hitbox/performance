@@ -10,6 +10,7 @@ from .flight_delay import OriginDelay
 from .flight_type import FlightType
 from .flight_type import FlightTypeRelationshipMixin
 from .mixin import MetaMixin
+from .performance import Performance
 from .report import Report
 from .scheduled_flight import ScheduledFlight
 from .scheduled_report import ScheduledReport

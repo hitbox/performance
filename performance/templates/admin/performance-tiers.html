@@ -1,10 +1,8 @@
-{% extends "admin/base-list-form.html" %}
+{% extends "admin/base.html" %}
 
 
 {% from "macros.html" import render_form %}
 {% from "macros.html" import render_pagination %}
-
-
 {% from "performance-contract/macros.html" import render_performance_contracts_table %}
 {% from "performance-tier/macros.html" import render_performance_tiers_table %}
 
@@ -22,42 +20,29 @@
 {% endif %}
 
 
-{% block top %}
-<h3 class="page">
-    <a href="{{ url_for('admin.performance_contract.listform', id=contract.id) }}">Back to contract</a>
-</h3>
-{% endblock %}
-
-
-{% block listing %}
-{% if pagination %}
-<h3 class="page">Performance Contracts{# should match performance_contracts.html:plural #}</h3>
-{{ render_performance_contracts_table(pagination.items, instance_endpoint='admin.performance_contract.listform', numbered=true) }}
-{{ render_pagination(pagination, endpoint=request.endpoint) }}
-{% else %}{# display the other tiers for the contract of this contract #}
-<h3>Contract "{{ contract.name }}" Tiers</h3>
-<table class="expand">
-    {{ render_performance_tiers_table(
-           contract.tiers,
-           active_id = tier.id,
-           instance_endpoint = 'admin.performance_tier.listform',
-           instance_kwargs = dict(
-               contract_id = request.view_args.contract_id,
-           )
-       ) }}
-</table>
-{% endif %}{# pagination #}
-{% endblock listing %}
-
-
-{% block form %}
-{% if tier %}
-    <h3>Editing {{ singular }} "{{ tier.tier }}"</h3>
-{% else %}
-    <h3>New {{ singular }}</h3>
-{% endif %}
-<form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
-    {{ render_form(form) }}
-</form>
-<h4><a href="{{ url_for('admin.performance_tier.listform', contract_id=request.view_args.contract_id) }}">New tier</a></h4>
-{% endblock %}
+{% block content %}
+    <h3 class="page">
+        <a href="{{ url_for('admin.performance_contract.listform', id=contract.id) }}">Back to contract "{{ contract.name }}"</a>
+    </h3>
+    <div class="col-2">
+        <div>
+            {% if pagination %}
+            <h3 class="page">Performance Contracts{# should match performance_contracts.html:plural #}</h3>
+            {{ render_performance_contracts_table(pagination.items, instance_endpoint='admin.performance_contract.listform', numbered=true) }}
+            {{ render_pagination(pagination, endpoint=request.endpoint) }}
+            {% else %}{# display the other tiers for the contract of this contract #}
+            <h3>Contract "{{ contract.name }}" Tiers</h3>
+            <table class="expand">
+                {{ render_performance_tiers_table(contract.tiers, active_id=tier.id, instance_endpoint='admin.performance_tier.listform', instance_kwargs=dict( contract_id=request.view_args.contract_id)) }}
+            </table>
+            {% endif %}{# pagination #}
+        </div>
+        <div>
+            <h3 class="page">{% if tier %}Editing {{ singular }} "{{ tier.tier }}"{% else %}New {{ singular }}{% endif %}</h3>
+            <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+                {{ render_form(form) }}
+            </form>
+            <h4><a href="{{ url_for('admin.performance_tier.listform', contract_id=request.view_args.contract_id) }}">New tier</a></h4>
+        </div>
+    </div>
+{% endblock content %}

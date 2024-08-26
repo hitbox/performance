@@ -23,12 +23,10 @@ class ScheduledReport(
     scheduled_flights = db.relationship(
         'ScheduledFlight',
         back_populates = 'scheduled_report',
-        # ETD seems more logical but it's been flight_number for a long time.
-        #order_by = 'ScheduledFlight.origin_departure_estimated_time',
         cascade = 'all, delete-orphan',
         order_by = ','.join([
-            'ScheduledFlight.flight_number',
             'ScheduledFlight.origin_departure_estimated_time',
+            'ScheduledFlight.flight_number_as_integer',
         ]),
     )
 

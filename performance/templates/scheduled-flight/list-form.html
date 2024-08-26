@@ -1,9 +1,7 @@
-{% extends "admin/base-list-form.html" %}
+{% extends "admin/base.html" %}
 
 
 {% from "macros.html" import render_form %}
-
-
 {% from "scheduled-flight/macros.html" import render_scheduled_flights_table %}
 
 
@@ -15,37 +13,44 @@
 {% block header %}{# disable showing admin links #}{% endblock %}
 
 
+{% block content %}
+    <h3 class="page"><a href="{{ url_for('scheduled.report.list', id=scheduled_report.id) }}">Back to scheduled report</a></h3>
+    <div class="table-form-grid">
+        <div>
+            <h3 class="page">{{ plural }}</h3>
+            <table class="expand">
+                {# we render all flights instead of pagination like admin #}
+                {{ render_scheduled_flights_table(scheduled_report.scheduled_flights) }}
+            </table>
+        </div>
+        <div class="scheduled-flight form-container">
+            <h3 class="page">{% if scheduled_flight %}Editing Flight "{{ scheduled_flight.flight_number }}"{% else %}New {{ singular }}{% endif %}</h3>
+            {% if alert_for_default_flight_type %}{{ alert_for_default_flight_type }}{% endif %}
+            <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
+                {{ render_form(form) }}
+            </form>
+            {% if scheduled_flight %}
+            <h4 class="page"><a href="{{ url_for('scheduled.flight.listform', scheduled_report_id=scheduled_report.id) }}">New {{ singular }}</a></h4>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}
+
+
 {% block top %}
+    {# XXX #}
+    {# Keep this? Fix it? #}
 {# when configured for only one schedule, we hide the link back to a list of scheduled reports #}
 {% if not config.SCHEDULED_REPORTS_ONLYONE %}
-<h3 class="page"><a href="{{ url_for('scheduled_report.list', id=scheduled_report.id) }}">Back to Scheduled Reports</a></h3>
+<h3 class="page"><a href="{{ url_for('scheduled.report.list', id=scheduled_report.id) }}">Back to Scheduled Reports</a></h3>
 {% endif %}{# not config.SCHEDULED_REPORTS_ONLYONE #}
 <h3 class="page">{{ scheduled_report.name }} Scheduled Report</h3>
 {% endblock %}
 
 
 {% block listing %}
-<h3 class="page">{{ plural }}</h3>
-<table class="expand">
-    {# we render all flights instead of pagination like admin #}
-    {{ render_scheduled_flights_table(scheduled_report.scheduled_flights) }}
-</table>
 {% endblock listing %}
 
 
 {% block form %}
-<div class="scheduled-flight form-container">
-    <h3 class="page">{% if scheduled_flight %}
-        Editing Flight "{{ scheduled_flight.flight_number }}"
-        {% else %}
-        New {{ singular }}
-        {% endif %}
-    </h3>
-    <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
-        {{ render_form(form) }}
-    </form>
-    {% if scheduled_flight %}
-    <h4 class="page"><a href="{{ url_for('scheduled_flight.listform', scheduled_report_id=scheduled_report.id) }}">New {{ singular }}</a></h4>
-    {% endif %}
-</div>
 {% endblock %}

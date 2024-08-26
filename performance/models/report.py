@@ -1,4 +1,5 @@
 from datetime import time
+from itertools import groupby
 from operator import attrgetter
 
 import sqlalchemy as sa
@@ -6,9 +7,9 @@ import sqlalchemy as sa
 from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from ..exceptions import PerformanceError
-from ..extensions import db
-from ..utils import quarter_of_date
+from performance.exceptions import PerformanceError
+from performance.extensions import db
+from performance.utils import quarter_of_date
 
 from .assumed_best import AssumedBest
 from .flight_type import FlightType
@@ -58,14 +59,22 @@ class Report(MetaMixin, db.Model):
     Amazon Performance Report.
     """
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key = True,
+    )
 
-    date = db.Column(db.Date, unique=True)
+    date = db.Column(
+        db.Date,
+        unique = True,
+    )
+
     flights = db.relationship(
         'Flight',
         back_populates = 'report',
-        cascade = 'all,delete-orphan',
+        cascade = 'all, delete-orphan',
     )
+
     system_detail = db.Column(
         db.Text,
         info = dict(
@@ -77,10 +86,12 @@ class Report(MetaMixin, db.Model):
     def assumed_best(self):
         # XXX: not quite sure this is a great way to do this, but I want this
         #      attribute on report objects
-        return AssumedBest.query.get(dict(
+        ident = dict(
             month = self.date.month,
             year = self.date.year,
-        ))
+        )
+        instance = db.session.get(AssumedBest, ident)
+        return instance
 
     @hybrid_property
     def date_quarter(self):
@@ -97,23 +108,22 @@ class Report(MetaMixin, db.Model):
         # quarter of a date calculation
         # (month - 1) // 3 + 1
         # NOTE: sa.func.div postgres specific
-        quarter = sa.func.div(
-            sa.cast(
-                sa.func.date_part('month', Report.date) - 1,
-                sa.Integer),
-            3) + 1
+        zero_based_month = sa.cast(
+            sa.func.date_part('month', Report.date) - 1,
+            sa.Integer
+        )
+        quarter = 1 + sa.func.div(zero_based_month, 3)
         return quarter
 
     def flights_by_type(self):
-        # [(flight_type, flight of that type), ...]
-        grouped = [
-            (flight_type,
-             sorted(
-                 (flight for flight in self.flights if flight.flight_type == flight_type),
-                 key = by_estimated_departure))
-            for flight_type in FlightType.query.order_by(FlightType.report_order)
-        ]
-        return grouped
+        """
+        Group flights for this report by FlightType and sort the groups of
+        flights by ETD.
+        """
+        groupkey = attrgetter('flight_type')
+        sortkey = attrgetter('origin_departure_estimated_time_or_midnight')
+        grouped = groupby(sorted(self.flights, key=groupkey), key=groupkey)
+        return [(key, sorted(flights, key=sortkey)) for key, flights in grouped]
 
     def lane_flights(self):
         """

@@ -1,11 +1,9 @@
-{% extends "admin/base-list-form.html" %}
-
-
-{% from "macros.html" import render_form %}
-{% from "macros.html" import render_pagination %}
+{% extends "admin/base.html" %}
 
 
 {% from "delay-codes/macros.html" import render_delays_table %}
+{% from "macros.html" import render_form %}
+{% from "macros.html" import render_pagination %}
 
 
 {% set singular = "Delay Code" %}
@@ -13,38 +11,37 @@
 {% set delay_code = instance %}
 
 
-{% block listing %}
-{% if request.args.page %}
-    {% set instance_kwargs = dict(page=request.args.page) %}
-{% else %}
-    {% set instance_kwargs = dict() %}
-{% endif %}
-<table class="expand">
-    {{ render_delays_table(
-           pagination.items,
-           active_id = delay_code.id,
-           instance_endpoint = '.list',
-           instance_kwargs = instance_kwargs,
-           backurl = url_for(request.endpoint, page=request.args.page or 1, **request.view_args)
-       ) }}
-</table>
-{{ render_pagination(pagination, endpoint=request.endpoint) }}
-{% endblock listing %}
-
-
-{% block form %}
-{% if delay_code %}
-    {% set action = url_for(request.endpoint, id=request.view_args.id) %}
-    <h3>Editing {{ singular }} "{{ delay_code.code }}"</h3>
-{% else %}
-    {% set action = url_for(request.endpoint) %}
-    <h3>New {{ singular }}</h3>
-{% endif %}
-<form action="{{ action }}" class="delay-code" method="POST">
-    {{ render_form(form) }}
-</form>
-{# disabled because these get automatically created by the delay codes parser #}
-{% if false and delay_code %}
-<h4 class="page"><a href="{{ url_for(request.endpoint, page=request.args.page) }}">New {{ singular }}</a></h4>
-{% endif %}
-{% endblock %}
+{% block content %}
+    <div class="table-form-grid">
+        {# table listing #}
+        <div>
+            {% if request.args.page %}
+                {% set instance_kwargs = dict(page=request.args.page) %}
+            {% else %}
+                {% set instance_kwargs = dict() %}
+            {% endif %}
+            <h3 class="page">{{ plural }}</h3>
+            <table class="expand">
+                {% set backurl = url_for(request.endpoint, page=request.args.page or 1, **request.view_args) %}
+                {{ render_delays_table(pagination.items, active_id=delay_code.id, instance_endpoint='.list', instance_kwargs=instance_kwargs, backurl=backurl ) }}
+            </table>
+            {{ render_pagination(pagination, endpoint=request.endpoint) }}
+        </div>
+        <div>
+            <h3 class="page">{% if delay_code %}
+                {% set action = url_for(request.endpoint, id=request.view_args.id) %}
+                Editing {{ singular }} "{{ delay_code.code }}"
+            {% else %}
+                {% set action = url_for(request.endpoint) %}
+                New {{ singular }}
+            {% endif %}</h3>
+            <form action="{{ action }}" class="delay-code" method="POST">
+                {{ render_form(form) }}
+            </form>
+            {# disabled because these get automatically created by the delay codes parser #}
+            {% if false and delay_code %}
+            <h4 class="page"><a href="{{ url_for(request.endpoint, page=request.args.page) }}">New {{ singular }}</a></h4>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

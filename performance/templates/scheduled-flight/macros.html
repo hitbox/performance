@@ -8,7 +8,7 @@
 
 {% macro render_create_link(scheduled_report, flight_type, backurl) %}
 <h4>
-    <a href="{{ url_for('scheduled_flight.create', scheduled_report_id=scheduled_report.id, flight_type_id=flight_type.id, backurl=backurl) }}">Add {{ flight_type.name }} Flight</a>
+    <a href="{{ url_for('scheduled.flight.create', scheduled_report_id=scheduled_report.id, flight_type_id=flight_type.id, backurl=backurl) }}">Add {{ flight_type.name }} Flight</a>
 </h4>
 {% endmacro %}
 
@@ -21,7 +21,7 @@ scheduled_flight view. therefore we need to fallback to the request object.
 {% set instance_endpoint = kwargs.instance_endpoint or request.endpoint %}
 {% set backurl = kwargs.backurl %}
 {% set instance_kwargs = kwargs.get('instance_kwargs', {'scheduled_report_id': request.view_args.scheduled_report_id}) %}
-{% set show_active = request.endpoint.startswith('scheduled_flight') %}
+{% set show_active = request.endpoint.startswith('scheduled.flight') %}
 <thead>
     <tr>
         <th>Flight</th>
@@ -30,6 +30,7 @@ scheduled_flight view. therefore we need to fallback to the request object.
         <th>Dest</th>
         <th>ETA</th>
         <th>Active?</th>
+        <th>Type</th>
     </tr>
 </thead>
 <tbody>{% if not scheduled_flights %}
@@ -47,6 +48,7 @@ scheduled_flight view. therefore we need to fallback to the request object.
         <td class="data">{{ string(scheduled_flight.destination_station) }}</td>
         <td class="data number">{{ time(scheduled_flight.destination_arrival_estimated_time) }}</td>
         <td class="data">{{ yes(scheduled_flight.is_active) }}</td>
+        <td class="data">{{ scheduled_flight.flight_type.name }}</td>
     </tr>{% endfor %}
 {% endif %}</tbody>
 {% endmacro %}

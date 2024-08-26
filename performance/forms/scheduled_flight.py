@@ -1,86 +1,120 @@
 import sqlalchemy as sa
 
 from wtforms import HiddenField
+from wtforms import validators as wtforms_validators
+from wtforms import widgets as wtforms_widgets
 from wtforms.validators import DataRequired
 from wtforms_alchemy import ClassMap
+from wtforms_sqlalchemy.orm import model_form
 
-from .. import queries
-from ..models import ScheduledFlight
+from performance import models
+from performance import queries
+from performance import settings
+from performance.extensions import db
+from performance.models import FlightType
+from performance.models import ScheduledFlight
 
 from .base import ModelForm
+from .fields import HiddenIntegerField
 from .fields import StringTimeField
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
+from .model_converter import PerformanceModelConverter
 
-_class_names = 'scheduled-flight'
+_only = [
+    'flight_number',
+    'origin_station',
+    'origin_departure_estimated_time',
+    'destination_station',
+    'destination_arrival_estimated_time',
+    'is_active',
+    'flight_type',
+]
 
-class ScheduledFlightForm(
+class BaseScheduledFlightForm(
     BackLinkMixin,
     ModelForm,
     SubmitUpdateDeleteMixin,
 ):
+    """
+    Mix useful things together for base.
+    """
     class Meta:
-        model = ScheduledFlight
-        presentation = True
-        type_map = ClassMap({
-            sa.Time: StringTimeField,
-        })
-        only = [
-            'flight_number',
-            'origin_station',
-            'origin_departure_estimated_time',
-            'destination_station',
-            'destination_arrival_estimated_time',
-            'is_active',
-        ]
-        fields_order = ['flight_type'] + only + ['submit', 'delete']
-        # overriding estimated times labels because there's no date fields
-        field_args = {
-            'flight_number': {
-                'render_kw': {
-                    'class': f'{_class_names}',
-                    'placeholder': 'Flight Number',
-                },
-            },
-            'origin_station': {
-                'label': 'Orig.',
-                'render_kw': {
-                    'class': f'{_class_names}',
-                    'placeholder': 'Origin Station',
-                },
-            },
-            'destination_station': {
-                'label': 'Dest.',
-                'render_kw': {
-                    'class': f'{_class_names}',
-                    'placeholder': 'Destination Station',
-                },
-            },
-            'origin_departure_estimated_time': {
-                'label': 'ETD',
-                'render_kw': {
-                    'class': f'{_class_names} origin',
-                    'placeholder': 'ETD',
-                },
-            },
-            'destination_arrival_estimated_time': {
-                'label': 'ETA',
-                'render_kw': {
-                    'class': f'{_class_names} origin',
-                    'placeholder': 'ETA',
-                },
-            },
-            'is_active': {
-                'label': 'Active?',
-                'render_kw': {
-                    'title': 'Flight is loaded on new operation',
-                },
-            },
-        }
+        fields_order = ['flight_type'] + _only + ['submit', 'delete']
 
-    scheduled_report_id = HiddenField(validators=[DataRequired()])
+    scheduled_report_id = HiddenIntegerField()
 
-    flight_type_id = HiddenField(
-        default = lambda: queries.get_scheduled_flight_type_instance().id,
-        filters = [int],
-    )
+
+_class_names = 'scheduled-flight'
+
+_field_args = dict(
+    flight_type = dict(
+        get_label = 'name',
+        default = settings.default_flight_type,
+    ),
+    flight_number = dict(
+        render_kw = dict(
+            placeholder = 'Flight Number',
+        ),
+    ),
+    origin_station = dict(
+        label = 'Orig.',
+        render_kw = dict(
+            placeholder = 'Origin Station',
+        ),
+    ),
+    destination_station = dict(
+        label = 'Dest.',
+        render_kw = dict(
+            placeholder = 'Destination Station',
+        ),
+    ),
+    origin_departure_estimated_time = dict(
+        label = 'ETD',
+        render_kw = dict(
+            class_ = _class_names + ' origin',
+            placeholder = 'ETD',
+        ),
+    ),
+    destination_arrival_estimated_time = dict(
+        label = 'ETA',
+        render_kw = dict(
+            class_ = _class_names + ' origin',
+            placeholder = 'ETA',
+        ),
+    ),
+    is_active = dict(
+        label = 'Active?',
+        render_kw = dict(
+            title = ScheduledFlight.is_active.doc,
+        ),
+    ),
+)
+
+ScheduledFlightForm = model_form(
+    model = ScheduledFlight,
+    db_session = db.session,
+    base_class = BaseScheduledFlightForm,
+    only = _only,
+    field_args = _field_args,
+    converter = PerformanceModelConverter(),
+)
+
+fieldnames = [
+    'flight_number',
+    'origin_station',
+    'destination_station',
+    'origin_departure_estimated_time',
+    'destination_arrival_estimated_time',
+]
+for fieldname in fieldnames:
+    field = getattr(ScheduledFlightForm, fieldname)
+    field.kwargs.setdefault('render_kw', dict())
+    field.kwargs['render_kw'].setdefault('class_', _class_names)
+
+ScheduledFlightForm.is_active.kwargs['validators'] = [wtforms_validators.Optional()]
+
+# Setting this in the base mix above, makes all the attributes come through as fields.
+ScheduledFlightForm.Meta.model = ScheduledFlight
+
+ScheduledFlightForm.flight_type.kwargs['query_factory'] = FlightType.query_factory

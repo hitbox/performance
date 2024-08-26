@@ -1,13 +1,16 @@
 from flask import Blueprint
 from flask import request
 
-from ..authorization import edit_schedule_check
-from ..forms import ScheduledFlightForm
-from ..models import ScheduledFlight
-from ..models import ScheduledReport
-from ..pluggable import FormListView
+from performance.authorization import edit_schedule_check
+from performance.extensions import db
+from performance.forms import ScheduledFlightForm
+from performance.models import ScheduledFlight
+from performance.models import ScheduledReport
+from performance.pluggable import FormListView
 
-scheduled_flight_bp = Blueprint('scheduled_flight', __name__)
+from .utils import update_context_for_default_flight_type
+
+scheduled_flight_bp = Blueprint('flight', __name__)
 
 @edit_schedule_check
 @scheduled_flight_bp.before_request
@@ -27,15 +30,22 @@ def instance_getter(*ignore_args, **ignore_kwargs):
 def context_processor():
     scheduled_report_id = request.view_args['scheduled_report_id']
     scheduled_report = ScheduledReport.query.get_or_404(scheduled_report_id)
-    return dict(
+    more_context = dict(
         scheduled_report = scheduled_report,
     )
+    update_context_for_default_flight_type(more_context)
+    return more_context
 
 def form_getter(**kwargs):
     form = ScheduledFlightForm(**kwargs)
-    if hasattr(form, 'backurl'):
-        del form.backurl
+
+    # update scheduled report id
+    form.scheduled_report_id.data = request.view_args['scheduled_report_id']
     return form
+
+def form_submitter(form, instance):
+    response = ScheduledFlightForm.standard_submit(form, instance)
+    return response
 
 view_func = FormListView.as_view(
     name = 'listform',
@@ -43,7 +53,7 @@ view_func = FormListView.as_view(
     instance_getter = instance_getter,
     pagination_getter = lambda: None,
     form_getter = form_getter,
-    form_submitter = ScheduledFlightForm.standard_submit,
+    form_submitter = form_submitter,
     context_processor = context_processor,
 )
 

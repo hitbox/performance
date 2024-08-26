@@ -2,7 +2,10 @@ from types import SimpleNamespace
 
 from flask import current_app
 
-from . import constants
+from performance import constants
+from performance import models
+from performance import settings
+from performance.extensions import db
 
 def config_as_obj():
     ns = SimpleNamespace(**current_app.config)
@@ -83,3 +86,11 @@ def scheduled_reports_onlyone():
 def performance_report_title():
     key = constants.PERFORMANCE_REPORT_TITLE
     return current_app.config.get(key, False)
+
+def default_flight_type():
+    """
+    Default FlightType configured by admin users.
+    """
+    stmt = db.select(models.Performance)
+    performance_settings = db.session.scalars(stmt).one()
+    return performance_settings.default_flight_type

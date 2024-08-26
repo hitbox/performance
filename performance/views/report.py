@@ -1,6 +1,5 @@
 import datetime
 
-from collections import defaultdict
 from decimal import Decimal
 from types import SimpleNamespace
 
@@ -22,6 +21,7 @@ from performance import settings
 from performance.authorization import basic_check
 from performance.authorization import edit_check
 from performance.extensions import db
+from performance.forms import ReportForm
 
 report_bp = Blueprint('report', __name__)
 
@@ -35,7 +35,7 @@ def get_report_form_class():
     """
     Wrap in function to avoid the aggressiveness of wtforms_alchemy.
     """
-    from ..forms import ReportForm
+    from performance.forms import ReportForm
     return ReportForm
 
 def get_context(report):
@@ -83,7 +83,7 @@ def view_report(id):
     """
     View Report object.
     """
-    ReportForm = get_report_form_class()
+    #ReportForm = get_report_form_class()
     report = models.Report.query.get_or_404(id)
     form = ReportForm(obj=report)
 
@@ -92,11 +92,14 @@ def view_report(id):
     if form.validate_on_submit():
         report.system_detail = form.system_detail.data
         db.session.commit()
-        return redirect(
+        response = redirect(
             url_for(
                 request.endpoint,
                 _anchor = 'system-detail',
-                **request.view_args))
+                **request.view_args
+            )
+        )
+        return response
 
     context = get_context(report)
     context.update(get_prev_next_context(report.date))
