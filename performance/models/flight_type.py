@@ -1,6 +1,6 @@
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from wtforms_alchemy import QuerySelectField
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from ..extensions import db
 
@@ -96,27 +96,18 @@ class FlightType(
         return db.session.scalars(stmt)
 
     @classmethod
-    def as_query_select_field(
-        cls,
-        label = 'Flight Type',
-        get_label = 'name',
-        query_factory = None,
-        render_kw = None,
-    ):
+    def as_query_select_field(cls, **kwargs):
         """
         """
-        if query_factory is None:
-            query_factory = cls.query_factory
-        if render_kw is None:
-            render_kw = dict()
+        kwargs.setdefault('label', 'Flight Type')
+        kwargs.setdefault('get_label', 'name')
+        kwargs.setdefault('query_factory', cls.query_factory)
+
+        render_kw = kwargs.setdefault('render_kw', {})
         render_kw.setdefault('class', 'narrower flight')
         render_kw.setdefault('autofocus', True)
-        field = QuerySelectField(
-            'Flight Type',
-            get_label = 'name',
-            query_factory = query_factory,
-            render_kw = render_kw,
-        )
+
+        field = QuerySelectField(**kwargs)
         return field
 
 

@@ -5,7 +5,6 @@
 {% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
 {% set include_controllable_columns = flight_type.name == 'Scheduled' %}
 {% set with_edit = current_user.is_editor or current_user.is_admin %}
-{% set backurl = url_for(request.endpoint, **request.view_args) %}
 
 
 {% macro render_flight_type_th(colspan, text) %}
@@ -15,9 +14,16 @@
 
 {# included by print-with-edit.html for each grouping of flights #}
 
+{# this is inside the context of for flight_type, flights in report.flights_by_type #}
+
 
 {# different grouping than DHL #}
-<div{% if not flights %} class="noprint"{% endif %}>
+
+{% set _anchor = "flight-type-id-" + flight_type.id|string %}
+
+{% set backurl = url_for(request.endpoint, _anchor=_anchor, **request.view_args) %}
+
+<div id="{{ _anchor }}"{% if not flights %} class="noprint"{% endif %}>
     <table class="expand flights-table">
         {% if flights %}<thead>
             <tr>{% if include_controllable_columns %}
@@ -48,7 +54,8 @@
             </tr>
         </thead>
         <tbody>{% if flights %}
-            {% for flight in flights %}<tr{% if with_edit %} data-href="{{ url_for('flight.edit', id=flight.id, backurl=backurl) }}" title="{{ url_for('flight.edit', id=flight.id) }}"{% endif %}>
+            {% for flight in flights %}
+            <tr{% if with_edit %} data-href="{{ url_for('flight.edit', id=flight.id, backurl=backurl) }}" title="{{ url_for('flight.edit', id=flight.id) }}"{% endif %}>
                 {% include "report/flight-table-data.html" with context %}
             </tr>{% endfor %}
             {%- else -%}

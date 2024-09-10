@@ -120,10 +120,27 @@ class Report(MetaMixin, db.Model):
         Group flights for this report by FlightType and sort the groups of
         flights by ETD.
         """
-        groupkey = attrgetter('flight_type')
-        sortkey = attrgetter('origin_departure_estimated_time_or_midnight')
-        grouped = groupby(sorted(self.flights, key=groupkey), key=groupkey)
-        return [(key, sorted(flights, key=sortkey)) for key, flights in grouped]
+        from .flight import Flight
+
+        groups = []
+        stmt = (
+            sa.select(FlightType)
+            .where(FlightType.is_active)
+            .order_by(FlightType.report_order)
+        )
+        for flight_type in db.session.scalars(stmt):
+            stmt = (
+                sa.select(Flight)
+                .join(Report)
+                .where(
+                    Report.id == self.id,
+                    Flight.flight_type_id == flight_type.id,
+                )
+                .order_by(Flight.origin_departure_estimated_time_or_midnight)
+            )
+            flights = db.session.scalars(stmt).all()
+            groups.append((flight_type, flights))
+        return groups
 
     def lane_flights(self):
         """

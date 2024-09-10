@@ -1,12 +1,12 @@
 import sqlalchemy as sa
+import wtforms.validators as wtforms_validators
 
 from flask import request
 from wtforms import HiddenField
 from wtforms import StringField
-from wtforms_alchemy import ClassMap
-from wtforms_alchemy import QuerySelectField
 
 from performance import models
+from performance.extensions import db
 
 from . import defaults
 from .base import ModelForm
@@ -34,9 +34,6 @@ class FlightForm(
     class Meta:
         model = models.Flight
         presentation = True
-        type_map = ClassMap({
-            sa.Time: StringTimeField,
-        })
         field_args = {
             'flight_number': {
                 'label': 'Flight',
@@ -148,18 +145,11 @@ class FlightForm(
 
     report_id = HiddenField()
 
-    flight_type = models.FlightType.as_query_select_field()
-
-    #flight_type = QuerySelectField(
-    #    'Flight Type',
-    #    default = defaults.flight_type,
-    #    get_label = 'name',
-    #    query_factory = lambda: FlightType.query.order_by(FlightType.report_order).all(),
-    #    render_kw = {
-    #        'class': 'narrower flight',
-    #        'autofocus': True,
-    #    }
-    #)
+    flight_type = models.FlightType.as_query_select_field(
+        validators = [
+            wtforms_validators.DataRequired(),
+        ],
+    )
 
     # NOTE:
     # *_delays_string fields are added manually to avoid wtforms_alchemy
@@ -182,6 +172,7 @@ class FlightForm(
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dynamic_date_field_placeholder()
+        self.flight_type_from_request()
 
     def dynamic_date_field_placeholder(self):
         """
@@ -211,3 +202,16 @@ class FlightForm(
         for attrname in attrnames:
             field = getattr(self, attrname)
             field.render_kw['placeholder'] = placeholder
+
+    def flight_type_from_request(self):
+        """
+        Update the value of flight_type from the request.
+        """
+        if 'flight_type_id' in request.view_args:
+            stmt = (
+                sa.select(models.FlightType)
+                .where(
+                    models.FlightType.id == request.view_args['flight_type_id']
+                )
+            )
+            self.flight_type.data = db.session.scalars(stmt).one()

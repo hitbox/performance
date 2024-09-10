@@ -156,7 +156,7 @@ def redirect_for_delete(form):
 # create flight
 # NOTE: forms will snag report_id out of the request.view_args
 flight_bp.add_url_rule(
-    '/create/<int:report_id>',
+    '/create/<int:report_id>/<int:flight_type_id>',
     view_func = CreateView.as_view(
         'create',
         flight_form_class,
