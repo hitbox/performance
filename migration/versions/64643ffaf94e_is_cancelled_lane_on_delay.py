@@ -59,6 +59,9 @@ def upgrade():
                 app_config.PERFORMANCE_LANES_INCLUDE_CANCELLED_DELAYS
             )
         )
+        .where(
+            delay_table.c.is_cancelled_lane is None,
+        )
     )
 
 def downgrade():
