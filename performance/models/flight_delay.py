@@ -34,19 +34,12 @@ class DelayAssocMixin(UniqueMixin):
         return db.Column(db.Integer, primary_key=True)
 
     @db.declared_attr
-    def delay_object(cls):
-        """
-        Attribute to delay object itself.
-        """
-        return db.relationship(Delay)
-
-    @db.declared_attr
     def code(cls):
         """
         Convenience attribute for the delay code string.
         """
         return association_proxy(
-            'delay_object',
+            'delay',
             'code',
             creator = lambda code: Delay.as_unique(db.session, code=code)
         )
@@ -54,16 +47,16 @@ class DelayAssocMixin(UniqueMixin):
     @db.declared_attr
     def is_controllable(cls):
         """
-        Convenient access to .delay_object.is_controllable
+        Convenient access to .delay.is_controllable
         """
-        return association_proxy('delay_object', 'is_controllable')
+        return association_proxy('delay', 'is_controllable')
 
     @db.declared_attr
     def is_cancelled_lane(cls):
         """
-        Convenient access to .delay_object.is_cancelled_lane
+        Convenient access to .delay.is_cancelled_lane
         """
-        return association_proxy('delay_object', 'is_cancelled_lane')
+        return association_proxy('delay', 'is_cancelled_lane')
 
     @db.declared_attr
     def minutes(cls):
@@ -171,6 +164,11 @@ class OriginDelay(
         back_populates = 'origin_delays',
     )
 
+    delay = db.relationship(
+        Delay,
+        back_populates = 'as_origin_delay',
+    )
+
 
 class DestinationDelay(
     DelayAssocMixin,
@@ -183,4 +181,9 @@ class DestinationDelay(
     flight = db.relationship(
         'Flight',
         back_populates = 'destination_delays',
+    )
+
+    delay = db.relationship(
+        Delay,
+        back_populates = 'as_destination_delay',
     )

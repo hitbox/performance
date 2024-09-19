@@ -6,6 +6,9 @@
 {% from "macros.html" import yes %}
 
 
+{# {% include %}-ed by flight-table.html #}
+
+
 {% set edit_url = url_for('flight.edit', id=flight.id, backurl=thisurl) %}
 
 
@@ -31,11 +34,9 @@
 <td class="data">{% if flight.show_destination_delays() %}{{ render_delays(flight.destination_delays) }}{% endif %}</td>
 
 
-{#- controllable delays -#}
-{#{% if flight.flight_type.name == 'Scheduled' %}#}
+{#- controllable delays over boolean field -#}
 {% if include_controllable_columns %}
     {% for over_minutes in [15, 30] %}
-        {#{% set delays = flight.controllable_destination_delays(over_minutes) %}#}
         {% set is_over = flight.controllable_destination_delays_minutes > over_minutes %}
         <td{% if is_over %} class="data late"{% endif %}>{{ yes(is_over) }}</td>
     {% endfor %}

@@ -48,6 +48,16 @@ class Delay(
         doc = 'Override hiding for LATE_GT threshold.',
     )
 
+    as_origin_delay = db.relationship(
+        'OriginDelay',
+        back_populates = 'delay',
+    )
+
+    as_destination_delay = db.relationship(
+        'DestinationDelay',
+        back_populates = 'delay',
+    )
+
     @classmethod
     def unique_hash(cls, *, code):
         return (code.upper(), )

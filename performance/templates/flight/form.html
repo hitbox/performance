@@ -39,6 +39,7 @@ const destinationDelayCodesId = "{{ form.destination_delays_string.id }}";{# the
 
 {% block content %}
 <article>
+    {% if form.errors %}<ul>{% for error in form.errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
     <form action="{{ url_for(request.endpoint, **request.view_args) }}" id="edit"{# create or update #} method="POST">
         {{ form.hidden_tag() }}
         <fieldset>

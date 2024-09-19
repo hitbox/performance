@@ -4,6 +4,10 @@ import wtforms.validators as wtforms_validators
 from flask import request
 from wtforms import HiddenField
 from wtforms import StringField
+from wtforms_alchemy import ClassMap
+from wtforms_sqlalchemy.orm import ModelConverter
+from wtforms_sqlalchemy.orm import converts
+from wtforms_sqlalchemy.orm import model_form
 
 from performance import models
 from performance.extensions import db
@@ -26,148 +30,155 @@ def report_id_from_view_args():
 def date_field_classes_string(*specific_classes):
     return ' '.join(('flight', 'date-entry') + specific_classes)
 
-class FlightForm(
-    BackLinkMixin,
+field_args = {
+    'flight_number': {
+        'label': 'Flight',
+        'render_kw': {
+            'class': 'flight narrowest',
+        },
+    },
+    'leg': {
+        'label': 'Leg',
+        'render_kw': {
+            'class': 'flight narrowest',
+        },
+    },
+    'tail_number': {
+        'label': 'Tail',
+        'render_kw': {
+            'class': 'flight narrowest',
+        },
+    },
+    'weight': {
+        'label': 'Weight',
+        'render_kw': {
+            'class': 'flight narrowest',
+        },
+    },
+    'origin_station': {
+        'label': 'Station',
+        'render_kw': {
+            'class': 'flight narrowest',
+        },
+    },
+    'origin_departure_estimated_date': {
+        'label': 'ETD',
+        'render_kw': {
+            'class': date_field_classes_string('origin'),
+            'title': DATE_FIELD_TITLE,
+            'tabindex': DATE_FIELD_TABINDEX,
+        },
+    },
+    'origin_departure_estimated_time': {
+        'label': '',
+        'render_kw': {
+            'class': 'flight origin time-entry',
+            'placeholder': 'ETD',
+        },
+    },
+    'origin_departure_actual_date': {
+        'label': 'ATD',
+        'render_kw': {
+            'class': date_field_classes_string('origin'),
+            'title': DATE_FIELD_TITLE,
+            'tabindex': DATE_FIELD_TABINDEX,
+        },
+    },
+    'origin_departure_actual_time': {
+        'label': '',
+        'render_kw': {
+            'class': 'flight origin time-entry',
+            'placeholder': 'ATD',
+        },
+    },
+    'origin_delays_string': {
+    },
+    'destination_station': {
+        'label': 'Station',
+        'render_kw': {
+            'class': 'flight narrowest',
+        },
+    },
+    'destination_arrival_estimated_date': {
+        'label': 'ETA',
+        'render_kw': {
+            'class': date_field_classes_string('destination'),
+            'title': DATE_FIELD_TITLE,
+            'tabindex': DATE_FIELD_TABINDEX,
+        },
+    },
+    'destination_arrival_estimated_time': {
+        'label': '',
+        'render_kw': {
+            'class': 'flight origin time-entry',
+            'placeholder': 'ETA',
+        },
+    },
+    'destination_arrival_actual_date': {
+        'label': 'ATA',
+        'render_kw': {
+            'class': date_field_classes_string('destination'),
+            'title': DATE_FIELD_TITLE,
+            'tabindex': DATE_FIELD_TABINDEX,
+        },
+    },
+    'destination_arrival_actual_time': {
+        'label': '',
+        'render_kw': {
+            'class': 'flight destination time-entry',
+            'placeholder': 'ATA',
+        },
+    },
+    'comment': {
+        'label': 'Comment',
+        'render_kw': {
+            'class': 'flight',
+            'cols': 100,
+            'rows': 8,
+        },
+    },
+}
+
+class FlightModelConverter(ModelConverter):
+
+    @converts('Time')
+    def handle_time_types(self, column, field_args, **extra):
+        return StringTimeField(**field_args)
+
+
+class FlightFormBase(
     ModelForm,
+    BackLinkMixin,
     SubmitUpdateDeleteMixin,
 ):
     class Meta:
-        model = models.Flight
         presentation = True
-        field_args = {
-            'flight_number': {
-                'label': 'Flight',
-                'render_kw': {
-                    'class': 'flight narrowest',
-                },
-            },
-            'leg': {
-                'label': 'Leg',
-                'render_kw': {
-                    'class': 'flight narrowest',
-                },
-            },
-            'tail_number': {
-                'label': 'Tail',
-                'render_kw': {
-                    'class': 'flight narrowest',
-                },
-            },
-            'weight': {
-                'label': 'Weight',
-                'render_kw': {
-                    'class': 'flight narrowest',
-                },
-            },
-            'origin_station': {
-                'label': 'Station',
-                'render_kw': {
-                    'class': 'flight narrowest',
-                },
-            },
-            'origin_departure_estimated_date': {
-                'label': 'ETD',
-                'render_kw': {
-                    'class': date_field_classes_string('origin'),
-                    'title': DATE_FIELD_TITLE,
-                    'tabindex': DATE_FIELD_TABINDEX,
-                },
-            },
-            'origin_departure_estimated_time': {
-                'label': '',
-                'render_kw': {
-                    'class': 'flight origin time-entry',
-                    'placeholder': 'ETD',
-                },
-            },
-            'origin_departure_actual_date': {
-                'label': 'ATD',
-                'render_kw': {
-                    'class': date_field_classes_string('origin'),
-                    'title': DATE_FIELD_TITLE,
-                    'tabindex': DATE_FIELD_TABINDEX,
-                },
-            },
-            'origin_departure_actual_time': {
-                'label': '',
-                'render_kw': {
-                    'class': 'flight origin time-entry',
-                    'placeholder': 'ATD',
-                },
-            },
-            'origin_delays_string': {
-            },
-            'destination_station': {
-                'label': 'Station',
-                'render_kw': {
-                    'class': 'flight narrowest',
-                },
-            },
-            'destination_arrival_estimated_date': {
-                'label': 'ETA',
-                'render_kw': {
-                    'class': date_field_classes_string('destination'),
-                    'title': DATE_FIELD_TITLE,
-                    'tabindex': DATE_FIELD_TABINDEX,
-                },
-            },
-            'destination_arrival_estimated_time': {
-                'label': '',
-                'render_kw': {
-                    'class': 'flight origin time-entry',
-                    'placeholder': 'ETA',
-                },
-            },
-            'destination_arrival_actual_date': {
-                'label': 'ATA',
-                'render_kw': {
-                    'class': date_field_classes_string('destination'),
-                    'title': DATE_FIELD_TITLE,
-                    'tabindex': DATE_FIELD_TABINDEX,
-                },
-            },
-            'destination_arrival_actual_time': {
-                'label': '',
-                'render_kw': {
-                    'class': 'flight destination time-entry',
-                    'placeholder': 'ATA',
-                },
-            },
-            'comment': {
-                'label': 'Comment',
-                'render_kw': {
-                    'class': 'flight',
-                    'cols': 100,
-                    'rows': 8,
-                },
-            },
-        }
 
     report_id = HiddenField()
 
-    flight_type = models.FlightType.as_query_select_field(
-        validators = [
-            wtforms_validators.DataRequired(),
-        ],
-    )
+    #flight_type = models.FlightType.as_query_select_field(
+    #    validators = [
+    #        wtforms_validators.DataRequired(),
+    #    ],
+    #)
 
     # NOTE:
     # *_delays_string fields are added manually to avoid wtforms_alchemy
     # crawling on them which is causing errors; probably because the model
     # fields are not designed properly.
-    origin_delays_string = StringField(
-        'Delays',
-        render_kw = dict(
-            class_ = 'flight',
-        )
-    )
+    #origin_delays_string = StringField(
+    #    'Delays',
+    #    render_kw = dict(
+    #        class_ = 'flight',
+    #    )
+    #)
 
-    destination_delays_string = StringField(
-        'Delays',
-        render_kw = dict(
-            class_ = 'flight',
-        )
-    )
+    #destination_delays_string = StringField(
+    #    'Delays',
+    #    render_kw = dict(
+    #        class_ = 'flight',
+    #    )
+    #)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -215,3 +226,47 @@ class FlightForm(
                 )
             )
             self.flight_type.data = db.session.scalars(stmt).one()
+
+
+class TrashFlightForm(
+    FlightFormBase,
+    ModelForm,
+    BackLinkMixin,
+    SubmitUpdateDeleteMixin,
+):
+    class Meta:
+        model = models.Flight
+        presentation = True
+        type_map = ClassMap({
+            sa.Time: StringTimeField,
+        })
+        field_args = field_args
+
+
+FlightForm = model_form(
+    model = models.Flight,
+    db_session = db.session,
+    base_class = FlightFormBase,
+    field_args = field_args,
+    converter = FlightModelConverter(),
+)
+
+FlightForm.flight_type = models.FlightType.as_query_select_field(
+    validators = [
+        wtforms_validators.DataRequired(),
+    ],
+)
+
+FlightForm.origin_delays_string = StringField(
+    'Delays',
+    render_kw = dict(
+        class_ = 'flight',
+    )
+)
+
+FlightForm.destination_delays_string = StringField(
+    'Delays',
+    render_kw = dict(
+        class_ = 'flight',
+    )
+)

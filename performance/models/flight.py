@@ -1,13 +1,12 @@
 import datetime
-import string
 
 from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.orderinglist import ordering_list
 
-from .. import parse
-from ..extensions import db
-from ..utils import diff_minutes
+from performance import parse
+from performance.extensions import db
+from performance.utils import diff_minutes
 
 from .delay import Delay
 from .flight_delay import DestinationDelay
@@ -250,7 +249,7 @@ class Flight(
             destination_delay.minutes
             for destination_delay in self.destination_delays
             if destination_delay.minutes is not None
-            and destination_delay.delay_object.is_controllable
+            and destination_delay.delay.is_controllable
         )
 
     @controllable_destination_delays_minutes.expression
@@ -279,7 +278,7 @@ class Flight(
             self.flight_type.is_lane
             # all cancelled delays are permitted by flag on delay object
             and all(
-                destination_delay.delay_object.is_cancelled_lane
+                destination_delay.delay.is_cancelled_lane
                 for destination_delay in self.destination_delays
                 if destination_delay.is_cancelled
             ))
@@ -332,69 +331,34 @@ def delays_setter(
     attr,
 ):
     """
-    Generic function to clear and update the flight delays list.
+    Ensure that the delay codes scraped from text input exists as database
+    objects for linking through the association objects. Ignores the
+    unaccounted minutes placeholder.
     """
-    delays_data = [
-        data for data in parse.delaystring(delays_string)
-    ]
-    # ensure all delay code objects exist in database
-    for delay_data in delays_data:
-        delay_object = Delay.as_unique(
-            session,
-            code = delay_data['code']
+    list_ = []
+    delays = parse.delaystring(delays_string)
+    for position, delay_data in enumerate(delays):
+        # ignore placeholder
+        if delay_data['code'] in (parse.PLACEHOLDER_CODE, ):
+            continue
+        # add delay object if needed
+        stmt = db.select(Delay).where(
+            Delay.code == delay_data['code'],
         )
-    session.commit()
-    # add new or update existing
-    for position, delay_data in enumerate(delays_data):
-        delay_object = Delay.as_unique(
-            session,
-            code = delay_data['code']
+        delay = session.scalars(stmt).one_or_none()
+        if delay is None:
+            delay = Delay(code = delay_data['code'])
+            session.add(delay)
+        # append association object
+        assoc = flight_delay_class(
+            flight = flight,
+            delay = delay,
+            position = position,
+            minutes = delay_data['minutes'],
+            is_cancelled = delay_data['is_cancelled'],
         )
-        if delay_object not in session:
-            session.add(delay_object)
-
-        if flight_id is None:
-            delay_assoc = flight_delay_class(
-                delay_id = delay_object.id,
-                position = position,
-            )
-            delay_assoc.flight = flight
-        else:
-            with session.no_autoflush:
-                exists = flight_delay_class.query.filter(
-                    flight_delay_class.flight_id == flight_id,
-                    flight_delay_class.delay_id == delay_object.id,
-                    flight_delay_class.position == position,
-                    flight_delay_class.is_cancelled == delay_data['is_cancelled'],
-                ).one_or_none()
-                if exists:
-                    delay_assoc = exists
-                else:
-                    delay_assoc = flight_delay_class(
-                        flight_id = flight_id,
-                        delay_id = delay_object.id,
-                        position = position,
-                    )
-                    db.session.add(delay_assoc)
-        delay_assoc.minutes = delay_data['minutes']
-        delay_assoc.is_cancelled = delay_data['is_cancelled']
-    # delete flight_delays not in string
-    with session.no_autoflush:
-        for exist_delay in delays_list:
-            for position, delay_data in enumerate(delays_data):
-                if (
-                    exist_delay.code == delay_data['code']
-                    and exist_delay.minutes == delay_data['minutes']
-                    and exist_delay.position == position
-                    and exist_delay.is_cancelled == delay_data['is_cancelled']
-                ):
-                    break
-            else:
-                # flight delay not in string but exists in either database or just
-                # python side.
-                if db.inspect(exist_delay).persistent:
-                    db.session.delete(exist_delay)
-    # need to commit because the other origin/destination codes may happen?
+        list_.append(assoc)
+    setattr(flight, attr, list_)
     session.commit()
 
 def sql_delays_string(cls, flight_delay_class):
