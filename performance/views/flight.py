@@ -9,13 +9,14 @@ from flask import url_for
 from performance import parse
 from performance import queries
 from performance.authorization import edit_check
+from performance.extensions import db
 from performance.models import Flight
 from performance.models import FlightType
 from performance.models import Report
-from performance.utils import diff_minutes as diff_minutes_func
-from performance.utils import massage_time
 from performance.pluggable import CreateView
 from performance.pluggable import UpdateView
+from performance.utils import diff_minutes as diff_minutes_func
+from performance.utils import massage_time
 
 flight_bp = Blueprint('flight', __name__)
 
@@ -131,9 +132,8 @@ def _delays(data):
     return delays_string
 
 def create_context_processor():
-    # XXX: shares a lot with forms.flight.FlightForm:__init__
     report_id = request.view_args['report_id']
-    report = Report.query.get(report_id)
+    report = db.session.get(Report, report_id)
     context = dict(
         fallbackDate = report.date,
         report = report,
@@ -141,7 +141,6 @@ def create_context_processor():
     return context
 
 def update_delete_context_processor():
-    # XXX: shares a lot with forms.flight.FlightForm:__init__
     flight_id = request.view_args['id']
     flight = Flight.query.get(flight_id)
     context = dict(
@@ -160,6 +159,7 @@ flight_bp.add_url_rule(
     view_func = CreateView.as_view(
         'create',
         flight_form_class,
+        model = Flight,
         template = 'flight/form.html',
         context_processor = create_context_processor,
     ))
@@ -170,6 +170,7 @@ flight_bp.add_url_rule(
     view_func = UpdateView.as_view(
         'edit',
         flight_form_class,
+        model = Flight,
         instance_query = lambda id: Flight.query.get_or_404(id),
         template = 'flight/form.html',
         context_processor = update_delete_context_processor,

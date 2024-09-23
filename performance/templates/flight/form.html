@@ -32,14 +32,19 @@ const destinationDelayCodesId = "{{ form.destination_delays_string.id }}";{# the
 
 {% block header %}
 <nav id="flight-form-back">
-    <h3>Back to <a href="{{ url_for('report.view_report', id=report.id) }}">{{ render_date(report.date) }}</a></h3>
+    {% if request.args.backurl %}
+        {% set url = request.args.backurl %}
+    {% else %}
+        {% set url = url_for('report.view_report', id=report.id) %}
+    {% endif %}
+    <h3>Back to <a href="{{ url }}">{{ render_date(report.date) }}</a></h3>
 </nav>
 {% endblock header %}
 
 
 {% block content %}
 <article>
-    {% if form.errors %}<ul>{% for error in form.errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+    {% if form.errors %}<div>{{ form.errors }}</div>{% endif %}
     <form action="{{ url_for(request.endpoint, **request.view_args) }}" id="edit"{# create or update #} method="POST">
         {{ form.hidden_tag() }}
         <fieldset>

@@ -26,7 +26,10 @@ class Flight(
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    report_id = db.Column(db.ForeignKey('report.id'))
+    report_id = db.Column(
+        db.ForeignKey('report.id'),
+        nullable = False,
+    )
     report = db.relationship(
         'Report',
         back_populates = 'flights',

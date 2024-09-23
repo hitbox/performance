@@ -156,34 +156,11 @@ class FlightFormBase(
 
     report_id = HiddenField()
 
-    #flight_type = models.FlightType.as_query_select_field(
-    #    validators = [
-    #        wtforms_validators.DataRequired(),
-    #    ],
-    #)
-
-    # NOTE:
-    # *_delays_string fields are added manually to avoid wtforms_alchemy
-    # crawling on them which is causing errors; probably because the model
-    # fields are not designed properly.
-    #origin_delays_string = StringField(
-    #    'Delays',
-    #    render_kw = dict(
-    #        class_ = 'flight',
-    #    )
-    #)
-
-    #destination_delays_string = StringField(
-    #    'Delays',
-    #    render_kw = dict(
-    #        class_ = 'flight',
-    #    )
-    #)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dynamic_date_field_placeholder()
         self.flight_type_from_request()
+        self.update_report_id_from_request()
 
     def dynamic_date_field_placeholder(self):
         """
@@ -227,26 +204,18 @@ class FlightFormBase(
             )
             self.flight_type.data = db.session.scalars(stmt).one()
 
-
-class TrashFlightForm(
-    FlightFormBase,
-    ModelForm,
-    BackLinkMixin,
-    SubmitUpdateDeleteMixin,
-):
-    class Meta:
-        model = models.Flight
-        presentation = True
-        type_map = ClassMap({
-            sa.Time: StringTimeField,
-        })
-        field_args = field_args
+    def update_report_id_from_request(self):
+        if self.report_id.data is None:
+            self.report_id.data = request.view_args['report_id']
 
 
 FlightForm = model_form(
     model = models.Flight,
     db_session = db.session,
     base_class = FlightFormBase,
+    exclude = [
+        'report',
+    ],
     field_args = field_args,
     converter = FlightModelConverter(),
 )
