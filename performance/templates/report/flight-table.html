@@ -3,7 +3,7 @@
 
 {% set ncols = 15 %}
 {% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
-{% set include_controllable_columns = flight_type.name == 'Scheduled' %}
+{% set include_controllable_columns = flight_type.is_controllable %}
 {% set with_edit = current_user.is_editor or current_user.is_admin %}
 
 
