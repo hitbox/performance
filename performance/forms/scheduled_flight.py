@@ -1,10 +1,8 @@
 import sqlalchemy as sa
 
+from flask import request
 from wtforms import HiddenField
 from wtforms import validators as wtforms_validators
-from wtforms import widgets as wtforms_widgets
-from wtforms.validators import DataRequired
-from wtforms_alchemy import ClassMap
 from wtforms_sqlalchemy.orm import model_form
 
 from performance import models

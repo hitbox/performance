@@ -40,15 +40,19 @@ def before_request():
 
 def context_processor():
     """
-    Add a scheduled flight form instance the template can show on the same page.
+    Add a scheduled flight form instance the template can show on the same
+    page, if there is a scheduled report instance in the context.
     """
-    form = ScheduledFlightForm()
-    # default FlightType for new scheduled flight
-    form.flight_type.data = _default_flight_type()
+    scheduled_flight_form = ScheduledFlightForm()
 
+    # default FlightType for new scheduled flight
+    scheduled_flight_form.flight_type.data = _default_flight_type()
+
+    # scheduled report id from request
+    scheduled_flight_form.scheduled_report_id.data = request.view_args.get('id')
 
     context = dict(
-        new_scheduled_flight_form = form,
+        new_scheduled_flight_form = scheduled_flight_form,
     )
     update_context_for_default_flight_type(context)
     return context

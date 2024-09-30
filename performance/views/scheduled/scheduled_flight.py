@@ -36,13 +36,6 @@ def context_processor():
     update_context_for_default_flight_type(more_context)
     return more_context
 
-def form_getter(**kwargs):
-    form = ScheduledFlightForm(**kwargs)
-
-    # update scheduled report id
-    form.scheduled_report_id.data = request.view_args['scheduled_report_id']
-    return form
-
 def form_submitter(form, instance):
     response = ScheduledFlightForm.standard_submit(form, instance)
     return response
@@ -52,7 +45,7 @@ view_func = FormListView.as_view(
     template = 'scheduled-flight/list-form.html',
     instance_getter = instance_getter,
     pagination_getter = lambda: None,
-    form_getter = form_getter,
+    form_getter = ScheduledFlightForm,
     form_submitter = form_submitter,
     context_processor = context_processor,
 )
