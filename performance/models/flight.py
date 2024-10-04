@@ -5,6 +5,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.orderinglist import ordering_list
 
 from performance import parse
+from performance import settings
 from performance.extensions import db
 from performance.utils import diff_minutes
 
@@ -332,17 +333,20 @@ def delays_setter(
     flight_id,
     flight,
     attr,
+    ignore_codes = None,
 ):
     """
     Ensure that the delay codes scraped from text input exists as database
     objects for linking through the association objects. Ignores the
     unaccounted minutes placeholder.
     """
+    if ignore_codes is None:
+        ignore_codes = set()
     list_ = []
     delays = parse.delaystring(delays_string)
     for position, delay_data in enumerate(delays):
         # ignore placeholder
-        if delay_data['code'] in (parse.PLACEHOLDER_CODE, ):
+        if delay_data['code'] in ignore_codes:
             continue
         # add delay object if needed
         stmt = db.select(Delay).where(
