@@ -23,6 +23,11 @@ class User(
     A user of the web app with certain privileges.
     """
 
+    class Meta:
+        # Order by username for AppContextMixin.noapp_pagination
+        order_by = 'username'
+
+
     id = db.Column(
         db.Integer,
         primary_key = True,
