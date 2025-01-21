@@ -27,6 +27,13 @@ def create_app(silent_config=False):
     # list of strings
     app.config.setdefault('ALWAYS_SHOW_DELAY_CODES', [])
 
+    performance_stats = app.config.setdefault('PERFORMANCE_STATS', {})
+    performance_stats.setdefault('lanes', True)
+    performance_stats.setdefault('chargeable_delays', True)
+    performance_stats.setdefault('delays_gt_30_count', True)
+    performance_stats.setdefault('on_time_performance_gt_15', True)
+    performance_stats.setdefault('on_time_performance_gt_30', True)
+
     @app.context_processor
     def context_processor():
         """

@@ -28,7 +28,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
+        {% if performance_stats.lanes %}<tr>
             <th class="row">Lanes</th>
             <td class="data number">
                 <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='lanes') }}">
@@ -46,8 +46,8 @@
                 </a>
             </td>
             {% if show_contracts_column %}<td></td>{% endif %}
-        </tr>
-        <tr>
+        {% endif %}</tr>
+        {% if performance_stats.chargeable_delays %}<tr>
             <th class="row" title="{{ controllable_delays_note }}">Chargeable Delays</th>
             <td class="data number">
                 <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='flights_with_controllable_destination_delays_over15') }}">
@@ -65,8 +65,8 @@
                 </a>
             </td>
             {% if show_contracts_column %}<td></td>{% endif %}
-        </tr>
-        <tr>
+        {% endif %}</tr>
+        {% if performance_stats.delays_gt_30_count %}<tr>
             <th class="row" title="{{ controllable_delays_note }}">Delays &gt; 30 Count</th>
             <td class="data number">
                 <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='flights_with_controllable_destination_delays_over30') }}">
@@ -84,8 +84,8 @@
                 </a>
             </td>
             {% if show_contracts_column %}<td></td>{% endif %}
-        </tr>
-        <tr>
+        {% endif %}</tr>
+        {% if performance_stats.on_time_performance_gt_15 %}<tr>
             <th class="row" title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
             <td class="data number" title="{{ render_performance_calc_formula(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}</td>
@@ -99,14 +99,14 @@
                 </a>
             </td>
             {% endif %}
-        </tr>
-        <tr>
+        {% endif %}</tr>
+        {% if performance_stats.on_time_performance_gt_30 %}<tr>
             <th class="row" title="On-time Performance greater than 30 minutes">On-time Performance &gt; 30</th>
             <td class="data number" title="{{ render_performance_calc_formula(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(quarter_to_date.lanes, quarter_to_date.flights_with_controllable_destination_delays_over30) }}</td>
             {% if show_contracts_column %}<td class="data number"></td>{% endif %}
-        </tr>
+        </tr>{% endif %}
         <tr>
             <th class="row">
             {% set url = url_for('assumed_best.for_', year=report.date.year, month=report.date.month, backurl=thisurl) %}
