@@ -41,13 +41,14 @@
 
 {% macro render_performance_contracts_table(performance_contracts) %}
 {# render iterable of performance contracts as table #}
+{% set use_date_range = true or config.PERFORMANCE_CONTRACTS_USE_DATE_RANGE %}
 {% set instance_endpoint = kwargs.get('instance_endpoint') %}
 {% set instance_kwargs = kwargs.get('instance_kwargs', {}) %}
 {% set active_id = kwargs.active_id %}
 <thead>
     <tr>
         <th>Name</th>
-        {% if config.PERFORMANCE_CONTRACTS_USE_DATE_RANGE %}
+        {% if use_date_range %}
         <th>Start</th>
         <th>End</th>
         {% endif %}
@@ -60,7 +61,7 @@
     <tr{% if active_id is not none and performance_contract.id == active_id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ url_for(instance_endpoint, id=performance_contract.id, **instance_kwargs) }}{% endif %}">
         {#<td class="data">{{ performance_contract.id }}</td>#}
         <td class="data">{{ performance_contract.name }}</td>
-        {% if config.PERFORMANCE_CONTRACTS_USE_DATE_RANGE %}
+        {% if use_date_range %}
         <td class="data date">{{ render_date(performance_contract.date_range_start) }}</td>
         <td class="data date">{{ render_date(performance_contract.date_range_end) }}</td>
         {% endif %}

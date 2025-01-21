@@ -5,12 +5,11 @@ from flask import request
 from flask import url_for
 from flask_wtf import FlaskForm
 from wtforms import Form
-from wtforms_alchemy import model_form_factory
 
-from ..extensions import db
-from ..utils import get_form_redirect
-from ..utils import is_field_populated
-from ..utils import sortfunc_by_type
+from performance.extensions import db
+from performance.utils import get_form_redirect
+from performance.utils import is_field_populated
+from performance.utils import sortfunc_by_type
 
 class BaseForm(Form):
     """
@@ -25,6 +24,9 @@ class BaseForm(Form):
         self._update_from_view_args()
 
     def _update_from_view_args(self):
+        """
+        Update the data of any field with a name matching a view argument.
+        """
         for field in self:
             if (
                 field.data is None
@@ -33,6 +35,9 @@ class BaseForm(Form):
                 field.data = request.view_args[field.name]
 
     def _presentation(self, obj):
+        """
+        Update the labels on usual buttons like submit and delete.
+        """
         # wtforms is removing "_obj kluge". new strategy seems to be passing it around.
         if (
             not hasattr(self, 'Meta')
@@ -99,21 +104,3 @@ class BaseForm(Form):
 
         url = url_for(request.endpoint, **request.view_args)
         return redirect(url, code=303)
-
-
-class BaseFlaskForm(
-    BaseForm,
-    FlaskForm,
-):
-    """
-    Mix `flask_wtf.FlaskForm` with this project's custom base form.
-    """
-
-
-BaseModelForm = model_form_factory(BaseFlaskForm)
-
-class ModelForm(BaseModelForm):
-
-    @classmethod
-    def get_session(self):
-        return db.session

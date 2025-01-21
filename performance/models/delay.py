@@ -14,9 +14,14 @@ class Delay(
     class Meta:
         # see AppContextMixin.noapp_pagination
         order_by = 'code'
-        paginate_kw = dict(
-            per_page = 100,
-        )
+
+    # Metadata mainly for user interfaces.
+    __notes__ = {
+        'admin_note':
+            'Delay codes are automatically added after parsing them from'
+            ' the flight forms. After that their attributes can be updated'
+            ' here. Deleting delay codes is not supported.',
+    }
 
     id = db.Column(db.Integer, primary_key=True)
 

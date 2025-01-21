@@ -1,34 +1,45 @@
+from flask_wtf import FlaskForm
+
 from performance.models import ScheduledReport
 
-from .base import ModelForm
+from .base import BaseForm
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
+from .model_converter import model_form
 
-class ScheduledReportForm(
+class BaseForm(
     BackLinkMixin,
-    ModelForm,
+    BaseForm,
+    FlaskForm,
     SubmitUpdateDeleteMixin,
 ):
     class Meta:
-        model = ScheduledReport
-        presentation = True
-        only = [
-            'name',
-            'display_order',
+        fields_order = [
+            'submit',
+            'delete',
         ]
-        fields_order = only + ['submit', 'delete']
-        field_args = {
-            'name': {
-                'label': 'Name',
-                'render_kw': {'class': 'scheduled-report'},
+        presentation = True
+
+
+ScheduledReportForm = model_form(
+    model = ScheduledReport,
+    base_class = BaseForm,
+    exclude = (
+        'scheduled_flights',
+        'created',
+        'updated',
+    ),
+    field_args = {
+        'name': {
+            'render_kw': {'class': 'scheduled-report'},
+        },
+        'display_order': {
+            'render_kw': {
+                'class': 'scheduled-report',
+                'title':
+                    'Scheduled report display order in editor table'
+                    ' and new report prompt.',
             },
-            'display_order': {
-                'label': 'Display Order',
-                'render_kw': {
-                    'class': 'scheduled-report',
-                    'title':
-                        'Scheduled report display order in editor table'
-                        ' and new report prompt.',
-                },
-            },
-        }
+        },
+    },
+)

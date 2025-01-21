@@ -21,8 +21,8 @@
 
 
 {% block content %}
-    <h3 class="page">
-        <a href="{{ url_for('admin.performance_contract.listform', id=contract.id) }}">Back to contract "{{ contract.name }}"</a>
+    <h3 class="page">{% set url = url_for('admin.performance_contract.listform', id=contract.id) %}
+        <a href="{{ url }}">Back to contract "{{ contract.name }}"</a>
     </h3>
     <div class="col-2">
         <div>
@@ -33,16 +33,16 @@
             {% else %}{# display the other tiers for the contract of this contract #}
             <h3>Contract "{{ contract.name }}" Tiers</h3>
             <table class="expand">
-                {{ render_performance_tiers_table(contract.tiers, active_id=tier.id, instance_endpoint='admin.performance_tier.listform', instance_kwargs=dict( contract_id=request.view_args.contract_id)) }}
+                {{ render_performance_tiers_table(contract.tiers, active_id=tier.id, instance_endpoint='admin.performance_tier.listform', instance_kwargs=dict(contract_id=request.view_args.contract_id)) }}
             </table>
             {% endif %}{# pagination #}
         </div>
-        <div>
+        <div>{% set url = url_for(request.endpoint, **request.view_args) %}
             <h3 class="page">{% if tier %}Editing {{ singular }} "{{ tier.tier }}"{% else %}New {{ singular }}{% endif %}</h3>
-            <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
-                {{ render_form(form) }}
-            </form>
-            <h4><a href="{{ url_for('admin.performance_tier.listform', contract_id=request.view_args.contract_id) }}">New tier</a></h4>
+            <form action="{{ url }}" method="POST">{{ render_form(form) }}</form>
+            <h4 class="page">{% set url = url_for('admin.performance_tier.listform', contract_id=request.view_args.contract_id) %}
+                <a href="{{ url }}">New {{ singular }}</a>
+            </h4>
         </div>
     </div>
 {% endblock content %}

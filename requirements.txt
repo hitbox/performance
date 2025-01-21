@@ -2,7 +2,6 @@ alembic
 cssmin
 flask
 flask-assets
-flask-htmlmin
 flask-login
 flask-sqlalchemy
 flask-wtf
@@ -17,6 +16,7 @@ pytest
 pywin32; sys_platform == 'win32'
 sqlalchemy
 sqlalchemy-utils
+typing-extensions
 wtforms
-wtforms-alchemy # remove this, it is dead
+wtforms-components
 wtforms-sqlalchemy

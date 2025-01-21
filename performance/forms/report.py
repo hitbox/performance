@@ -1,16 +1,17 @@
-from wtforms_sqlalchemy.orm import model_form
+from flask_wtf import FlaskForm
 
-from performance.extensions import db
 from performance.models import Report
 
-from .base import ModelForm
+from .base import BaseForm
 from .mixins import BackLinkMixin
 from .mixins import SubmitMixin
 from .model_converter import PerformanceModelConverter
+from .model_converter import model_form
 
-class ReportForm(
+class ReportFormBase(
     BackLinkMixin,
-    ModelForm,
+    BaseForm,
+    FlaskForm,
     SubmitMixin,
 ):
     class Meta:
@@ -28,15 +29,13 @@ class ReportForm(
         }
 
 
-class ReportFormBase(BackLinkMixin, ModelForm, SubmitMixin):
-    pass
-
-
+# Form to edit the "system detail" field of a report.
 ReportForm = model_form(
     model = Report,
-    db_session = db.session,
     base_class = ReportFormBase,
-    only = ['system_detail'],
+    only = [
+        'system_detail',
+    ],
     field_args = dict(
         system_detail = dict(
             render_kw = dict(

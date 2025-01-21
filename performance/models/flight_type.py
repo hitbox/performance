@@ -24,6 +24,10 @@ class FlightType(
     name = db.Column(
         db.String,
         nullable = False,
+        doc = 'Flight type name.',
+        info = dict(
+            human_field_name = 'Name',
+        ),
     )
 
     report_order = db.Column(

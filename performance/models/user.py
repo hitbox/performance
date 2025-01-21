@@ -32,11 +32,19 @@ class User(
         db.String,
         unique = True,
         nullable = False,
+        doc = 'Account username.',
+        info = dict(
+            human_field_name = 'Username',
+        ),
     )
 
     email = db.Column(
         db.String,
         nullable = False,
+        doc = 'Account email.',
+        info = dict(
+            human_field_name = 'Email',
+        ),
     )
 
     password = db.Column(
@@ -48,31 +56,46 @@ class User(
     is_admin = db.Column(
         db.Boolean,
         default = False,
-        doc = "User can administrate.",
+        doc = "User account has full access to web interface.",
+        info = dict(
+            human_field_name = 'Admin?',
+        ),
     )
 
     is_editor = db.Column(
         db.Boolean,
         default = False,
         doc = "User can edit reports and flights.",
+        info = dict(
+            human_field_name = 'Editor?',
+        ),
     )
 
-    is_active  =  db.Column(
+    is_active = db.Column(
         db.Boolean,
         default = True,
         doc = "User can login.",
+        info = dict(
+            human_field_name = 'Active?',
+        ),
     )
 
-    reset_password  =  db.Column(
+    reset_password = db.Column(
         db.Boolean,
         default = True,
         doc = "User must change password.",
+        info = dict(
+            human_field_name = 'Reset Password?',
+        ),
     )
 
-    can_edit_schedule  =  db.Column(
+    can_edit_schedule = db.Column(
         db.Boolean,
         default = False,
         doc = "User can edit the scheduled reports and flights.",
+        info = dict(
+            human_field_name = 'Edit Schedules?',
+        ),
     )
 
     @db.validates('username', 'password')

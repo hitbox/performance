@@ -18,6 +18,7 @@
         <div>
             {# performance contracts list #}
             <h3 class="page">{{ plural }}</h3>
+            <p class="tight admin-note">{{ class_.__notes__.admin_note }}</p>
             <table class="expand">
                 {{ render_performance_contracts_table(pagination.items, active_id=performance_contract.id, instance_endpoint='.listform', instance_kwargs=dict(page=request.args.page or 1)) }}
             </table>

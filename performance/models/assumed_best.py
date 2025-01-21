@@ -16,6 +16,12 @@ class AssumedBest(
     Assumed best performance number for a month.
     """
 
+    # Metadata mainly for the user interface.
+    __notes__ = {
+        'description_for_select':
+            'The number of assumed best lanes.',
+    }
+
     month = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer, primary_key=True)
 

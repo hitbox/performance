@@ -1,6 +1,5 @@
 import flask_assets as fa
 
-from flask_htmlmin import HTMLMIN
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -8,7 +7,6 @@ from .middleware import PrefixMiddleware
 
 assets = fa.Environment()
 db = SQLAlchemy()
-htmlmin = HTMLMIN()
 login_manager = LoginManager()
 
 assets.register(
@@ -63,7 +61,6 @@ def init_app(app):
     Initialize extensions against application.
     """
     assets.init_app(app)
-    htmlmin.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
 

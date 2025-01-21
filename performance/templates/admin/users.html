@@ -3,12 +3,43 @@
 
 {% from "macros.html" import render_form %}
 {% from "macros.html" import render_pagination %}
-{% from "user/macros.html" import render_user_table %}
+{% from "macros.html" import yes %}
 
 
 {% set singular = 'User' %}
 {% set plural = 'Users' %}
 {% set user = instance %}{# rename #}
+
+
+{% macro render_column_th(column) %}<th title="{{ column.doc }}">{{ column.info.human_field_name }}</th>{% endmacro %}
+
+
+{% macro render_user_table(users) %}
+    {% set active_id = kwargs.active_id %}
+    {% set instance_endpoint = kwargs.instance_endpoint %}
+    <thead>
+        <tr>
+            {{ render_column_th(User.username) }}
+            {{ render_column_th(User.email) }}
+            {{ render_column_th(User.is_admin) }}
+            {{ render_column_th(User.is_editor) }}
+            {{ render_column_th(User.is_active) }}
+            {{ render_column_th(User.reset_password) }}
+            {{ render_column_th(User.can_edit_schedule) }}
+        </tr>
+    </thead>
+    <tbody>{% for user in users %}
+            <tr{% if active_id is not none and user.id == active_id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ url_for(instance_endpoint, id=user.id) }}"{% endif %}>
+            <td class="data">{{ user.username }}</td>
+            <td class="data"><a href="mailto:{{ user.email }}" tabindex="-1">{{ user.email }}</td>
+            <td class="data">{{ yes(user.is_admin) }}</td>
+            <td class="data">{{ yes(user.is_editor) }}</td>
+            <td class="data">{{ yes(user.is_active) }}</td>
+            <td class="data">{{ yes(user.reset_password) }}</td>
+            <td class="data">{{ yes(user.can_edit_schedule) }}</td>
+        </tr>{% endfor %}
+    </tbody>
+{% endmacro %}
 
 
 {% block content %}
@@ -26,11 +57,11 @@
             {% else %}
                 <h3 class="page">New {{ singular }} Account</h3>
             {% endif %}
-                {% if request.args.page %}
-                {% set action_url = url_for(request.endpoint, page=request.args.page, **request.view_args) %}
-                {% else %}
-                {% set action_url = url_for(request.endpoint, **request.view_args) %}
-                {% endif %}
+            {% if request.args.page %}
+            {% set action_url = url_for(request.endpoint, page=request.args.page, **request.view_args) %}
+            {% else %}
+            {% set action_url = url_for(request.endpoint, **request.view_args) %}
+            {% endif %}
             <form action="{{ action_url }}" method="POST">
                 {{ render_form(form) }}
             </form>

@@ -17,6 +17,7 @@ class FormListView(View):
         template,
         response_for_delete = None,
         context_processor = None,
+        extra_context = None,
     ):
         """
         :param instance_getter:
@@ -32,6 +33,8 @@ class FormListView(View):
         :param context_processor:
             if given, a callable to return extra data for the context given to
             the template.
+        :param extra_context:
+            Always passed extra context for the template.
         """
         self.instance_getter = instance_getter
         self.pagination_getter = pagination_getter
@@ -40,6 +43,7 @@ class FormListView(View):
         self.template = template
         self.response_for_delete = response_for_delete
         self.context_processor = context_processor
+        self.extra_context = extra_context
 
     def dispatch_request(self, **instance_identity):
         """
@@ -63,6 +67,9 @@ class FormListView(View):
             instance = instance,
             form = form,
         )
+        if self.extra_context:
+            context.update(self.extra_context)
+
         if callable(self.pagination_getter):
             context['pagination'] = self.pagination_getter()
 

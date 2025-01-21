@@ -11,7 +11,18 @@
     {{ render_nav_item('admin.flight_type.list', 'Flight Types', active_prefix='admin.flight_type.') }}
     {{ render_nav_item('admin.delay.list', 'Delay codes', active_prefix='admin.delay.') }}
     {% if config.PERFORMANCE_CONTRACTS %}
+    {#
     {{ render_nav_item('admin.performance_contract.listform', 'Performance Contracts', active_prefix='admin.performance_contract.') }}
+    #}
+    {# Note: #}
+    {# - Needed a way to check several conditions for setting the active class.
+         render_nav_item was not designed for that and is probably doing too
+         much anyway. #}
+    {# - Also setting the title to the endpoint name was probably some
+         development code that should be changed. #}
+    {% set is_active = request.endpoint and (request.endpoint.startswith('admin.performance_contract.') or request.endpoint.startswith('admin.performance_tier.')) %}
+    {% set url = url_for('admin.performance_contract.listform') %}
+    <a class="nav{% if is_active %} active{% endif %}" href="{{ url }}" title="{{ request.endpoint }}">Performance Contracts</a>
     {% endif %}
     {{ render_nav_item('admin.user.list', 'User accounts', active_prefix='admin.user.') }}
 </nav>

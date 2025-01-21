@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 
+{% from "macros.html" import render_integer %}
+
+
 {% set year = request.view_args.year %}
 {% set thisurl = url_for(request.endpoint, **request.view_args) %}
 
@@ -15,10 +18,12 @@
 
 
 {% block content %}
-<div class="flat months">{% for month_name in month_names %}
-    {% set month = loop.index %}
-    <a class="card month-name" href="{{ url_for('assumed_best.for_', year=year, month=month, backurl=thisurl) }}">{% if month in existing_months %}&starf; {% endif %}{{ month_name }}</a>{% endfor %}
-</div>
+    <p>{{ AssumedBest.__notes__['description_for_select'] }}</p>
+    <div class="flat months">{% for month in range(1, 13) %}
+        {% set best = existing_months.get(month) %}
+        {% set url = url_for('assumed_best.for_', year=year, month=month, backurl=thisurl) %}
+        <a class="card month-name" href="{{ url }}">{% if best %}&starf; {% endif %}{{ calendarlib.month_name[month] }}{% if best %} {{ render_integer(best.lanes) }}{% endif %}</a>
+    {% endfor %}</div>
 {% endblock content %}
 
 

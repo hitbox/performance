@@ -769,6 +769,11 @@ form .flight {
     width: min-content;
 }
 
+.admin-note {
+    /* note on admin pages under table listing heading */
+    min-width: 50ch;
+}
+
 .summary-row-title {
     text-align: right;
 }

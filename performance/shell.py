@@ -3,6 +3,9 @@ Conveniences for `flask shell`.
 """
 
 def root_context():
+    """
+    Return a context dict of generally useful things for the flask shell.
+    """
     import datetime as dt
     from pprint import pprint
 
@@ -11,7 +14,6 @@ def root_context():
 
     from .extensions import assets
     from .extensions import db
-    from .extensions import htmlmin
     from .extensions import login_manager
     from .forms import AssumedBestForm
     from .forms import ContractForm

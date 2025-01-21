@@ -1,47 +1,46 @@
-import sqlalchemy as sa
+import wtforms.validators
 
-from wtforms import BooleanField
-from wtforms import PasswordField
-from wtforms import StringField
-from wtforms import SubmitField
-from wtforms import ValidationError
-from wtforms.validators import EqualTo
-from wtforms.validators import InputRequired
+from flask_wtf import FlaskForm
 
-from ..models import User
+from performance.extensions import db
+from performance.forms import HiddenIntegerField
+from performance.models import User
 
-from .base import BaseFlaskForm
+from .base import BaseForm
 
 def validate_available_username(form, field):
     """
     Raise for already existing username.
     """
-    user = User.query.filter(
-        sa.func.lower(User.username) == sa.func.lower(field.data)
-    ).one_or_none()
-    if user:
-        raise ValidationError('Username is taken')
+    query = db.select(
+        User
+    ).where(
+        db.func.lower(User.username) == db.func.lower(field.data),
+    )
+    if db.session.execute(query).one_or_none():
+        raise wtforms.ValidationError('Username is taken')
 
-class LoginForm(BaseFlaskForm):
+class LoginForm(BaseForm, FlaskForm):
     """
     Login form.
     """
-    username = StringField('Username')
-    password = PasswordField('Password')
-    submit = SubmitField('Login')
+    username = wtforms.StringField('Username')
+    password = wtforms.PasswordField('Password')
+    submit = wtforms.SubmitField('Login')
 
 
-class ResetPasswordForm(BaseFlaskForm):
+class ResetPasswordForm(BaseForm, FlaskForm):
     """
     Reset password form
     """
-    password = PasswordField('Password')
-    confirm = PasswordField('Confirm', validators=[EqualTo('password')])
-    submit = SubmitField('Reset')
+    password = wtforms.PasswordField('Password')
+    confirm = wtforms.PasswordField('Confirm', validators=[wtforms.validators.EqualTo('password')])
+    submit = wtforms.SubmitField('Reset')
 
 
 class EditUserForm(
-    BaseFlaskForm,
+    BaseForm,
+    FlaskForm,
 ):
     """
     Edit user account form for administration.
@@ -52,28 +51,34 @@ class EditUserForm(
         # relabling
         presentation = True
 
+    id = HiddenIntegerField(
+        validators = [
+            wtforms.validators.Optional(),
+        ],
+    )
+
     # requires unique in __init__
-    username = StringField(
+    username = wtforms.StringField(
         label = 'Username',
         validators = [
-            InputRequired(),
+            wtforms.validators.InputRequired(),
         ],
         render_kw = dict(
             placeholder = 'username',
         ),
     )
 
-    email = StringField(
+    email = wtforms.StringField(
         label = 'Email',
         validators = [
-            InputRequired(),
+            wtforms.validators.InputRequired(),
         ],
         render_kw = dict(
             placeholder = 'email',
         ),
     )
 
-    password = PasswordField(
+    password = wtforms.PasswordField(
         label = 'Password',
         render_kw = dict(
             autocomplete = 'new-password',
@@ -81,7 +86,7 @@ class EditUserForm(
         )
     )
 
-    password_confirm = PasswordField(
+    password_confirm = wtforms.PasswordField(
         label = 'Confirm',
         render_kw = dict(
             autocomplete = 'off',
@@ -89,15 +94,39 @@ class EditUserForm(
         )
     )
 
-    is_active = BooleanField('Active?', default=True)
+    is_active = wtforms.BooleanField(
+        'Active?',
+        default = True,
+        render_kw = dict(
+            title = 'Account can be used to login.',
+        ),
+    )
 
-    reset_password = BooleanField('Reset password?', default=True)
+    reset_password = wtforms.BooleanField(
+        'Reset password?',
+        default = True,
+        render_kw = dict(
+            title = 'User must change their password after logging in.',
+        ),
+    )
 
-    is_admin = BooleanField('Admin?', default=False)
+    is_admin = wtforms.BooleanField(
+        'Admin?',
+        default = False,
+        render_kw = dict(
+            title = 'User has complete access to web interface.',
+        ),
+    )
 
-    is_editor = BooleanField('Editor?', default=True)
+    is_editor = wtforms.BooleanField(
+        'Editor?',
+        default = True,
+        render_kw = dict(
+            title = User.is_editor.doc,
+        ),
+    )
 
-    can_edit_schedule = BooleanField(
+    can_edit_schedule = wtforms.BooleanField(
         'Edit schedules?',
         default = False,
         render_kw = dict(
@@ -105,13 +134,12 @@ class EditUserForm(
         ),
     )
 
-    submit = SubmitField()
+    submit = wtforms.SubmitField()
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if not kwargs.get('obj', None):
-            # new user so add username validator
-            self.username.validators.append(validate_available_username)
+    def validate_username(form, field):
+        if not form.id.data:
+            # validate username for new user
+            validate_available_username(form, field)
 
     def validate_password_confirm(form, field):
         """
@@ -121,7 +149,7 @@ class EditUserForm(
             form.password.data
             and field.data != form.password.data
         ):
-            raise ValidationError('Password confirmation does not match.')
+            raise wtforms.ValidationError('Password confirmation does not match.')
 
 
     @classmethod

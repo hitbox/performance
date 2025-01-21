@@ -1,28 +1,26 @@
-from wtforms import SubmitField
-from wtforms.validators import Optional
-from wtforms.widgets import TextArea
-from wtforms_sqlalchemy.orm import model_form
+from flask_wtf import FlaskForm
 
-from performance.extensions import db
 from performance.models import FlightType
 
-from .base import ModelForm
+from .base import BaseForm
 from .mixins import BackLinkMixin
-from .mixins import SubmitUpdateDeleteMixin
 from .mixins import SubmitMixin
+from .model_converter import model_form
+from .utils import remove_required_from_boolean_fields
 
 class BaseFlightType(
     BackLinkMixin,
-    ModelForm,
+    BaseForm,
+    FlaskForm,
     SubmitMixin,
 ):
-    class Meta:
-        model = FlightType
+    """
+    Base FlightType Form.
+    """
 
 
 FlightTypeForm = model_form(
     model = FlightType,
-    db_session = db.session,
     base_class = BaseFlightType,
     field_args = dict(
         is_controllable = dict(
@@ -46,8 +44,4 @@ FlightTypeForm = model_form(
     )
 )
 
-# override the automatically added required validator (because column is
-# nullable=false).
-for fieldname in ['is_controllable', 'is_lane', 'is_active']:
-    field = getattr(FlightTypeForm, fieldname)
-    field.kwargs['validators'] = [Optional()]
+remove_required_from_boolean_fields(FlightTypeForm)

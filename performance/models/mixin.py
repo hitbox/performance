@@ -1,6 +1,9 @@
 from ..extensions import db
 
 class MetaMixin:
+    """
+    Common attributes for all models.
+    """
 
     @db.declared_attr
     def created(cls):

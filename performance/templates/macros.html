@@ -177,8 +177,8 @@
 {# Simple Fields #}
 {% macro render_form_simple_parts(form) %}
 {# render simple field and label pairs #}
-{% set unwanted = ('CSRFTokenField', 'HiddenField', 'HiddenIntegerField', 'FieldList', 'FormField', 'SubmitField') %}
-<div class="fields col-2">{% for field in form|rejectattr('type', 'in', unwanted) %}
+{% set unwanted_types = ('CSRFTokenField', 'HiddenField', 'HiddenIntegerField', 'FieldList', 'FormField', 'SubmitField') %}
+<div class="fields col-2">{% for field in form|rejectattr('type', 'in', unwanted_types) %}
     {{ render_field(field) }}
 {% endfor %}</div>
 {% endmacro %}

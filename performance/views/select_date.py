@@ -64,12 +64,16 @@ def monthly(year):
     """
     Yearly calendar to select a month.
     """
-    existing_bests = AssumedBest.query.filter(
+    existing_bests_query = db.select(
+        AssumedBest,
+    ).where(
         AssumedBest.year == year,
-    ).all()
+    )
+    existing_bests = db.session.scalars(existing_bests_query).all()
     context = dict(
-        existing_months = [best.month for best in existing_bests],
-        month_names = [name for name in calendarlib.month_name if name],
+        AssumedBest = AssumedBest,
+        calendarlib = calendarlib,
+        existing_months = {best.month: best for best in existing_bests},
     )
     return render_template('select-month.html', **context)
 

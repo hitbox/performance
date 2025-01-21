@@ -1,15 +1,26 @@
-from wtforms_sqlalchemy.orm import model_form
+from flask_wtf import FlaskForm
 
-from performance.extensions import db
 from performance.models import FlightType
 from performance.models import Performance
 
-from .base import ModelForm
+from .base import BaseForm
+from .mixins import BackLinkMixin
+from .mixins import SubmitMixin
+from .model_converter import model_form
+
+class BaseSettingsForm(
+    BaseForm,
+    FlaskForm,
+    SubmitMixin,
+):
+    class Meta:
+        presentation = True
+
 
 SettingsForm = model_form(
     model = Performance,
-    db_session = db.session,
-    base_class = ModelForm,
+    type_name = 'SettingsForm',
+    base_class = BaseSettingsForm,
     field_args = dict(
         default_flight_type = dict(
             get_label = 'name',

@@ -1,95 +1,60 @@
-from flask import current_app
-from wtforms import HiddenField
+from flask_wtf import FlaskForm
 
-from .. import settings
-from ..models import Contract
-from ..models import PerformanceTier
-from ..models.contract import Operator
+from performance.models import Contract
 
-from .base import ModelForm
+from .base import BaseForm
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
+from .model_converter import model_form
+from .utils import remove_required_from_boolean_fields
 
-class PerformanceTierForm(
+class ContractBaseForm(
     BackLinkMixin,
-    ModelForm,
+    BaseForm,
+    FlaskForm,
     SubmitUpdateDeleteMixin,
 ):
     """
-    Arrival Performance tier for a performance range.
+    Performance Contract form base.
     """
+
     class Meta:
-        model = PerformanceTier
-        presentation = True
-        only = [
-            'tier',
-            'performance_operator_start',
-            'performance_range_start',
-            'performance_operator_end',
-            'performance_range_end',
-        ]
-        fields_order = only + ['submit', 'delete']
-        field_args = dict(
-            tier = dict(
-                label = 'Tier',
-            ),
-            performance_range_start = dict(
-                label = 'Range Start',
-            ),
-            performance_operator_start = dict(
-                label = 'Start Operator',
-                choices = Operator.as_choices(),
-                default = Operator.GE,
-            ),
-            performance_range_end = dict(
-                label = 'Range End',
-            ),
-            performance_operator_end = dict(
-                label = 'End Operator',
-                choices = Operator.as_choices(),
-                default = Operator.LE,
-            ),
-        )
-
-    contract_id = HiddenField()
-
-
-class ContractForm(
-    BackLinkMixin,
-    ModelForm,
-    SubmitUpdateDeleteMixin,
-):
-    """
-    Arrival Performance Contract for a date range.
-    """
-    class Meta:
-        model = Contract
-        presentation = True
-        only = [
+        fields_order = [
             'name',
             'date_range_start',
             'date_range_end',
+            'submit',
+            'delete',
         ]
-        fields_order = only + ['submit', 'delete']
-        field_args = dict(
-            name = dict(
-                label = 'Name',
-            ),
-            date_range_start = dict(
-                label = 'Start',
-                render_kw = dict(
-                    pattern = r'\d{4}-\d{2}-\d{2}'
-                ),
-            ),
-            date_range_end = dict(
-                label = 'End',
-                render_kw = dict(
-                    pattern = r'\d{4}-\d{2}-\d{2}'
-                ),
-            ),
-        )
+        presentation = True
 
-    def _update_for_app_config(self):
-        if not settings.contracts_use_date_range():
-            del self.date_range_start
-            del self.date_range_end
+
+# Arrival Performance Contract for a date range.
+ContractForm = model_form(
+    model = Contract,
+    base_class = ContractBaseForm,
+    exclude = (
+        'created',
+        'updated',
+        'tiers',
+    ),
+    field_args = dict(
+        name = dict(
+            label = 'Name',
+        ),
+        date_range_start = dict(
+            label = 'Start',
+            render_kw = dict(
+                pattern = r'\d{4}-\d{2}-\d{2}'
+            ),
+        ),
+        date_range_end = dict(
+            label = 'End',
+            render_kw = dict(
+                pattern = r'\d{4}-\d{2}-\d{2}'
+            ),
+        ),
+    ),
+)
+
+remove_required_from_boolean_fields(ContractForm)

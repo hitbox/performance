@@ -13,6 +13,11 @@ admin_list_view = FormListView.as_view(
     form_getter = DelayForm,
     form_submitter = DelayForm.standard_submit,
     template = 'admin/delay-codes.html',
+    extra_context = dict(
+        class_ = Delay,
+    ),
 )
+
 delay_bp.add_url_rule('/', view_func=admin_list_view)
+
 delay_bp.add_url_rule('/<int:id>', view_func=admin_list_view)

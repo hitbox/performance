@@ -29,6 +29,11 @@ class ScheduledFlight(
     """
     Minimal flight information to partially populate new reports.
     """
+    class Meta:
+        paginate_kw = dict(
+            per_page = 10,
+        )
+
 
     id = db.Column(db.Integer, primary_key=True)
 

@@ -1,81 +1,83 @@
-from wtforms import BooleanField
-from wtforms import DateField
-from wtforms import DateTimeField
-from wtforms import FieldList
-from wtforms import FloatField
-from wtforms import Form
-from wtforms import FormField
-from wtforms import IntegerField
-from wtforms import StringField
-from wtforms import SubmitField
-from wtforms import TimeField
+import wtforms
+
+from flask_wtf import FlaskForm
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
-from wtforms.widgets import TextInput
 
 from performance import models
-from performance.utils import deep_getattr
 
-from .base import BaseFlaskForm
 from .base import BaseForm
-from .base import ModelForm
-from .flight import FlightForm
+from .model_converter import model_form
 
-class QueryParametersForm(Form):
+class QueryParametersForm(wtforms.Form):
     """
     User controlled parameters for the external query. Used for the parameters
     of imports and updates.
     """
 
-    show_kg = BooleanField(
+    show_kg = wtforms.BooleanField(
         label = 'Show kg Column?',
     )
 
-    show_all_fields = BooleanField(
+    show_all_fields = wtforms.BooleanField(
         label = 'Show All Fields?',
         default = False,
     )
 
-    submit = SubmitField(
+    submit = wtforms.SubmitField(
         label = 'Query...',
         name = 's',
     )
 
 
-class LegPaxForm(ModelForm):
+class LegPaxFormBase(
+    BaseForm,
+    FlaskForm,
+):
     """
     Form for LegPax objects from external database.
     """
-    class Meta:
-        model = models.LegPax
-        field_args = dict(
-            baggage_weight = dict(
-                widget = HiddenInput(),
-            ),
-        )
 
-    baggage_weight_lbs = FloatField(
+    baggage_weight_lbs = wtforms.FloatField(
         widget = HiddenInput(),
     )
 
 
-class LegForm(ModelForm):
+LegPaxForm = model_form(
+    model = models.LegPax,
+    base_class = LegPaxFormBase,
+    field_args = dict(
+        baggage_weight = dict(
+            widget = HiddenInput(),
+        ),
+    ),
+)
+
+
+class LegFormBase(
+    BaseForm,
+    FlaskForm,
+):
     """
     Form for Leg objects from external database.
     """
-    class Meta:
-        model = models.Leg
-        field_args = dict(
-            fn_number = dict(
-                widget = HiddenInput(),
-            ),
-            dep_dt = dict(
-                widget = HiddenInput(),
-            ),
-            arr_dt = dict(
-                widget = HiddenInput(),
-            ),
-        )
+
+
+LegForm = model_form(
+    model = models.Leg,
+    base_class = LegFormBase,
+    field_args = dict(
+        fn_number = dict(
+            widget = HiddenInput(),
+        ),
+        dep_dt = dict(
+            widget = HiddenInput(),
+        ),
+        arr_dt = dict(
+            widget = HiddenInput(),
+        ),
+    ),
+)
 
 
 class ResultRowForm(BaseForm):
@@ -83,39 +85,45 @@ class ResultRowForm(BaseForm):
     Form for rows of results from external database.
     """
 
-    fn_number = StringField()
-    dep_dt = DateTimeField()
-    arr_dt = DateTimeField()
-    baggage_weight_kg = IntegerField()
-    baggage_weight_lbs = IntegerField()
+    fn_number = wtforms.StringField()
+    dep_dt = wtforms.DateTimeField()
+    arr_dt = wtforms.DateTimeField()
+    baggage_weight_kg = wtforms.IntegerField()
+    baggage_weight_lbs = wtforms.IntegerField()
 
 
-class ResultsForm(BaseFlaskForm):
+class ResultsForm(
+    BaseForm,
+    FlaskForm,
+):
     """
     Form for all the result of the external database query.
     """
 
-    rows = FieldList(
-        FormField(ResultRowForm),
+    rows = wtforms.FieldList(
+        wtforms.FormField(ResultRowForm),
     )
 
-    submit = SubmitField(
+    submit = wtforms.SubmitField(
         label = 'Import...',
     )
 
 
-class InternalFlightForm(BaseFlaskForm):
+class InternalFlightForm(
+    BaseForm,
+    FlaskForm,
+):
     """
     Internal flight data matching some data from external database.
     """
 
-    id = IntegerField(
+    id = wtforms.IntegerField(
         render_kw = dict(
             class_ = 'hidden',
         ),
     )
 
-    origin_departure_actual_date = DateField(
+    origin_departure_actual_date = wtforms.DateField(
         validators = [
             Optional(),
         ],
@@ -124,7 +132,7 @@ class InternalFlightForm(BaseFlaskForm):
         )
     )
 
-    origin_departure_actual_time = TimeField(
+    origin_departure_actual_time = wtforms.TimeField(
         validators = [
             Optional(),
         ],
@@ -133,7 +141,7 @@ class InternalFlightForm(BaseFlaskForm):
         )
     )
 
-    destination_arrival_actual_date = DateField(
+    destination_arrival_actual_date = wtforms.DateField(
         validators = [
             Optional(),
         ],
@@ -142,7 +150,7 @@ class InternalFlightForm(BaseFlaskForm):
         )
     )
 
-    destination_arrival_actual_time = TimeField(
+    destination_arrival_actual_time = wtforms.TimeField(
         validators = [
             Optional(),
         ],
@@ -151,7 +159,7 @@ class InternalFlightForm(BaseFlaskForm):
         )
     )
 
-    weight = IntegerField(
+    weight = wtforms.IntegerField(
         validators = [
             Optional(),
         ],
@@ -161,44 +169,47 @@ class InternalFlightForm(BaseFlaskForm):
     )
 
 
-class ExternalFlightForm(BaseFlaskForm):
+class ExternalFlightForm(
+    BaseForm,
+    FlaskForm,
+):
 
-    dep_dt_date = DateField(
+    dep_dt_date = wtforms.DateField(
         validators = [Optional()],
         render_kw = dict(
             class_ = 'hidden',
         ),
     )
 
-    dep_dt_time = TimeField(
+    dep_dt_time = wtforms.TimeField(
         validators = [Optional()],
         render_kw = dict(
             class_ = 'hidden',
         ),
     )
 
-    arr_dt_date = DateField(
+    arr_dt_date = wtforms.DateField(
         validators = [Optional()],
         render_kw = dict(
             class_ = 'hidden',
         ),
     )
 
-    arr_dt_time = TimeField(
+    arr_dt_time = wtforms.TimeField(
         validators = [Optional()],
         render_kw = dict(
             class_ = 'hidden',
         ),
     )
 
-    baggage_weight_kg = IntegerField(
+    baggage_weight_kg = wtforms.IntegerField(
         validators = [Optional()],
         render_kw = dict(
             class_ = 'hidden',
         ),
     )
 
-    baggage_weight_lbs = IntegerField(
+    baggage_weight_lbs = wtforms.IntegerField(
         validators = [Optional()],
         render_kw = dict(
             class_ = 'hidden',
@@ -206,18 +217,21 @@ class ExternalFlightForm(BaseFlaskForm):
     )
 
 
-class DiffForm(BaseFlaskForm):
+class DiffForm(
+    BaseForm,
+    FlaskForm,
+):
     """
     Single difference between flights.
     """
 
-    internal_attr = StringField()
-    internal_label = StringField()
+    internal_attr = wtforms.StringField()
+    internal_label = wtforms.StringField()
 
-    external_attr = StringField()
-    external_label = StringField()
+    external_attr = wtforms.StringField()
+    external_label = wtforms.StringField()
 
-    do_update = BooleanField(
+    do_update = wtforms.BooleanField(
         # user checkbox to choose to do this update
         default = True,
         render_kw = dict(
@@ -226,21 +240,24 @@ class DiffForm(BaseFlaskForm):
     )
 
 
-class FlightChangesForm(BaseFlaskForm):
+class FlightChangesForm(
+    BaseForm,
+    FlaskForm,
+):
     """
     Contain a list of diffs between internal and external flights.
     """
 
-    internal_flight = FormField(
+    internal_flight = wtforms.FormField(
         InternalFlightForm,
     )
 
-    external_flight = FormField(
+    external_flight = wtforms.FormField(
         ExternalFlightForm,
     )
 
-    diffs = FieldList(
-        FormField(
+    diffs = wtforms.FieldList(
+        wtforms.FormField(
             DiffForm,
         ),
     )
@@ -260,17 +277,20 @@ class FlightChangesForm(BaseFlaskForm):
             return getattr(self.external_flight, attrname)
 
 
-class ChangesForm(BaseFlaskForm):
+class ChangesForm(
+    BaseForm,
+    FlaskForm,
+):
 
-    flight_changes = FieldList(
-        FormField(
+    flight_changes = wtforms.FieldList(
+        wtforms.FormField(
             FlightChangesForm,
         ),
     )
 
-    clear = SubmitField()
+    clear = wtforms.SubmitField()
 
-    submit = SubmitField(
+    submit = wtforms.SubmitField(
         label = 'Import...',
     )
 

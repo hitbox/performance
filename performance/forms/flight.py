@@ -1,22 +1,17 @@
-import sqlalchemy as sa
 import wtforms.validators as wtforms_validators
 
+from flask_wtf import FlaskForm
 from flask import request
 from wtforms import HiddenField
 from wtforms import StringField
-from wtforms_alchemy import ClassMap
-from wtforms_sqlalchemy.orm import ModelConverter
-from wtforms_sqlalchemy.orm import converts
-from wtforms_sqlalchemy.orm import model_form
 
 from performance import models
 from performance.extensions import db
 
-from . import defaults
-from .base import ModelForm
-from .fields import StringTimeField
+from .base import BaseForm
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
+from .model_converter import model_form
 
 DATE_FIELD_TITLE = 'Falls back to report date if blank.'
 DATE_FIELD_TABINDEX = '-1'
@@ -139,16 +134,10 @@ field_args = {
     },
 }
 
-class FlightModelConverter(ModelConverter):
-
-    @converts('Time')
-    def handle_time_types(self, column, field_args, **extra):
-        return StringTimeField(**field_args)
-
-
 class FlightFormBase(
-    ModelForm,
     BackLinkMixin,
+    BaseForm,
+    FlaskForm,
     SubmitUpdateDeleteMixin,
 ):
     class Meta:
@@ -197,7 +186,7 @@ class FlightFormBase(
         """
         if 'flight_type_id' in request.view_args:
             stmt = (
-                sa.select(models.FlightType)
+                db.select(models.FlightType)
                 .where(
                     models.FlightType.id == request.view_args['flight_type_id']
                 )
@@ -211,13 +200,11 @@ class FlightFormBase(
 
 FlightForm = model_form(
     model = models.Flight,
-    db_session = db.session,
     base_class = FlightFormBase,
     exclude = [
         'report',
     ],
     field_args = field_args,
-    converter = FlightModelConverter(),
 )
 
 FlightForm.flight_type = models.FlightType.as_query_select_field(

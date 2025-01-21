@@ -2,7 +2,7 @@ from flask import request
 from wtforms import HiddenField
 from wtforms import SubmitField
 
-from ..utils import get_thisurl
+from performance.utils import get_thisurl
 
 # this exists because of so many forms there were problems keep the field
 # declarations consistent.
@@ -18,6 +18,9 @@ class BackLinkMixin:
 
 
 class DeleteMixin:
+    """
+    Mixin a delete button.
+    """
 
     delete = SubmitField(
         'Delete',
@@ -39,6 +42,9 @@ class SubmitMixin:
 
 
 class SearchCriteriaMixin:
+    """
+    Mixin function to return a list of text filters.
+    """
 
     def search_criteria(self, model_class):
         """

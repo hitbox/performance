@@ -21,6 +21,7 @@
                 {% set instance_kwargs = dict() %}
             {% endif %}
             <h3 class="page">{{ plural }}</h3>
+            <p class="tight admin-note">{{ class_.__notes__.admin_note }}</p>
             <table class="expand">
                 {% set backurl = url_for(request.endpoint, page=request.args.page or 1, **request.view_args) %}
                 {{ render_delays_table(pagination.items, active_id=delay_code.id, instance_endpoint='.list', instance_kwargs=instance_kwargs, backurl=backurl ) }}
@@ -38,10 +39,7 @@
             <form action="{{ action }}" class="delay-code" method="POST">
                 {{ render_form(form) }}
             </form>
-            {# disabled because these get automatically created by the delay codes parser #}
-            {% if false and delay_code %}
-            <h4 class="page"><a href="{{ url_for(request.endpoint, page=request.args.page) }}">New {{ singular }}</a></h4>
-            {% endif %}
+            {# no link to new because these get automatically created by the delay codes parser #}
         </div>
     </div>
 {% endblock content %}

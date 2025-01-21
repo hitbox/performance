@@ -6,10 +6,11 @@ from flask import request
 from flask import url_for
 
 from performance.authorization import edit_check
+from performance.extensions import db
 from performance.forms import AssumedBestForm
 from performance.models import AssumedBest
-from performance.pluggable.simpler import EditView
 from performance.pluggable import CreateView
+from performance.pluggable.simpler import EditView
 
 assumed_best_bp = Blueprint('assumed_best', __name__)
 
@@ -29,10 +30,7 @@ def for_(year, month):
     """
     Convenience for templates to avoid lots of control flow.
     """
-    assumed_best = AssumedBest.query.get(dict(
-        year = year,
-        month = month,
-    ))
+    assumed_best = db.session.get(AssumedBest, {'year': year, 'month': month})
     if not assumed_best:
         url = url_for('.create', year=year, month=month, **request.args)
     else:

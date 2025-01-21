@@ -12,6 +12,8 @@
     <tr>
         <th>Code</th>
         <th>Controllable?</th>
+        <th>Cancelled Land?</th>
+        <th>Always Show?</th>
         <th>Description</th>
     </tr>
 </thead>
@@ -26,6 +28,8 @@
     {% endif %}
     <tr{% if active_id is not none and active_id == delay.id %} class="active"{% endif %}{% if instance_endpoint %} data-href="{{ instance_url }}" title="{{ title_url }}"{% endif %}>
         <td class="data">{{ delay.code }}</td>
+        <td class="data">{{ yes(delay.is_cancelled_lane) }}</td>
+        <td class="data">{{ yes(delay.is_always_show) }}</td>
         <td class="data">{{ yes(delay.is_controllable) }}</td>
         <td>{{ string(delay.description) }}</td>
     </tr>{% endfor %}

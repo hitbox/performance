@@ -1,23 +1,15 @@
-import sqlalchemy as sa
-
-from flask import request
-from wtforms import HiddenField
+from flask_wtf import FlaskForm
 from wtforms import validators as wtforms_validators
-from wtforms_sqlalchemy.orm import model_form
 
-from performance import models
-from performance import queries
 from performance import settings
-from performance.extensions import db
 from performance.models import FlightType
 from performance.models import ScheduledFlight
 
-from .base import ModelForm
+from .base import BaseForm
 from .fields import HiddenIntegerField
-from .fields import StringTimeField
 from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
-from .model_converter import PerformanceModelConverter
+from .model_converter import model_form
 
 _only = [
     'flight_number',
@@ -31,7 +23,8 @@ _only = [
 
 class BaseScheduledFlightForm(
     BackLinkMixin,
-    ModelForm,
+    BaseForm,
+    FlaskForm,
     SubmitUpdateDeleteMixin,
 ):
     """
@@ -39,6 +32,7 @@ class BaseScheduledFlightForm(
     """
     class Meta:
         fields_order = ['flight_type'] + _only + ['submit', 'delete']
+        presentation = True
 
     scheduled_report_id = HiddenIntegerField()
 
@@ -91,11 +85,9 @@ _field_args = dict(
 
 ScheduledFlightForm = model_form(
     model = ScheduledFlight,
-    db_session = db.session,
     base_class = BaseScheduledFlightForm,
     only = _only,
     field_args = _field_args,
-    converter = PerformanceModelConverter(),
 )
 
 fieldnames = [

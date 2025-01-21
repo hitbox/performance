@@ -16,6 +16,13 @@ class Contract(
     Performance contract applied to a date range.
     """
 
+    # Metadata mainly for user interfaces.
+    __notes__ = {
+        'admin_note':
+            'Performance contracts define a name and date range for a set'
+            ' of performance tiers to apply.',
+    }
+
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(
