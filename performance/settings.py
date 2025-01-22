@@ -84,6 +84,9 @@ def scheduled_reports_onlyone():
     return current_app.config.get(key, False)
 
 def performance_report_title():
+    """
+    Return the title that should appear on reports.
+    """
     key = constants.PERFORMANCE_REPORT_TITLE
     return current_app.config.get(key, False)
 

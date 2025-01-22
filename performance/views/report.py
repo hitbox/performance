@@ -22,6 +22,10 @@ report_bp = Blueprint('report', __name__)
 
 @report_bp.context_processor
 def context_processor():
+    """
+    Additional context for computations in the templates.
+    """
+    # NOTE: Never put calculations in templates again.
     return dict(
         Decimal = Decimal,
     )
@@ -52,6 +56,9 @@ def get_context(report):
     return context
 
 def get_prev_next_context(report_date):
+    """
+    Convenience func to get yesterday and tomorrow.
+    """
     return dict(
         prev_date = report_date - datetime.timedelta(days=1),
         next_date = report_date + datetime.timedelta(days=1),
