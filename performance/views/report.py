@@ -30,13 +30,6 @@ def context_processor():
         Decimal = Decimal,
     )
 
-def get_report_form_class():
-    """
-    Wrap in function to avoid the aggressiveness of wtforms_alchemy.
-    """
-    from performance.forms import ReportForm
-    return ReportForm
-
 def get_context(report):
     """
     Context data for viewing report.
