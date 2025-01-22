@@ -1,21 +1,16 @@
 import datetime
 
 from decimal import Decimal
-from types import SimpleNamespace
 
 import click
-import sqlalchemy as sa
 
 from flask import Blueprint
-from flask import abort
-from flask import current_app
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
 
 from performance import business
-from performance import forms
 from performance import models
 from performance import settings
 from performance.authorization import basic_check
@@ -83,7 +78,6 @@ def view_report(id):
     """
     View Report object.
     """
-    #ReportForm = get_report_form_class()
     report = models.Report.query.get_or_404(id)
     form = ReportForm(obj=report)
 
