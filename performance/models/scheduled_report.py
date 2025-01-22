@@ -2,11 +2,13 @@ from performance.extensions import db
 
 from .mixin import AppContextMixin
 from .mixin import MetaMixin
+from .mixin import VisibilityMixin
 from .report import Report
 
 class ScheduledReport(
     AppContextMixin,
     MetaMixin,
+    VisibilityMixin,
     db.Model,
 ):
     """
@@ -31,17 +33,25 @@ class ScheduledReport(
         ]),
     )
 
+    def active_scheduled_flights(self):
+        return [
+            scheduled_flight.as_flight()
+            for scheduled_flight in self.scheduled_flights
+            if scheduled_flight.is_active
+        ]
+
     def as_report(self, report_date):
         """
         Instantiate report from this scheduled report.
         """
         return Report(
             date = report_date,
-            flights = [
-                scheduled_flight.as_flight()
-                for scheduled_flight in self.scheduled_flights
-                if scheduled_flight.is_active
-            ],
+            flights = self.active_scheduled_flights(),
+            show_lanes = self.show_lanes,
+            show_chargeable_delays = self.show_chargeable_delays,
+            show_delays_gt_30_count = self.show_delays_gt_30_count,
+            show_on_time_performance_gt_15 = self.show_on_time_performance_gt_15,
+            show_on_time_performance_gt_30 = self.show_on_time_performance_gt_30,
         )
 
     def as_dict(self):
@@ -52,7 +62,16 @@ class ScheduledReport(
             scheduled_flights = [
                 scheduled_flight.as_dict()
                 for scheduled_flight in self.scheduled_flights
-            ]
+            ],
+            show_lanes = self.show_lanes,
+            show_chargeable_delays =
+                self.show_chargeable_delays,
+            show_delays_gt_30_count =
+                self.show_delays_gt_30_count,
+            show_on_time_performance_gt_15 =
+                self.show_on_time_performance_gt_15,
+            show_on_time_performance_gt_30 =
+                self.show_on_time_performance_gt_30,
         )
 
     @classmethod
@@ -69,5 +88,14 @@ class ScheduledReport(
                     ScheduledFlight.get_or_new_from_dict(flight_data)
                     for flight_data in data['scheduled_flights']
                 ],
+                show_lanes = data['show_lanes'],
+                show_chargeable_delays =
+                    data['show_chargeable_delays'],
+                show_delays_gt_30_count =
+                    data['show_delays_gt_30_count'],
+                show_on_time_performance_gt_15 =
+                    data['show_on_time_performance_gt_15'],
+                show_on_time_performance_gt_30 =
+                    data['show_on_time_performance_gt_30'],
             )
         return instance

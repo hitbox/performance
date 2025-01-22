@@ -97,10 +97,3 @@ def default_flight_type():
     stmt = db.select(models.Performance)
     performance_settings = db.session.scalars(stmt).one()
     return performance_settings.default_flight_type
-
-def performance_stats():
-    """
-    Return dict for which performance statistics to show. By default, all.
-    """
-    key = constants.PERFORMANCE_STATS
-    return current_app.config[key]

@@ -11,6 +11,7 @@ from .flight import FlightForm
 from .flight_type import FlightTypeForm
 from .performance_tier import PerformanceTierForm
 from .report import ReportForm
+from .report import ReportVisibilityForm
 from .scheduled_flight import ScheduledFlightForm
 from .scheduled_report import ScheduledReportForm
 from .settings import SettingsForm

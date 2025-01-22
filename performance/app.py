@@ -20,13 +20,6 @@ def setdefault_config(app):
     # list of strings
     app.config.setdefault('ALWAYS_SHOW_DELAY_CODES', [])
 
-    performance_stats = app.config.setdefault('PERFORMANCE_STATS', {})
-    performance_stats.setdefault('lanes', True)
-    performance_stats.setdefault('chargeable_delays', True)
-    performance_stats.setdefault('delays_gt_30_count', True)
-    performance_stats.setdefault('on_time_performance_gt_15', True)
-    performance_stats.setdefault('on_time_performance_gt_30', True)
-
 def ensure_metadata(app):
     # ensure that at least one object exists for metadata settings
     db = extensions.db

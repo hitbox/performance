@@ -15,7 +15,11 @@ from performance.models import Performance
 settings_bp = Blueprint('settings', __name__, url_prefix='/settings')
 
 def _get_performance_object():
-    performance = db.session.scalars(db.select(Performance)).one()
+    """
+    Return the single performance (settings) object.
+    """
+    stmt = db.select(Performance)
+    performance = db.session.scalars(stmt).one()
     return performance
 
 @settings_bp.route('/', methods=['GET', 'POST'])

@@ -17,6 +17,7 @@ from performance.authorization import basic_check
 from performance.authorization import edit_check
 from performance.extensions import db
 from performance.forms import ReportForm
+from performance.forms import ReportVisibilityForm
 
 report_bp = Blueprint('report', __name__)
 
@@ -98,8 +99,27 @@ def view_report(id):
     context = get_context(report)
     context.update(get_prev_next_context(report.date))
     context.setdefault('form', form)
-    context['performance_stats'] = settings.performance_stats()
     return render_template('report/print-with-edit.html', **context)
+
+@report_bp.route('/visibility/<int:id>', methods=['GET', 'POST'])
+@edit_check
+def report_visibility(id):
+    """
+    Edit the options for visibility on a report.
+    """
+    report = models.Report.query.get_or_404(id)
+    form = ReportVisibilityForm(obj=report)
+
+    if form.validate_on_submit():
+        form.populate_obj(report)
+        db.session.commit()
+        return redirect(url_for('.view_report', id=report.id))
+
+    context = dict(
+        form = form,
+        report = report,
+    )
+    return render_template('report/edit-visibility.html', **context)
 
 @report_bp.route('/delete/<int:report_id>')
 @edit_check

@@ -1,0 +1,24 @@
+{% extends "report/base.html" %}
+
+
+{% from "macros.html" import render_date %}
+{% from "macros.html" import render_form %}
+
+
+{% block content %}
+    <nav id="report-nav">
+        <h3>
+            Back to <a href="{{ url_for('report.view_report', id=report.id) }}">{{ config.PERFORMANCE_REPORT_TITLE }}: {{ render_date(report.date) }}</a>
+        </h3>
+    </nav>
+    <div class="rows-container">
+        <div>
+            <p>Options for which rows to show in the performance statistics table.</p>
+        </div>
+    </div>
+    <div class="rows-container">
+        <div>
+            <form method="POST">{{ render_form(form) }}</form>
+        </div>
+    </div>
+{% endblock content %}

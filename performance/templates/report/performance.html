@@ -20,7 +20,7 @@
 <table id="performance-table">
     <thead>
         <tr>
-            <th></th>
+            <th><a class="noprint" href="{{ url_for('.report_visibility', id=report.id) }}">Visibility</a></th>
             <th class="top">Daily</th>
             <th class="top" title="Month To Date">MTD</th>
             <th class="top" title="Quarter To Date">QTD</th>
@@ -28,7 +28,7 @@
         </tr>
     </thead>
     <tbody>
-        {% if performance_stats.lanes %}<tr>
+        {% if report.show_lanes %}<tr>
             <th class="row">Lanes</th>
             <td class="data number">
                 <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='lanes') }}">
@@ -47,7 +47,7 @@
             </td>
             {% if show_contracts_column %}<td></td>{% endif %}
         {% endif %}</tr>
-        {% if performance_stats.chargeable_delays %}<tr>
+        {% if report.show_chargeable_delays %}<tr>
             <th class="row" title="{{ controllable_delays_note }}">Chargeable Delays</th>
             <td class="data number">
                 <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='flights_with_controllable_destination_delays_over15') }}">
@@ -66,7 +66,7 @@
             </td>
             {% if show_contracts_column %}<td></td>{% endif %}
         {% endif %}</tr>
-        {% if performance_stats.delays_gt_30_count %}<tr>
+        {% if report.show_delays_gt_30_count %}<tr>
             <th class="row" title="{{ controllable_delays_note }}">Delays &gt; 30 Count</th>
             <td class="data number">
                 <a href="{{ url_for('performance_details.for_range', report_date=report.date, date_range_key='daily', performance_key='flights_with_controllable_destination_delays_over30') }}">
@@ -85,7 +85,7 @@
             </td>
             {% if show_contracts_column %}<td></td>{% endif %}
         {% endif %}</tr>
-        {% if performance_stats.on_time_performance_gt_15 %}<tr>
+        {% if report.show_on_time_performance_gt_15 %}<tr>
             <th class="row" title="On-time Performance greater than 15 minutes">On-time Performance &gt; 15</th>
             <td class="data number" title="{{ render_performance_calc_formula(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over15) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over15) }}</td>
@@ -100,7 +100,7 @@
             </td>
             {% endif %}
         {% endif %}</tr>
-        {% if performance_stats.on_time_performance_gt_30 %}<tr>
+        {% if report.show_on_time_performance_gt_30 %}<tr>
             <th class="row" title="On-time Performance greater than 30 minutes">On-time Performance &gt; 30</th>
             <td class="data number" title="{{ render_performance_calc_formula(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(daily.lanes, daily.flights_with_controllable_destination_delays_over30) }}</td>
             <td class="data number" title="{{ render_performance_calc_formula(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}">{{ performance_calc(month_to_date.lanes, month_to_date.flights_with_controllable_destination_delays_over30) }}</td>

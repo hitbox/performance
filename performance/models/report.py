@@ -1,10 +1,3 @@
-from datetime import time
-from itertools import groupby
-from operator import attrgetter
-
-import sqlalchemy as sa
-
-from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from performance.exceptions import PerformanceError
@@ -14,18 +7,11 @@ from performance.utils import quarter_of_date
 from .assumed_best import AssumedBest
 from .flight_type import FlightType
 from .mixin import MetaMixin
-
-FLIGHTS_BY_TYPE_SORT = attrgetter('origin_departure_estimated_time')
+from .mixin import VisibilityMixin
 
 class ReportError(PerformanceError):
     pass
 
-
-def by_estimated_departure(flight):
-    if isinstance(flight.origin_departure_estimated_time, time):
-        return flight.origin_departure_estimated_time
-    else:
-        return time(0,0)
 
 def flight_types_for_controllable_delays():
     """
@@ -54,7 +40,11 @@ def controllable_destination_delays(report, over_minutes):
     ]
     return result
 
-class Report(MetaMixin, db.Model):
+class Report(
+    MetaMixin,
+    VisibilityMixin,
+    db.Model,
+):
     """
     Amazon Performance Report.
     """
@@ -107,12 +97,12 @@ class Report(MetaMixin, db.Model):
         """
         # quarter of a date calculation
         # (month - 1) // 3 + 1
-        # NOTE: sa.func.div postgres specific
-        zero_based_month = sa.cast(
-            sa.func.date_part('month', Report.date) - 1,
-            sa.Integer
+        # NOTE: db.func.div postgres specific
+        zero_based_month = db.cast(
+            db.func.date_part('month', Report.date) - 1,
+            db.Integer
         )
-        quarter = 1 + sa.func.div(zero_based_month, 3)
+        quarter = 1 + db.func.div(zero_based_month, 3)
         return quarter
 
     def flights_by_type(self):
@@ -124,13 +114,13 @@ class Report(MetaMixin, db.Model):
 
         groups = []
         stmt = (
-            sa.select(FlightType)
+            db.select(FlightType)
             .where(FlightType.is_active)
             .order_by(FlightType.report_order)
         )
         for flight_type in db.session.scalars(stmt):
             stmt = (
-                sa.select(Flight)
+                db.select(Flight)
                 .join(Report)
                 .where(
                     Report.id == self.id,

@@ -70,6 +70,67 @@ class UniqueMixin:
         )
 
 
+class VisibilityMixin:
+    """
+    Mixin options for whether to show or hide attributes.
+    """
+
+    @db.declared_attr
+    def show_lanes(cls):
+        return db.Column(
+            db.Boolean,
+            default = True,
+            nullable = False,
+            doc =
+                'Show the daily, month-to-date, and quarter-to-date'
+                ' number of lanes.',
+        )
+
+    @db.declared_attr
+    def show_chargeable_delays(cls):
+        return db.Column(
+            db.Boolean,
+            default = True,
+            nullable = False,
+            doc =
+                'Show the daily, month-to-date, and quarter-to-date'
+                ' number of chargeable delays.',
+        )
+
+    @db.declared_attr
+    def show_delays_gt_30_count(cls):
+        return db.Column(
+            db.Boolean,
+            default = True,
+            nullable = False,
+            doc =
+                'Show the daily, month-to-date, and quarter-to-date'
+                ' number of delays over 30 minutes.',
+        )
+
+    @db.declared_attr
+    def show_on_time_performance_gt_15(cls):
+        return db.Column(
+            db.Boolean,
+            default = True,
+            nullable = False,
+            doc =
+                'Show the daily, month-to-date, and quarter-to-date'
+                ' on-time performance percentage over 15 minutes.',
+        )
+
+    @db.declared_attr
+    def show_on_time_performance_gt_30(cls):
+        return db.Column(
+            db.Boolean,
+            default = True,
+            nullable = False,
+            doc =
+                'Show the daily, month-to-date, and quarter-to-date'
+                ' on-time performance percentage over 30 minutes.',
+        )
+
+
 def unique(
     *, # keyword only
     session,
