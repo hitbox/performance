@@ -26,3 +26,6 @@ KG_CONVERSION_FACTOR = 'KG_CONVERSION_FACTOR'
 
 # disable showing multiple scheduled reports
 SCHEDULED_REPORTS_ONLYONE = 'SCHEDULED_REPORTS_ONLYONE'
+
+# Which performance stats to show.
+PERFORMANCE_STATS = 'PERFORMANCE_STATS'

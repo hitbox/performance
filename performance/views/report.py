@@ -98,7 +98,7 @@ def view_report(id):
     context = get_context(report)
     context.update(get_prev_next_context(report.date))
     context.setdefault('form', form)
-    context['performance_stats'] = current_app.config['PERFORMANCE_STATS']
+    context['performance_stats'] = settings.performance_stats()
     return render_template('report/print-with-edit.html', **context)
 
 @report_bp.route('/delete/<int:report_id>')
