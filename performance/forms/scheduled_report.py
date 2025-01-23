@@ -29,17 +29,36 @@ ScheduledReportForm = model_form(
         'created',
         'updated',
     ),
-    field_args = {
-        'name': {
-            'render_kw': {'class': 'scheduled-report'},
-        },
-        'display_order': {
-            'render_kw': {
-                'class': 'scheduled-report',
-                'title':
+    field_args = dict(
+        name = dict(
+            render_kw = dict(
+                class_ = 'scheduled-report',
+            ),
+        ),
+        display_order = dict(
+            render_kw = dict(
+                class_ = 'scheduled-report',
+                title =
                     'Scheduled report display order in editor table'
                     ' and new report prompt.',
-            },
-        },
-    },
+            ),
+        ),
+        # TODO
+        # - Get these automatically.
+        show_lanes = dict(
+            label = ScheduledReport.show_lanes.info['form_label'],
+        ),
+        show_chargeable_delays = dict(
+            label = ScheduledReport.show_chargeable_delays.info['form_label'],
+        ),
+        show_delays_gt_30_count = dict(
+            label = ScheduledReport.show_delays_gt_30_count.info['form_label'],
+        ),
+        show_on_time_performance_gt_15 = dict(
+            label = ScheduledReport.show_on_time_performance_gt_15.info['form_label'],
+        ),
+        show_on_time_performance_gt_30 = dict(
+            label = ScheduledReport.show_on_time_performance_gt_30.info['form_label'],
+        ),
+    ),
 )

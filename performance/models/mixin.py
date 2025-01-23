@@ -84,6 +84,9 @@ class VisibilityMixin:
             doc =
                 'Show the daily, month-to-date, and quarter-to-date'
                 ' number of lanes.',
+            info = dict(
+                form_label =  'Show lanes?',
+            ),
         )
 
     @db.declared_attr
@@ -95,6 +98,9 @@ class VisibilityMixin:
             doc =
                 'Show the daily, month-to-date, and quarter-to-date'
                 ' number of chargeable delays.',
+            info = dict(
+                form_label = 'Show chargeable delays?',
+            ),
         )
 
     @db.declared_attr
@@ -106,6 +112,9 @@ class VisibilityMixin:
             doc =
                 'Show the daily, month-to-date, and quarter-to-date'
                 ' number of delays over 30 minutes.',
+            info = dict(
+                form_label = 'Show delays > 30 count?',
+            ),
         )
 
     @db.declared_attr
@@ -117,6 +126,9 @@ class VisibilityMixin:
             doc =
                 'Show the daily, month-to-date, and quarter-to-date'
                 ' on-time performance percentage over 15 minutes.',
+            info = dict(
+                form_label = 'Show on-time performance > 15?',
+            ),
         )
 
     @db.declared_attr
@@ -128,6 +140,9 @@ class VisibilityMixin:
             doc =
                 'Show the daily, month-to-date, and quarter-to-date'
                 ' on-time performance percentage over 30 minutes.',
+            info = dict(
+                form_label = 'Show on-time performance > 30?',
+            ),
         )
 
 

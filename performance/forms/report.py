@@ -76,20 +76,22 @@ ReportVisibilityForm = model_form(
         'show_on_time_performance_gt_30',
     ],
     field_args = dict(
+        # TODO
+        # - Get these automatically.
         show_lanes = dict(
-            label = 'Show lanes?',
+            label = Report.show_lanes.info['form_label'],
         ),
         show_chargeable_delays = dict(
-            label = 'Show chargeable delays?',
+            label = Report.show_chargeable_delays.info['form_label'],
         ),
         show_delays_gt_30_count = dict(
-            label = 'Show delays > 30 count?',
+            label = Report.show_delays_gt_30_count.info['form_label'],
         ),
         show_on_time_performance_gt_15 = dict(
-            label = 'Show on-time performance > 15?',
+            label = Report.show_on_time_performance_gt_15.info['form_label'],
         ),
         show_on_time_performance_gt_30 = dict(
-            label = 'Show on-time performance > 30?',
+            label = Report.show_on_time_performance_gt_30.info['form_label'],
         ),
     ),
 )
