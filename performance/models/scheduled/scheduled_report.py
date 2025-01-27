@@ -1,9 +1,9 @@
 from performance.extensions import db
 
-from .mixin import AppContextMixin
-from .mixin import MetaMixin
-from .mixin import VisibilityMixin
-from .report import Report
+from performance.models.mixin import AppContextMixin
+from performance.models.mixin import MetaMixin
+from performance.models.mixin import VisibilityMixin
+from performance.models.report import Report
 
 class ScheduledReport(
     AppContextMixin,

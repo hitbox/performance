@@ -1,3 +1,5 @@
+from markupsafe import Markup
+
 from ..extensions import db
 
 class MetaMixin:
@@ -142,6 +144,50 @@ class VisibilityMixin:
                 ' on-time performance percentage over 30 minutes.',
             info = dict(
                 form_label = 'Show on-time performance > 30?',
+            ),
+        )
+
+    @db.declared_attr
+    def show_on_time_performance_gt_30(cls):
+        return db.Column(
+            db.Boolean,
+            default = True,
+            nullable = False,
+            doc =
+                'Show the daily, month-to-date, and quarter-to-date'
+                ' on-time performance percentage over 30 minutes.',
+            info = dict(
+                form_label = 'Show on-time performance > 30?',
+            ),
+        )
+
+    @db.declared_attr
+    def show_flights_controllable_over_15(cls):
+        return db.Column(
+            db.Boolean,
+            default = True,
+            nullable = False,
+            doc =
+                'Show the controllable over 15 minutes count column'
+                ' for flights.',
+            info = dict(
+                form_label = 'Show controllable > 15 column for flights?',
+                table_header = Markup('&gt;&nbsp;15'),
+            ),
+        )
+
+    @db.declared_attr
+    def show_flights_controllable_over_30(cls):
+        return db.Column(
+            db.Boolean,
+            default = True,
+            nullable = False,
+            doc =
+                'Show the controllable over 30 minutes count column'
+                ' for flights.',
+            info = dict(
+                form_label = 'Show controllable > 30 column for flights?',
+                table_header = Markup('&gt;&nbsp;30'),
             ),
         )
 

@@ -4,8 +4,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from performance import parse
 from performance.extensions import db
 
-from .delay import Delay
-from .mixin import UniqueMixin
+from performance.models.delay import Delay
+from performance.models.mixin import UniqueMixin
 
 class DelayAssocMixin(UniqueMixin):
     """

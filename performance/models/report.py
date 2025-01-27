@@ -5,7 +5,7 @@ from performance.extensions import db
 from performance.utils import quarter_of_date
 
 from .assumed_best import AssumedBest
-from .flight_type import FlightType
+from .flight import FlightType
 from .mixin import MetaMixin
 from .mixin import VisibilityMixin
 
@@ -156,3 +156,32 @@ class Report(
         """
         return len([flight for flight in self.flights
                     if flight.flight_type == flight_type])
+
+    def controllable_over_minutes_columns(self):
+        """
+        Return list of over-minutes columns configured for report.
+        """
+        columns = []
+        if self.show_flights_controllable_over_15:
+            columns.append(
+                self.__class__.show_flights_controllable_over_15.info['table_header'],
+            )
+        if self.show_flights_controllable_over_30:
+            columns.append(
+                self.__class__.show_flights_controllable_over_30.info['table_header'],
+            )
+        return columns
+
+    def controllable_over_minutes_values(self, flight):
+        """
+        Return list of over-minutes values (matching the columns) configured
+        for report.
+        """
+        values = []
+        if self.show_flights_controllable_over_15:
+            is_over = flight.controllable_destination_delays_minutes > 15
+            values.append(is_over)
+        if self.show_flights_controllable_over_30:
+            is_over = flight.controllable_destination_delays_minutes > 30
+            values.append(is_over)
+        return values

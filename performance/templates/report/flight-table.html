@@ -3,6 +3,8 @@
 
 {% set ncols = 15 %}
 {% set controllable_delays_note = "Delays " + config['PERFORMANCE_CONTROLLABLE']|join(', ') %}
+{# TODO #}
+{# move controllable logic to classes #}
 {% set include_controllable_columns = flight_type.is_controllable %}
 {% set with_edit = current_user.is_editor or current_user.is_admin %}
 
@@ -28,7 +30,7 @@
         {% if flights %}<thead>
             <tr>{% if include_controllable_columns %}
                 {{ render_flight_type_th(ncols - 3, flight_type.name) }}
-                <th colspan="2">ABX Controllable</th>
+                {% if include_controllable_columns %}<th colspan="{{ report.controllable_over_minutes_columns()|length }}">ABX Controllable</th>{% endif %}
                 <th></th>
             {% else %}
                 {{ render_flight_type_th(ncols, flight_type.name) }}
@@ -46,10 +48,7 @@
                 <th>ATA</th>
                 <th>{{ render_diff_minutes_text() }}</th>
                 <th title="{{ controllable_delays_note }}">Delay Codes</th>
-                {% if include_controllable_columns %}
-                <th>&gt;&nbsp;15</th>
-                <th>&gt;&nbsp;30</th>
-                {% endif %}
+                {% if include_controllable_columns %}{% for column in report.controllable_over_minutes_columns() %}<th>{{ column }}</th>{% endfor %}{% endif %}
                 <th>Weight</th>
             </tr>
         </thead>

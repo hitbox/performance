@@ -8,6 +8,8 @@ from .mixins import SubmitMixin
 from .model_converter import PerformanceModelConverter
 from .model_converter import model_form
 from .utils import remove_required_from_boolean_fields
+from .utils import visibility_column_field_args
+from .utils import visibility_column_names
 
 # TODO
 # - We surely do not need to specify field_args and only twice!
@@ -68,32 +70,8 @@ ReportForm = model_form(
 ReportVisibilityForm = model_form(
     model = Report,
     base_class = ReportVisibilityFormBase,
-    only = [
-        'show_lanes',
-        'show_chargeable_delays',
-        'show_delays_gt_30_count',
-        'show_on_time_performance_gt_15',
-        'show_on_time_performance_gt_30',
-    ],
-    field_args = dict(
-        # TODO
-        # - Get these automatically.
-        show_lanes = dict(
-            label = Report.show_lanes.info['form_label'],
-        ),
-        show_chargeable_delays = dict(
-            label = Report.show_chargeable_delays.info['form_label'],
-        ),
-        show_delays_gt_30_count = dict(
-            label = Report.show_delays_gt_30_count.info['form_label'],
-        ),
-        show_on_time_performance_gt_15 = dict(
-            label = Report.show_on_time_performance_gt_15.info['form_label'],
-        ),
-        show_on_time_performance_gt_30 = dict(
-            label = Report.show_on_time_performance_gt_30.info['form_label'],
-        ),
-    ),
+    only = visibility_column_names(),
+    field_args = visibility_column_field_args(Report),
 )
 
 remove_required_from_boolean_fields(ReportVisibilityForm)

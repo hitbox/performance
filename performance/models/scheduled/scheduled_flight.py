@@ -1,30 +1,16 @@
-from ..extensions import db
+from performance.extensions import db
 
-from .flight_mixin import FlightMixin
-from .flight_type import FlightTypeRelationshipMixin
-from .mixin import AppContextMixin
-from .mixin import MetaMixin
+from performance.models.flight import FlightMixin
+from performance.models.flight import FlightTypeRelationshipMixin
+from performance.models.mixin import AppContextMixin
+from performance.models.mixin import MetaMixin
 
 class ScheduledFlight(
-    AppContextMixin, # .noapp_get_or_404
-                     # .noapp_pagination
-    FlightMixin, # .flight_number
-                 # .leg
-                 # .tail_number
-                 # .weight
-                 # .comment
-                 # .origin_station
-                 # .origin_departure_estimated_date
-                 # .origin_departure_estimated_time
-                 # .destination_station
-                 # .destination_arrival_estimated_date
-                 # .destination_arrival_estimated_time
-    FlightTypeRelationshipMixin, # .flight_type_id
-                                 # .flight_type
-                                 # .flight_type_is_lane
-    MetaMixin, # .created
-               # .updated
-    db.Model,  # flask_sqlalchemy
+    AppContextMixin,
+    FlightMixin,
+    FlightTypeRelationshipMixin,
+    MetaMixin,
+    db.Model,
 ):
     """
     Minimal flight information to partially populate new reports.
@@ -62,7 +48,7 @@ class ScheduledFlight(
         """
         Instantiate flight from this scheduled flight.
         """
-        from .flight import Flight
+        from performance.models.flight import Flight
         return Flight(
             flight_number = self.flight_number,
             leg = self.leg,
@@ -101,7 +87,7 @@ class ScheduledFlight(
 
     @classmethod
     def get_or_new_from_dict(cls, data):
-        from .flight_type import FlightType
+        from performance.models.flight import FlightType
 
         instance = db.session.get(cls, dict(id=data['id']))
         if instance is None:

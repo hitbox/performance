@@ -2,9 +2,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from ..extensions import db
-
-from .mixin import AppContextMixin
+from performance.extensions import db
+from performance.models.mixin import AppContextMixin
 
 class FlightType(
     AppContextMixin,

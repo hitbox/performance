@@ -2,6 +2,8 @@ from wtforms import BooleanField
 from wtforms.fields.core import UnboundField
 from wtforms.validators import InputRequired
 
+from performance.models.mixin import VisibilityMixin
+
 def remove_required_from_boolean_fields(form_class):
     """
     Remove the required validator from all boolean fields. This counteracts the
@@ -23,3 +25,14 @@ def remove_required_from_boolean_fields(form_class):
                 continue
             # remove required validator
             validators.remove(validator)
+
+def visibility_column_names():
+    return [n for n in dir(VisibilityMixin) if not n.startswith('_')]
+
+def visibility_column_field_args(class_name):
+    return {
+        name: dict(
+            label = getattr(class_name, name).info['form_label'],
+        )
+        for name in visibility_column_names()
+    }

@@ -35,11 +35,7 @@
 
 
 {#- controllable delays over boolean field -#}
-{% if include_controllable_columns %}
-    {% for over_minutes in [15, 30] %}
-        {% set is_over = flight.controllable_destination_delays_minutes > over_minutes %}
-        <td{% if is_over %} class="data late"{% endif %}>{{ yes(is_over) }}</td>
-    {% endfor %}
-{% endif %}
+{% if include_controllable_columns %}{% for is_over in report.controllable_over_minutes_values(flight) %}<td{% if is_over %} class="data late"{% endif %}>{{ yes(is_over) }}</td>{% endfor %}{% endif %}
+
 {#- weight -#}
 <td class="data number">{{ render_integer(flight.weight) }}</td>

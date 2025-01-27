@@ -37,8 +37,7 @@
             <th>ATA</th>
             <th>{{ render_diff_minutes_text() }}</th>
             <th title="{{ controllable_delays_note }}">Delay Codes</th>
-            <th>&gt;&nbsp;15</th>
-            <th>&gt;&nbsp;30</th>
+            {% for column in report.controllable_over_minutes_columns() %}<th>{{ column }}</th>{% endfor %}
             <th>Weight</th>
         </tr>
     </thead>
@@ -67,11 +66,7 @@
             <td class="data">{% if flight.show_destination_delays() %}{{ render_delays(flight.destination_delays) }}{% endif %}</td>
 
             {#- controllable delays -#}
-            {% for over_minutes in [15, 30] %}
-                {#{% set delays = flight.controllable_destination_delays(over_minutes) %}#}
-                {% set is_over = flight.controllable_destination_delays_minutes > over_minutes %}
-                <td{% if is_over %} class="data late"{% endif %}>{{ yes(is_over) }}</td>
-            {% endfor %}
+            {% for is_over in report.controllable_over_minutes_values(flight) %}<td{% if is_over %} class="data late"{% endif %}>{{ yes(is_over) }}</td>{% endfor %}
             {#- weight -#}
             <td class="data number">{{ render_integer(flight.weight) }}</td>
         </tr>{% endfor %}
