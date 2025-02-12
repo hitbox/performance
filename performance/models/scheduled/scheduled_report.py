@@ -52,6 +52,8 @@ class ScheduledReport(
             show_delays_gt_30_count = self.show_delays_gt_30_count,
             show_on_time_performance_gt_15 = self.show_on_time_performance_gt_15,
             show_on_time_performance_gt_30 = self.show_on_time_performance_gt_30,
+            show_flights_controllable_over_15 = self.show_flights_controllable_over_15,
+            show_flights_controllable_over_30 = self.show_flights_controllable_over_30,
         )
 
     def as_dict(self):
