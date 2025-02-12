@@ -42,6 +42,7 @@ def upgrade():
 
     # Exceptional values we want going forward. Others default to true.
     values = {
+        ('scheduled_report', 'show_delays_gt_30_count'): False,
         ('scheduled_report', 'show_on_time_performance_gt_30'): False,
         ('scheduled_report', 'show_flights_controllable_over_30'): False,
     }
