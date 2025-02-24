@@ -14,6 +14,14 @@ from .utils import visibility_column_names
 # TODO
 # - We surely do not need to specify field_args and only twice!
 
+system_detail_args = {
+    'render_kw': {
+        'class_': 'auto-resize',
+        'cols': 133,
+        'rows': 15,
+    },
+}
+
 class ReportFormBase(
     BackLinkMixin,
     BaseForm,
@@ -25,14 +33,7 @@ class ReportFormBase(
         only = [
             'system_detail',
         ]
-        field_args = {
-            'system_detail': {
-                'render_kw': {
-                    'cols': 133,
-                    'rows': 15,
-                },
-            },
-        }
+        field_args = system_detail_args
 
 
 class ReportVisibilityFormBase(
@@ -55,14 +56,9 @@ ReportForm = model_form(
     only = [
         'system_detail',
     ],
-    field_args = dict(
-        system_detail = dict(
-            render_kw = dict(
-                cols = 133,
-                rows = 15,
-            ),
-        ),
-    ),
+    field_args = {
+        'system_detail': system_detail_args,
+    },
     converter = PerformanceModelConverter(),
 )
 

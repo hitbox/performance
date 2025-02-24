@@ -89,6 +89,26 @@ function init_clicks() {
     }
 }
 
+function init_textarea_resize() {
+    // Automatically resize height of selected textareas.
+    const textareas = document.querySelectorAll('textarea.auto-resize');
+
+    for (const textarea of textareas) {
+
+        function resize(textarea) {
+            // Reset height.
+            textarea.style.height = 'auto';
+            // Set height to scroll height
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        textarea.addEventListener('input', function() {
+            resize(textarea);
+        });
+        resize(textarea);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function(event) {
     initDataHref();
     initCloseButton();
@@ -97,4 +117,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
     initScrollToActive();
     push_anchor();
     init_clicks();
+    init_textarea_resize();
 });

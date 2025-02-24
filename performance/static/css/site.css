@@ -574,6 +574,12 @@ textarea {
     padding: 4px 8px;
 }
 
+textarea.auto-resize {
+    /* allow JS to resize */
+    overflow: hidden;
+    resize: both;
+}
+
 /* flight/form.html: makes things line up nicely */
 fieldset > label:nth-child(2) {
     margin-left: 0;
