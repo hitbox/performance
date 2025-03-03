@@ -45,6 +45,7 @@ assumed_best_bp.add_url_rule(
     view_func = CreateView.as_view(
         'create',
         form_class,
+        model = AssumedBest,
         template = 'assumed-best/edit.html',
     )
 )
