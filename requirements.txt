@@ -17,6 +17,7 @@ pywin32; sys_platform == 'win32'
 sqlalchemy
 sqlalchemy-utils
 typing-extensions
+waitress
 wtforms
 wtforms-components
 wtforms-sqlalchemy
