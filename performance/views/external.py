@@ -1,5 +1,7 @@
 import csv
 import datetime
+import inspect
+import os
 
 from pprint import pprint
 
@@ -185,7 +187,7 @@ def query(report_date, changes):
     '--ignore-unknown/--no-ignore-unknown',
     default = True,
     show_default = True,
-    help = 'Ignore the keys from CSV that the mapper doesn\' take.',
+    help = 'Ignore the keys from CSV that the mapper doesn\'t take.',
 )
 @click.option(
     '--commit/--no--commit',
@@ -225,3 +227,26 @@ def load(type_, file, class_, lower_keys, ignore_unknown, commit):
 
     if commit:
         db.session.commit()
+
+@external_bp.cli.command('dump')
+@click.argument('output', type=click.Path(file_okay=False, dir_okay=True, exists=True))
+def dump(output):
+    """
+    Dump external tables' data.
+
+    output: OUTPUT directory for CSVs.
+    """
+    external_models = [
+        cls for name, cls in inspect.getmembers(models.external)
+        if inspect.isclass(cls) and hasattr(cls, '__table__')
+    ]
+
+    for model in external_models:
+        filename = os.path.join(output, f'{model.__tablename__}.csv')
+        columns = [c.name for c in model.__table__.columns]
+        objects = db.session.scalars(db.select(model))
+        with open(filename, 'w', newline='', encoding='utf8') as output_file:
+            writer = csv.writer(output_file)
+            writer.writerow(columns)
+            for obj in objects:
+                writer.writerow([getattr(obj, col) for col in columns])
