@@ -1,5 +1,6 @@
 import csv
 import datetime
+import gzip
 import inspect
 import os
 
@@ -230,7 +231,8 @@ def load(type_, file, class_, lower_keys, ignore_unknown, commit):
 
 @external_bp.cli.command('dump')
 @click.argument('output', type=click.Path(file_okay=False, dir_okay=True, exists=True))
-def dump(output):
+@click.option('--compress/--no-compress', default=True)
+def dump(output, compress):
     """
     Dump external tables' data.
 
@@ -241,11 +243,22 @@ def dump(output):
         if inspect.isclass(cls) and hasattr(cls, '__table__')
     ]
 
+    if compress:
+        open_func = gzip.open
+        open_mode = 'wt'
+    else:
+        open_func = open
+        open_mode = 'w'
+
     for model in external_models:
         filename = os.path.join(output, f'{model.__tablename__}.csv')
+        if compress:
+            filename += '.gz'
+
         columns = [c.name for c in model.__table__.columns]
         objects = db.session.scalars(db.select(model))
-        with open(filename, 'w', newline='', encoding='utf8') as output_file:
+
+        with open_func(filename, open_mode, newline='', encoding='utf8') as output_file:
             writer = csv.writer(output_file)
             writer.writerow(columns)
             for obj in objects:
