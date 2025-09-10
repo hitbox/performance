@@ -18,13 +18,16 @@ from flask import request
 from flask import url_for
 
 from performance import business
-from performance import forms
 from performance import models
 from performance import queries
 from performance import settings
 from performance.authorization import basic_check
 from performance.authorization import edit_check
 from performance.extensions import db
+from performance.forms import ChangesForm
+from performance.forms import QueryParametersForm
+from performance.forms import ResultsForm
+from performance.utils import is_gzip_file
 
 external_bp = Blueprint('external', __name__)
 
@@ -49,14 +52,14 @@ def update_report_from_external(report_id):
     submit a form with selected updates for differences between external
     database and this one.
     """
-    report = models.Report.query.get_or_404(report_id)
+    report = db.get_or_404(models.Report, report_id)
 
     param_form = None
     results_form = None
 
     if request.method == 'POST':
         # POST is only for doing final import of results
-        results_form = forms.ChangesForm(formdata=request.form)
+        results_form = ChangesForm(formdata=request.form)
         if results_form.validate():
             # result form is valid
             if results_form.clear.data:
@@ -70,7 +73,7 @@ def update_report_from_external(report_id):
                 db.session.commit()
                 return redirect(url_for('report.view_report', id=report.id))
 
-    param_form = forms.QueryParametersForm(data=request.args)
+    param_form = QueryParametersForm(data=request.args)
     del param_form.show_kg
     del param_form.show_all_fields
 
@@ -86,7 +89,7 @@ def update_report_from_external(report_id):
         joined = business.external.joined_external_flights(report.date)
         flight_changes = business.external.make_diffs(report.date, joined)
         flight_changes = sorted(flight_changes, key=business.external.changes_sort_key)
-        results_form = forms.ChangesForm(
+        results_form = ChangesForm(
             data = dict(
                 flight_changes = flight_changes,
             ),
@@ -119,7 +122,7 @@ def import_for_new(report_date):
         abort(404)
 
     if request.method == 'POST':
-        results_form = forms.ResultsForm(formdata=request.form)
+        results_form = ResultsForm(formdata=request.form)
         if results_form.validate():
             report = business.external.new_report_from_external(
                 report_date,
@@ -129,7 +132,7 @@ def import_for_new(report_date):
             db.session.commit()
             return redirect(url_for('report.view_report_for_date', report_date=report_date))
 
-    param_form = forms.QueryParametersForm(data=request.args)
+    param_form = QueryParametersForm(data=request.args)
     # remove field that makes no sense here
     del param_form.show_all_fields
     if param_form.clear.data:
@@ -141,7 +144,7 @@ def import_for_new(report_date):
 
     if param_form.submit.name in request.args:
         results = business.external.external_results(report_date).mappings()
-        results_form = forms.ResultsForm(data=dict(rows=results))
+        results_form = ResultsForm(data=dict(rows=results))
     else:
         del param_form.clear
         results = None
@@ -194,10 +197,25 @@ def query(report_date, changes):
     '--commit/--no--commit',
     help = 'Commit added instances.',
 )
-def load(type_, file, class_, lower_keys, ignore_unknown, commit):
+@click.option(
+    '--compressed/--no--compressed',
+    default = None,
+    help = 'Read from compressed gzip files.',
+)
+def load(type_, file, class_, lower_keys, ignore_unknown, commit, compressed):
     """
     Load data from CSV.
+
+    TYPE: Type of file to read.
+    FILE: path to file.
+    CLASS_: Database model class name.
     """
+    if compressed is None:
+        compressed = is_gzip_file(file.name)
+
+    if compressed:
+        file = gzip.open(file.name, 'rt', encoding='utf8', newline='')
+
     class_ = getattr(models, class_)
     coerce = None
     for data in csv.DictReader(file):

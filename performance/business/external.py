@@ -1,13 +1,19 @@
-import datetime
-
+from datetime import date
+from datetime import time
+from itertools import chain
+from itertools import groupby
 from operator import attrgetter
 from types import SimpleNamespace
 
-from performance import models
 from performance import queries
 from performance.extensions import db
-
+from performance.models import Flight
+from performance.models import Leg
+from performance.models import LegPax
+from performance.models import Report
+from performance.queries import FakeFlight
 from performance.utils import popitem
+from performance.utils import sorted_groupby
 
 get_external_key = attrgetter(
     'fn_number_as_string',
@@ -51,8 +57,19 @@ date_and_time_to_delays = {
     'destination_arrival_actual_time': 'destination_delays',
 }
 
+sort_key_map = {
+    Flight: get_internal_key,
+    FakeFlight: get_external_key,
+}
+
+type_order = [FakeFlight, Flight]
+
+def key_for_flight_type(obj):
+    key = sort_key_map[type(obj)]
+    return key(obj)
+
 def external_label(attrname):
-    for class_ in [models.Leg, models.LegPax]:
+    for class_ in [Leg, LegPax]:
         attr = getattr(class_, attrname, None)
         if attr:
             return attr.info['label']
@@ -67,16 +84,18 @@ def internal_index(flight):
 
 def post_process_external_flights(external_flights):
     for flight in external_flights:
-        flight = SimpleNamespace(**flight._mapping)
-        flight.dep_dt_date = datetime.date.fromisoformat(flight.dep_dt_date_string)
-        flight.dep_dt_time = datetime.time.fromisoformat(flight.dep_dt_time_string)
-        flight.arr_dt_date = datetime.date.fromisoformat(flight.arr_dt_date_string)
-        flight.arr_dt_time = datetime.time.fromisoformat(flight.arr_dt_time_string)
-        del flight.dep_dt_date_string
-        del flight.dep_dt_time_string
-        del flight.arr_dt_date_string
-        del flight.arr_dt_time_string
-        yield flight
+        fake_flight = FakeFlight(
+            fn_number_as_string = flight.fn_number_as_string,
+            dep_dt_date = date.fromisoformat(flight.dep_dt_date_string),
+            dep_dt_time = time.fromisoformat(flight.dep_dt_time_string),
+            arr_dt_date = date.fromisoformat(flight.arr_dt_date_string),
+            arr_dt_time = time.fromisoformat(flight.arr_dt_time_string),
+            dep_ap_actual = flight.dep_ap_actual,
+            arr_ap_actual = flight.arr_ap_actual,
+            baggage_weight_kg = flight.baggage_weight_kg,
+            baggage_weight_lbs = flight.baggage_weight_lbs,
+        )
+        yield fake_flight
 
 def joined_external_flights(report_date):
     """
@@ -86,30 +105,25 @@ def joined_external_flights(report_date):
     # because these flights come from different sources we join in memory
     external_flights_stmt = queries.get_external_stmt(report_date)
     internal_flights_stmt = queries.get_internal_stmt(report_date)
+    internal_flights = db.session.scalars(internal_flights_stmt)
 
     external_flights = db.session.execute(external_flights_stmt)
     external_flights = post_process_external_flights(external_flights)
 
-    internal_flights = db.session.scalars(internal_flights_stmt)
+    indexed_internal_flights = {
+        get_internal_key(flight): flight for flight in internal_flights
+    }
 
-    indexed_external_flights = dict(map(external_index, external_flights))
-    indexed_internal_flights = dict(map(internal_index, internal_flights))
+    indexed_external_flights = {
+        get_external_key(flight): flight for flight in external_flights
+    }
 
     joined = []
-    while indexed_external_flights and indexed_internal_flights:
-        external_key, external_flight = popitem(indexed_external_flights)
-        for internal_key, internal_flight in indexed_internal_flights.items():
-            if external_key == internal_key:
-                joined.append((external_flight, internal_flight))
-                break
-        else:
-            # next while loop, ignore unmatched
-            continue
-        # internal was found: remove internal flight from consideration
-        del indexed_internal_flights[internal_key]
+    for key, internal_flight in indexed_internal_flights.items():
+        if key in indexed_external_flights:
+            external_flight = indexed_external_flights[key]
+            joined.append((external_flight, internal_flight))
 
-    # TODO
-    # - do something with unmatched?
     return joined
 
 def changes_sort_key(diff):
@@ -149,8 +163,10 @@ def flight_diff(report_date, external_flight, internal_flight):
         old = getattr(internal_flight, internal_attr)
         new = getattr(external_flight, external_attr)
         is_diff = diff_func(report_date, old, new)
-        if is_diff:
-            internal_label = getattr(models.Flight, internal_attr).info['label']
+        # TODO
+        # - old is None is a quick/dirty way to include empty old values.
+        if old is None or is_diff:
+            internal_label = getattr(Flight, internal_attr).info['label']
             diff = dict(
                 internal_attr = internal_attr,
                 internal_attr_order = internal_diff_attrs.index(internal_attr),
@@ -199,13 +215,13 @@ def new_report_from_external(report_date, results_data):
     :param report_date: date of new report.
     :param results_data: flight and report data, as from ResultsForm.
     """
-    report = models.Report(date=report_date)
+    report = Report(date=report_date)
     # XXX
     # - FlightType is not enforced as a requirement
     # - if it is not given, the flights will not appear on the report
     flight_type = default_flight_type()
     for row in results_data['rows']:
-        flight = models.Flight(
+        flight = Flight(
             flight_number = row['fn_number'],
             flight_type = flight_type,
         )
@@ -233,7 +249,7 @@ def update_from_flight_changes(flight_changes_list):
     """
     for flight_changes in flight_changes_list:
         internal_flight_data = flight_changes['internal_flight']
-        internal_flight = db.session.get(models.Flight, internal_flight_data['id'])
+        internal_flight = db.session.get(Flight, internal_flight_data['id'])
         external_flight = flight_changes['external_flight']
         for diff in flight_changes['diffs']:
             if not diff['do_update']:

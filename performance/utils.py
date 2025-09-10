@@ -2,6 +2,8 @@ import datetime as dt
 import math
 import re
 
+from itertools import groupby
+
 from flask import redirect
 from flask import request
 from flask import url_for
@@ -127,3 +129,11 @@ def sortfunc_by_type(obj):
          raise TypeError('Sorting by %r not supported', type(obj))
 
     return sortfunc
+
+def is_gzip_file(filepath):
+    with open(filepath, 'rb') as f:
+        header = f.read(2)
+    return header == b'\x1f\x8b'
+
+def sorted_groupby(iterable, key=None, reverse=False):
+    return groupby(sorted(iterable, key=key, reverse=reverse), key=key)
