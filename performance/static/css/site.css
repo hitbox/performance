@@ -934,3 +934,10 @@ form.delay-code #description {
     /* "indent" the changed fields rows */
     padding-left: 1rem;
 }
+
+pre.sql {
+    font-size: 1rem;
+    max-width: 80ch;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}

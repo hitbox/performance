@@ -70,6 +70,13 @@ def performance_summary(date, contract=None):
     result = dict()
     for date_range_name, subdict in queries.items():
         result[date_range_name] = dict()
-        for performance_name, query in subdict.items():
-            result[date_range_name][performance_name] = query.count()
+        for performance_name, stmt in subdict.items():
+            count_stmt = (
+                db.select(db.func.count())
+                .select_from(
+                    stmt.subquery()
+                )
+            )
+            count = db.session.scalar(count_stmt)
+            result[date_range_name][performance_name] = count
     return result

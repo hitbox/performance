@@ -5,6 +5,7 @@ from .delay import Delay
 from .external import Leg
 from .external import LegPax
 from .external import LegTimes
+from .fake_flight import FakeFlight
 from .flight import DestinationDelay
 from .flight import Flight
 from .flight import FlightType
