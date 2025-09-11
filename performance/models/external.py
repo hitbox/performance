@@ -232,7 +232,7 @@ class LegTimes(db.Model):
     leg_no = Column(
         'leg_no',
         Integer,
-        nullable = False,
+        primary_key = True,
         comment = 'Leg number',
     )
 
