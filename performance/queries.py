@@ -157,7 +157,7 @@ def contract_range_criteria(date, contract):
         )
     return db.and_(*criteria)
 
-def get_external_stmt(report_date):
+def get_external_stmt2(report_date):
     """
     """
     example_sql = """
