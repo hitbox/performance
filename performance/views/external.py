@@ -261,6 +261,12 @@ def load(type_, file, class_, lower_keys, ignore_unknown, commit, compressed):
     if commit:
         db.session.commit()
 
+def get_external_models():
+    return [
+        cls for name, cls in inspect.getmembers(models.external)
+        if inspect.isclass(cls) and hasattr(cls, '__table__')
+    ]
+
 @external_bp.cli.command('dump')
 @click.argument('output', type=click.Path(file_okay=False, dir_okay=True, exists=True))
 @click.option('--compress/--no-compress', default=True)
@@ -270,10 +276,7 @@ def dump(output, compress):
 
     output: OUTPUT directory for CSVs.
     """
-    external_models = [
-        cls for name, cls in inspect.getmembers(models.external)
-        if inspect.isclass(cls) and hasattr(cls, '__table__')
-    ]
+    external_models = get_external_models()
 
     if compress:
         open_func = gzip.open
