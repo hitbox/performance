@@ -16,6 +16,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from sqlalchemy.dialects import oracle as oracle_dialect
 
 from performance import business
 from performance import models
@@ -102,14 +103,27 @@ def update_report_from_external(report_id):
     if results_form and not results_form.flight_changes:
         del results_form.submit
 
-    context = dict(
-        kg_conversion_factor = settings.kilogram_conversion_factor(),
-        param_form = param_form,
-        report = report,
-        results_form = results_form,
-        show_param_form_title = False,
-        javascript_injection = javascript_injection,
-    )
+    context = {
+        'javascript_injection': javascript_injection,
+        'kg_conversion_factor': settings.kilogram_conversion_factor(),
+        'param_form': param_form,
+        'report': report,
+        'results_form': results_form,
+        'show_param_form_title': False,
+    }
+
+    if settings.show_external_query_statement():
+        stmt = queries.get_external_stmt(report.date)
+        compiled = stmt.compile(
+            dialect = oracle_dialect.dialect(),
+            compile_kwargs = {
+                'literal_binds': True,
+            },
+        )
+        context.update({
+            'external_flights_stmt': compiled,
+        })
+
     return render_template('report/import-changes.html', **context)
 
 @external_bp.route('/new/<date:report_date>', methods=['GET', 'POST'])

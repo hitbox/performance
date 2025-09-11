@@ -259,13 +259,12 @@ def update_from_flight_changes(flight_changes_list):
             external_attr = diff['external_attr']
             value = external_flight[external_attr]
             setattr(internal_flight, internal_attr, value)
-            if internal_attr not in date_and_time_to_delays:
-                # was not a diff affecting the delay codes' minutes
-                continue
-            delays_attr = date_and_time_to_delays[internal_attr]
-            delays = getattr(internal_flight, delays_attr)
-            for delay in delays:
-                delay.minutes = None
+            if internal_attr in date_and_time_to_delays:
+                # Remove delay minutes for updates to times.
+                delays_attr = date_and_time_to_delays[internal_attr]
+                delays = getattr(internal_flight, delays_attr)
+                for delay in delays:
+                    delay.minutes = None
 
 diff_funcs = {
     'dep_dt_date': date_is_changed,

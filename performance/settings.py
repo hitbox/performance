@@ -97,3 +97,6 @@ def default_flight_type():
     stmt = db.select(models.Performance)
     performance_settings = db.session.scalars(stmt).one()
     return performance_settings.default_flight_type
+
+def show_external_query_statement():
+    return current_app.config.get('SHOW_EXTERNAL_QUERY_STATEMENT', False)
