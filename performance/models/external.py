@@ -227,6 +227,8 @@ class LegTimes(db.Model):
     Actual times of a leg.
     """
 
+    __bind_key__ = BINDKEY
+
     leg_no = Column(
         'leg_no',
         Integer,
