@@ -4,6 +4,7 @@ from .contract import PerformanceTier
 from .delay import Delay
 from .external import Leg
 from .external import LegPax
+from .external import LegTimes
 from .flight import DestinationDelay
 from .flight import Flight
 from .flight import FlightType

@@ -1,5 +1,11 @@
 import sqlalchemy as sa
 
+from sqlalchemy import CHAR
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import ForeignKeyConstraint
+from sqlalchemy import Integer
+from sqlalchemy import String
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from performance import settings
@@ -213,3 +219,116 @@ class LegPax(db.Model):
             ),
             sa.Integer,
         ).label('baggage_weight_lbs_integer')
+
+
+
+class LegTimes(db.Model):
+    """
+    Actual times of a leg.
+    """
+
+    leg_no = Column(
+        'leg_no',
+        Integer,
+        nullable = False,
+        comment = 'Leg number',
+    )
+
+    usage = Column(
+        'usage',
+        CHAR(1),
+        nullable = False,
+        primary_key = True,
+        # Comment whitespace preserved from column comment.
+        comment =
+            'Entry usage:'
+            '   F=Flight Log (times from flight log)'
+            '  M=Movements (times from MVT-messages)'
+            '  A=ACARS (times from ACARS-messages)'
+            '  I=Irregularity'
+            '  C=Movement Estimates'
+            '   E=ACARS Estimates'
+            ' D=system calculated MVT Estimates'
+            '  G=system calculated ACARS Estimates'
+            ' T=target times as defined by IATA/AIDX'
+            ' B=Estimated Times from PSFlightMessages',
+    )
+
+    what_if = Column(
+        'what_if',
+        String(20),
+        nullable = False,
+        primary_key = True,
+        comment = 'What If',
+    )
+
+    update_key = Column(
+        'update_key',
+        Integer,
+        nullable = False,
+        comment = 'Update key of the table',
+    )
+
+    leg_update_no = Column(
+        'leg_update_no',
+        Integer,
+        nullable = False,
+        default = 1,
+    )
+
+    offblock_dt = Column(
+        'offblock_dt',
+        Date,
+        comment = 'Offblock time',
+    )
+
+    airborne_dt = Column(
+        'airborne_dt',
+        Date,
+        comment = 'Take-off time',
+    )
+
+    landing_dt = Column(
+        'landing_dt',
+        Date,
+        comment = 'Touch-down time',
+    )
+
+    onblock_dt = Column(
+        'onblock_dt',
+        Date,
+        comment = 'Onblock time',
+    )
+
+    acars_init_dt = Column(
+        'acars_init_dt',
+        Date,
+        comment = 'ACARS init time',
+    )
+
+    acars_doors_closed_dt = Column(
+        'acars_doors_closed_dt',
+        Date,
+        comment = 'ACARS doors closed time',
+    )
+
+    mvt_after_pushback_dt = Column(
+        'mvt_after_pushback_dt',
+        Date,
+        comment = 'Time of MVT after PushBack',
+    )
+
+    state = Column(
+        'state',
+        String(3),
+        nullable = False,
+        comment = 'the state of this entity ((N)ew, (U)pdate, (D)elete)',
+    )
+
+    startup_approval_dt = Column(
+        'startup_approval_dt',
+        Date,
+        comment =
+            'The time that an aircraft can expect to'
+            ' receive start up / push back approval',
+    )
