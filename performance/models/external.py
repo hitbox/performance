@@ -60,7 +60,26 @@ class Leg(db.Model):
             ' RTO - return to original,'
             ' INC - incomplete,'
             ' CNL - cancelled,'
-            ' DEL - deleted'
+            ' DEL - deleted',
+        info = {
+            'states': {
+                'SKD': 'scheduled',
+                'NEW': 'new',
+                'NXI': 'next info',
+                'ETD': 'estimated departure',
+                'ISK': 'informative schedule',
+                'OUT': 'off-block',
+                'DEP': 'departed',
+                'DIV': 'diverted',
+                'ON': 'touch down',
+                'ARR': 'arrived',
+                'RTR': 'return to ramp',
+                'RTO': 'return to original',
+                'INC': 'incomplete',
+                'CNL': 'cancelled',
+                'DEL': 'deleted',
+            },
+        },
     )
 
     @hybrid_property

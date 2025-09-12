@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import sqlalchemy as sa
 
 from flask import current_app
@@ -16,34 +18,43 @@ from .models import LegTimes
 from .models import Report
 from .utils import quarter_of_date
 
-def get_external_stmt(report_date):
+_exclude_leg_state_default = object()
+
+def get_external_stmt(report_date, exclude_leg_state=_exclude_leg_state_default):
     """
-    Query statement to get baggage weight from external source matching
-    departure date against report date.
+    Return select for external flight data.
     """
+    if exclude_leg_state is _exclude_leg_state_default:
+        exclude_leg_state = ('NEW', 'SKD')
     external_stmt = db.select(
         # flight number is string on this application's side
-        Leg.fn_number_as_string,
-        # datetimes broken apart into date and time, on the python side dates
-        # and times and strings on the database side
-        Leg.dep_dt_date_string,
-        Leg.dep_dt_time_string,
-        Leg.dep_ap_actual,
-        Leg.arr_dt_date_string,
-        Leg.arr_dt_time_string,
-        Leg.arr_ap_actual,
-        LegPax.baggage_weight_integer.label('baggage_weight_kg'),
-        LegPax.baggage_weight_lbs_integer.label('baggage_weight_lbs'),
+        Leg.ac_registration.label('tail_number_with_prefix'),
+        Leg.fn_number_as_string.label('flight_number'),
+        Leg.dep_ap_actual.label('origin_station'),
+        Leg.arr_ap_actual.label('destination_station'),
+        LegPax.baggage_weight_lbs_integer.label('weight'),
+        LegTimes.offblock_dt.label('actual_departure_datetime'),
+        LegTimes.onblock_dt.label('actual_arrival_datetime'),
     ).outerjoin(
         LegPax,
         Leg.leg_no == LegPax.leg_no,
+    ).outerjoin(
+        LegTimes,
+        LegTimes.leg_no == Leg.leg_no,
     ).where(
-        Leg.dep_dt_date_string == str(report_date),
         # filter for airline
         Leg.fn_carrier == settings.external_fn_carrier(),
-        # entry usage estimated, booked, and flown
-        LegPax.usage == settings.external_usage(),
+        LegPax.usage_flown,
+        LegTimes.usage_movements,
+        LegTimes.what_if_underscore,
+        # Compare as range for maximum database compatibility.
+        Leg.dep_dt >= report_date,
+        Leg.dep_dt < report_date + timedelta(days=1)
     )
+    if exclude_leg_state:
+        external_stmt = external_stmt.where(
+            Leg.leg_state.not_in(exclude_leg_state)
+        )
     return external_stmt
 
 def get_internal_stmt(report_date):
@@ -156,65 +167,3 @@ def contract_range_criteria(date, contract):
             Report.date >= contract.date_range_start,
         )
     return db.and_(*criteria)
-
-def get_external_stmt2(report_date):
-    """
-    """
-    example_sql = """
-    SELECT L.LEG_NO,
-           LT.ONBLOCK_DT ATA,
-           LT.OFFBLOCK_DT ATD,
-           ROUND(LP.BAGGAGE_WEIGHT * 2.20462,0) WEIGHT,
-           L.AC_REGISTRATION,
-           LT.STATE,
-           L.ENTRY_DT,
-           L.LEG_STATE
-    FROM SCHEDOPS.LEG L
-    LEFT JOIN SCHEDOPS.LEG_PAX LP
-      ON LP.LEG_NO = L.LEG_NO
-         AND LP.USAGE = 'F'
-    LEFT JOIN SCHEDOPS.LEG_TIMES LT
-      ON LT.LEG_NO = L.LEG_NO
-         AND LT.WHAT_IF = '_'
-         AND LT.USAGE = 'M'    
-    WHERE L.FN_CARRIER = 'GB'
-          AND L.WHAT_IF = '_'
-          AND L.ENTRY_DT > SYSDATE - 2
-          AND L.LEG_STATE NOT IN ('NEW', 'SKD')
-    """
-    external_stmt = db.select(
-        # flight number is string on this application's side
-        Leg.fn_number_as_string,
-        # datetimes broken apart into date and time, on the python side dates
-        # and times and strings on the database side
-        Leg.dep_dt_date_string,
-        Leg.dep_dt_time_string,
-        Leg.dep_ap_actual,
-        Leg.arr_dt_date_string,
-        Leg.arr_dt_time_string,
-        Leg.arr_ap_actual,
-        LegPax.baggage_weight_integer.label('baggage_weight_kg'),
-        LegPax.baggage_weight_lbs_integer.label('baggage_weight_lbs'),
-        LegTimes.onblock_dt.label('actual_arrival_datetime'),
-        LegTimes.offblock_dt.label('actual_departure_datetime'),
-        Leg.ac_registration,
-        LegTimes.state,
-        Leg.entry_dt,
-        Leg.leg_state,
-    ).outerjoin(
-        LegPax,
-        Leg.leg_no == LegPax.leg_no,
-    ).outerjoin(
-        LegTimes,
-        LegTimes.leg_no == Leg.leg_no,
-    ).where(
-        # filter for airline
-        Leg.fn_carrier == settings.external_fn_carrier(),
-        LegPax.usage_flown,
-        LegTimes.usage_movements,
-        LegTimes.what_if_underscore,
-        Leg.dep_dt_date_string == str(report_date),
-        sa.not_(Leg.leg_state_new),
-        sa.not_(Leg.leg_state_scheduled),
-    )
-    return external_stmt

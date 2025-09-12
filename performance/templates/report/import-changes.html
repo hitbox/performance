@@ -29,10 +29,17 @@
     {% if results_form %}
     {% set show_none = '(None)' %}{# what to show for None #}
     <h3>External Match Results</h3>
+
+    {# External Query Statement #}
     {% if external_flights_stmt is defined %}
-    <pre class="sql">{{ db.engines['schedops'] }}</pre>
-    <pre class="sql">{{ external_flights_stmt }}</pre>
+    <pre>{{ db.engines['schedops'] }}</pre>
+    <pre class="sql-container">{{ external_flights_stmt }}</pre>
     {% endif %}
+
+    {# External Query Results #}
+    {% if external_query_results %}<pre class="external-results">
+            {{ external_query_results }}
+    </pre>{% endif %}
 
     <form action="{{ url_for('.update_report_from_external', report_id=report.id) }}" method="POST">
         {{ results_form.hidden_tag() }}

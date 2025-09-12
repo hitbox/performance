@@ -28,6 +28,7 @@ from performance.extensions import db
 from performance.forms import ChangesForm
 from performance.forms import QueryParametersForm
 from performance.forms import ResultsForm
+from performance.html import highlighted_sql
 from performance.utils import is_gzip_file
 
 external_bp = Blueprint('external', __name__)
@@ -113,6 +114,7 @@ def update_report_from_external(report_id):
     }
 
     if settings.show_external_query_statement():
+        # Add compiled, highlighted, external sql to context.
         stmt = queries.get_external_stmt(report.date)
         compiled = stmt.compile(
             dialect = oracle_dialect.dialect(),
@@ -120,8 +122,15 @@ def update_report_from_external(report_id):
                 'literal_binds': True,
             },
         )
+        sql_html = highlighted_sql(compiled)
         context.update({
-            'external_flights_stmt': compiled,
+            'external_flights_stmt': sql_html,
+        })
+
+    if settings.show_external_query_results():
+        # Add external query results list to context.
+        context.update({
+            'external_query_results': flight_changes,
         })
 
     return render_template('report/import-changes.html', **context)

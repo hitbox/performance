@@ -17,8 +17,11 @@
 
 {% block import_content %}
     <div>
+        {# Tentively removing this feature #}
+        {#
         <h3>Delay Codes</h3>
         <p class="danger">Delay codes' minutes are cleared on update to times.</p>
+        #}
         <h3>Matching Flights</h3>
         <p>Flights are matched by:</p>
         <ol>
@@ -32,6 +35,7 @@
             <li>Flight number</li>
         </ol>
         <h3>Notes</h3>
+        <p><span class="data">"N"</span> prefix removed from external data, if present.</p>
         <p class="data">1 kg = {{ kg_conversion_factor }} lbs</p>
         <p>External database uses three-digit precision which is lost.</p>
         <h3>Results Interface</h3>

@@ -15,37 +15,24 @@ from performance.queries import FakeFlight
 from performance.utils import popitem
 from performance.utils import sorted_groupby
 
-get_external_key = attrgetter(
-    'fn_number_as_string',
-    'dep_ap_actual',
-    'arr_ap_actual',
-)
-
-get_internal_key = attrgetter(
+flight_key = attrgetter(
     'flight_number',
     'origin_station',
     'destination_station',
 )
 
+# Sorting key for final changes list.
 _flight_sort_key_for_changes = attrgetter(
     'origin_departure_estimated_datetime',
     'origin_station',
     'destination_station',
 )
 
-# *_diff_attrs drive what attributes are checked for differences
-external_diff_attrs = [
-    #'dep_dt_date',
-    'dep_dt_time',
-    #'arr_dt_date',
-    'arr_dt_time',
-    'baggage_weight_lbs',
-]
-
-internal_diff_attrs = [
-    #'origin_departure_actual_date',
+diff_attrs = [
+    'tail_number',
+    'origin_departure_actual_date',
     'origin_departure_actual_time',
-    #'destination_arrival_actual_date',
+    'destination_arrival_actual_date',
     'destination_arrival_actual_time',
     'weight',
 ]
@@ -57,17 +44,6 @@ date_and_time_to_delays = {
     'destination_arrival_actual_time': 'destination_delays',
 }
 
-sort_key_map = {
-    Flight: get_internal_key,
-    FakeFlight: get_external_key,
-}
-
-type_order = [FakeFlight, Flight]
-
-def key_for_flight_type(obj):
-    key = sort_key_map[type(obj)]
-    return key(obj)
-
 def external_label(attrname):
     for class_ in [Leg, LegPax]:
         attr = getattr(class_, attrname, None)
@@ -76,25 +52,15 @@ def external_label(attrname):
 
 def external_index(row):
     # enumerate-like for the external key
-    return (get_external_key(row), row)
+    return (flight_key(row), row)
 
 def internal_index(flight):
     # enumerate-like for the internal key
-    return (get_internal_key(flight), flight)
+    return (flight_key(flight), flight)
 
 def post_process_external_flights(external_flights):
-    for flight in external_flights:
-        fake_flight = FakeFlight(
-            fn_number_as_string = flight.fn_number_as_string,
-            dep_dt_date = date.fromisoformat(flight.dep_dt_date_string),
-            dep_dt_time = time.fromisoformat(flight.dep_dt_time_string),
-            arr_dt_date = date.fromisoformat(flight.arr_dt_date_string),
-            arr_dt_time = time.fromisoformat(flight.arr_dt_time_string),
-            dep_ap_actual = flight.dep_ap_actual,
-            arr_ap_actual = flight.arr_ap_actual,
-            baggage_weight_kg = flight.baggage_weight_kg,
-            baggage_weight_lbs = flight.baggage_weight_lbs,
-        )
+    for external_flight in external_flights:
+        fake_flight = FakeFlight(**external_flight._mapping)
         yield fake_flight
 
 def joined_external_flights(report_date):
@@ -102,20 +68,20 @@ def joined_external_flights(report_date):
     Join flight from external database with internal flights for a given report
     date.
     """
-    # because these flights come from different sources we join in memory
-    external_flights_stmt = queries.get_external_stmt(report_date)
+    # Because these flights come from different databases we join in memory.
     internal_flights_stmt = queries.get_internal_stmt(report_date)
     internal_flights = db.session.scalars(internal_flights_stmt)
 
-    external_flights = db.session.execute(external_flights_stmt)
-    external_flights = post_process_external_flights(external_flights)
+    external_flights_stmt = queries.get_external_stmt(report_date)
+    external_flights = db.session.execute(external_flights_stmt).mappings()
+    external_flights = [FakeFlight(**flight_data) for flight_data in external_flights]
 
     indexed_internal_flights = {
-        get_internal_key(flight): flight for flight in internal_flights
+        flight_key(flight): flight for flight in internal_flights
     }
 
     indexed_external_flights = {
-        get_external_key(flight): flight for flight in external_flights
+        flight_key(flight): flight for flight in external_flights
     }
 
     joined = []
@@ -140,10 +106,14 @@ def external_results(report_date):
     stmt = queries.get_external_stmt(report_date)
     return db.session.execute(stmt)
 
-def simple_diff(report_date, old, new):
-    return old and (old != new)
+def simple_is_changed(report_date, old, new):
+    return old != new
 
 def date_is_changed(report_date, olddate, newdate):
+
+    if olddate is None and newdate is None:
+        return False
+
     # special consideration for the fallback to report date for flights
     if olddate is None:
         # check against fallback to report date
@@ -152,26 +122,30 @@ def date_is_changed(report_date, olddate, newdate):
         is_changed = newdate != olddate
     return is_changed
 
+def time_is_changed(report_date, oldtime, newtime):
+    if newtime is None:
+        return False
+    return oldtime is None or newtime is not None and oldtime != newtime
+
 def flight_diff(report_date, external_flight, internal_flight):
     """
     Return list of differences between internal and external flights.
     """
     diffs = []
-    attr_items = zip(external_diff_attrs, internal_diff_attrs)
-    for external_attr, internal_attr in attr_items:
-        diff_func = diff_funcs[external_attr]
-        old = getattr(internal_flight, internal_attr)
-        new = getattr(external_flight, external_attr)
+    for attr in diff_attrs:
+        old = getattr(internal_flight, attr)
+        new = getattr(external_flight, attr)
+
+        diff_func = diff_funcs[attr]
         is_diff = diff_func(report_date, old, new)
-        # TODO
-        # - old is None is a quick/dirty way to include empty old values.
-        if old is None or is_diff:
-            internal_label = getattr(Flight, internal_attr).info['label']
+
+        if is_diff:
+            internal_label = getattr(Flight, attr).info['label']
             diff = dict(
-                internal_attr = internal_attr,
-                internal_attr_order = internal_diff_attrs.index(internal_attr),
+                internal_attr = attr,
+                internal_attr_order = diff_attrs.index(attr),
                 internal_label = internal_label,
-                external_attr = external_attr,
+                external_attr = attr,
             )
             diffs.append(diff)
     return diffs
@@ -243,7 +217,7 @@ def new_report_from_external(report_date, results_data):
         report.flights.append(flight)
     return report
 
-def update_from_flight_changes(flight_changes_list):
+def update_from_flight_changes(flight_changes_list, clear_delay_minutes=False):
     """
     Update flights' attributes from a list of differences.
     """
@@ -259,7 +233,11 @@ def update_from_flight_changes(flight_changes_list):
             external_attr = diff['external_attr']
             value = external_flight[external_attr]
             setattr(internal_flight, internal_attr, value)
-            if internal_attr in date_and_time_to_delays:
+
+            if (
+                clear_delay_minutes
+                and internal_attr in date_and_time_to_delays
+            ):
                 # Remove delay minutes for updates to times.
                 delays_attr = date_and_time_to_delays[internal_attr]
                 delays = getattr(internal_flight, delays_attr)
@@ -267,9 +245,10 @@ def update_from_flight_changes(flight_changes_list):
                     delay.minutes = None
 
 diff_funcs = {
-    'dep_dt_date': date_is_changed,
-    'dep_dt_time': simple_diff,
-    'arr_dt_date': date_is_changed,
-    'arr_dt_time': simple_diff,
-    'baggage_weight_lbs': simple_diff,
+    'weight': simple_is_changed,
+    'origin_departure_actual_date': date_is_changed,
+    'origin_departure_actual_time': time_is_changed,
+    'destination_arrival_actual_date': date_is_changed,
+    'destination_arrival_actual_time': time_is_changed,
+    'tail_number': simple_is_changed,
 }

@@ -1,36 +1,53 @@
+from datetime import date
+from datetime import time
+
 from collections import namedtuple
 
-FakeFlight = namedtuple(
-    'FakeFlight',
-    [
-        'fn_number_as_string',
-        'dep_dt_date',
-        'dep_dt_time',
-        'dep_ap_actual',
-        'arr_dt_date',
-        'arr_dt_time',
-        'arr_ap_actual',
-        'baggage_weight_kg',
-        'baggage_weight_lbs',
-    ],
-)
+class FakeFlight(
+    namedtuple(
+        'FakeFlightBase',
+        [
+            'tail_number_with_prefix',
+            'flight_number',
+            'origin_station',
+            'destination_station',
+            'weight',
+            'actual_departure_datetime',
+            'actual_arrival_datetime',
+        ],
+    )
+):
+    """
+    Simple convenience class for the results of the external query results.
+    """
 
-FakeFlight.__doc__ = """
-Lightweight container for flight data used to bridge external and internal
-representations.
+    _tail_number_strip_prefix = 'N'
 
-This object is not persisted in the database; it exists only to normalize
-attributes from external sources into a consistent shape before matching or
-merging with internal `Flight` objects.
+    # Properties to match internal Flight objects.
 
-Fields:
-    fn_number_as_string (str): Flight number (string form).
-    dep_dt_date (str): Departure date string.
-    dep_dt_time (str): Departure time string.
-    dep_ap_actual (str): Actual departure airport code.
-    arr_dt_date (str): Arrival date string.
-    arr_dt_time (str): Arrival time string.
-    arr_ap_actual (str): Actual arrival airport code.
-    baggage_weight_kg (int): Baggage weight in kilograms.
-    baggage_weight_lbs (int): Baggage weight in pounds.
-"""
+    @property
+    def tail_number(self):
+        tail_number = self.tail_number_with_prefix
+        if tail_number:
+            tail_number = tail_number.removeprefix(self._tail_number_strip_prefix)
+            return tail_number
+
+    @property
+    def origin_departure_actual_date(self):
+        if self.actual_departure_datetime:
+            return self.actual_departure_datetime.date()
+
+    @property
+    def origin_departure_actual_time(self):
+        if self.actual_departure_datetime:
+            return self.actual_departure_datetime.time()
+
+    @property
+    def destination_arrival_actual_date(self):
+        if self.actual_arrival_datetime:
+            return self.actual_arrival_datetime.date()
+
+    @property
+    def destination_arrival_actual_time(self):
+        if self.actual_arrival_datetime:
+            return self.actual_arrival_datetime.time()

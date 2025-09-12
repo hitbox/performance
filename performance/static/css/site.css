@@ -935,8 +935,56 @@ form.delay-code #description {
     padding-left: 1rem;
 }
 
-pre.sql {
+pre {
     font-size: 1rem;
+}
+
+.sql-container pre {
+    /*font-size: 1rem;*/
+    max-width: 80ch;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.sql-container span {
+    line-height: 1.5rem;
+}
+
+.sql-container .k {
+    /* sql keyword */
+    color: steelblue;
+}
+
+.sql-container .p + .n {
+    /* field name in sql */
+    color: chocolate;
+}
+
+.sql-container .n:has(+ .p) {
+    /* table name in sql */
+    color: tomato;
+}
+
+.sql-container .s1 {
+    /* literal string in sql */
+    color: brown;
+}
+
+.sql-container .mi {
+    /* literal number */
+    color: maroon;
+}
+
+.sql-container .o {
+    color: olive;
+}
+
+.sql-container .nb {
+    /* */
+    color: darkgreen;
+}
+
+pre.external-results {
     max-width: 80ch;
     white-space: pre-wrap;
     overflow-wrap: break-word;

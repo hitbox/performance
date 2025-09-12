@@ -100,3 +100,6 @@ def default_flight_type():
 
 def show_external_query_statement():
     return current_app.config.get('SHOW_EXTERNAL_QUERY_STATEMENT', False)
+
+def show_external_query_results():
+    return current_app.config.get('SHOW_EXTERNAL_QUERY_RESULTS', False)
