@@ -26,8 +26,10 @@ scheduled_flight view. therefore we need to fallback to the request object.
     <tr>
         <th>Flight</th>
         <th>Orig</th>
+        <th>Date</th>
         <th>ETD</th>
         <th>Dest</th>
+        <th>Date</th>
         <th>ETA</th>
         <th>Active?</th>
         <th>Type</th>
@@ -44,8 +46,10 @@ scheduled_flight view. therefore we need to fallback to the request object.
     <tr{% if show_active and scheduled_flight.id == request.view_args.id %} class="active"{% endif %}{% if instance_endpoint is not none %} data-href="{{ url_for(instance_endpoint, id=scheduled_flight.id, backurl=backurl, **instance_kwargs) }}" title="{{ url_for(instance_endpoint, id=scheduled_flight.id, **instance_kwargs) }}"{% endif %}>
         <td class="data">{{ string(scheduled_flight.flight_number) }}</td>
         <td class="data">{{ string(scheduled_flight.origin_station) }}</td>
+        <td class="data">{{ string(scheduled_flight.origin_departure_estimated_date_template) }}</td>
         <td class="data number">{{ time(scheduled_flight.origin_departure_estimated_time) }}</td>
         <td class="data">{{ string(scheduled_flight.destination_station) }}</td>
+        <td class="data">{{ string(scheduled_flight.destination_arrival_estimated_date_template) }}</td>
         <td class="data number">{{ time(scheduled_flight.destination_arrival_estimated_time) }}</td>
         <td class="data">{{ yes(scheduled_flight.is_active) }}</td>
         <td class="data">{{ scheduled_flight.flight_type.name }}</td>

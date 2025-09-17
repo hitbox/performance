@@ -1,5 +1,3 @@
-import wtforms
-
 from flask_wtf import FlaskForm
 from wtforms import BooleanField
 from wtforms import DateField
@@ -22,73 +20,13 @@ from .model_converter import model_form
 
 class QueryParametersForm(Form):
     """
-    User controlled parameters for the external query. Used for the parameters
-    of imports and updates.
+    External query form. Simply a submit button for GET.
     """
-
-    show_kg = BooleanField(
-        label = 'Show kg Column?',
-    )
-
-    show_all_fields = BooleanField(
-        label = 'Show All Fields?',
-        default = False,
-    )
 
     submit = SubmitField(
         label = 'Query...',
         name = 's',
     )
-
-
-class LegPaxFormBase(
-    BaseForm,
-    FlaskForm,
-):
-    """
-    Form for LegPax objects from external database.
-    """
-
-    baggage_weight_lbs = FloatField(
-        widget = HiddenInput(),
-    )
-
-
-LegPaxForm = model_form(
-    model = models.LegPax,
-    base_class = LegPaxFormBase,
-    field_args = dict(
-        baggage_weight = dict(
-            widget = HiddenInput(),
-        ),
-    ),
-)
-
-
-class LegFormBase(
-    BaseForm,
-    FlaskForm,
-):
-    """
-    Form for Leg objects from external database.
-    """
-
-
-LegForm = model_form(
-    model = models.Leg,
-    base_class = LegFormBase,
-    field_args = dict(
-        fn_number = dict(
-            widget = HiddenInput(),
-        ),
-        dep_dt = dict(
-            widget = HiddenInput(),
-        ),
-        arr_dt = dict(
-            widget = HiddenInput(),
-        ),
-    ),
-)
 
 
 class ResultRowForm(BaseForm):
@@ -270,13 +208,9 @@ class FlightChangesForm(
     Contain a list of diffs between internal and external flights.
     """
 
-    internal_flight = FormField(
-        InternalFlightForm,
-    )
+    internal_flight = FormField(InternalFlightForm)
 
-    external_flight = FormField(
-        ExternalFlightForm,
-    )
+    external_flight = FormField(ExternalFlightForm)
 
     diffs = FieldList(FormField(DiffForm))
 

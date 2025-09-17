@@ -26,6 +26,7 @@
         <div class="scheduled-flight form-container">
             <h3 class="page">{% if scheduled_flight %}Editing Flight "{{ scheduled_flight.flight_number }}"{% else %}New {{ singular }}{% endif %}</h3>
             {% if alert_for_default_flight_type %}{{ alert_for_default_flight_type }}{% endif %}
+            <p class="form-note">Date fields support templates (e.g. <span class="data">{date+1}</span>) which will be replaced with the report date plus one day.</p>
             <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="POST">
                 {{ render_form(form) }}
             </form>

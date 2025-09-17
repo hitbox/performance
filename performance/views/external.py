@@ -1,9 +1,9 @@
 import csv
-import datetime
 import gzip
 import inspect
 import os
 
+from datetime import datetime
 from pprint import pprint
 
 import click
@@ -56,9 +56,7 @@ def update_report_from_external(report_id):
     """
     report = db.get_or_404(models.Report, report_id)
 
-    param_form = None
     results_form = None
-
     if request.method == 'POST':
         # POST is only for doing final import of results
         results_form = ChangesForm(formdata=request.form)
@@ -76,9 +74,6 @@ def update_report_from_external(report_id):
                 return redirect(url_for('report.view_report', id=report.id))
 
     param_form = QueryParametersForm(data=request.args)
-    del param_form.show_kg
-    del param_form.show_all_fields
-
     javascript_injection = {}
     if (
         param_form.submit.name in request.args
@@ -88,13 +83,11 @@ def update_report_from_external(report_id):
         # user clicked to query external database
         # only create results_form if it has not already been created
         # it may have been created and failed validation
-        joined = business.external.joined_external_flights(report.date)
-        flight_changes = business.external.make_diffs(report.date, joined)
-        flight_changes = sorted(flight_changes, key=business.external.changes_sort_key)
+        flight_changes = business.external.get_flight_changes(report.date)
         results_form = ChangesForm(
-            data = dict(
-                flight_changes = flight_changes,
-            ),
+            data = {
+                'flight_changes': flight_changes,
+            },
         )
         # push an anchor to javascript
         javascript_injection['anchor'] = 'updates'
@@ -252,8 +245,8 @@ def load(type_, file, class_, lower_keys, ignore_unknown, commit, compressed):
             for key in data:
                 attr = getattr(class_, key)
                 python_type = attr.type.python_type
-                if python_type is datetime.datetime:
-                    python_type = datetime.datetime.fromisoformat
+                if python_type is datetime:
+                    python_type = datetime.fromisoformat
                 coerce[key] = python_type
 
         instance = class_()

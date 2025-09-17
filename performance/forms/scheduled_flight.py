@@ -1,5 +1,8 @@
+from datetime import date
+
 from flask_wtf import FlaskForm
 from wtforms import validators as wtforms_validators
+from wtforms.validators import ValidationError
 
 from performance import settings
 from performance.models import FlightType
@@ -11,11 +14,32 @@ from .mixins import BackLinkMixin
 from .mixins import SubmitUpdateDeleteMixin
 from .model_converter import model_form
 
+class DateFormatString:
+    """
+    Validate date format string resolves to a date.
+    """
+
+    def __call__(self, form, field):
+        if not field.data:
+            return
+
+        context = ScheduledFlight.context_for_dates(date.today())
+
+        format_string = field.data
+
+        try:
+            value = ScheduledFlight.resolve_date(None, format_string, **context)
+        except ValueError:
+            raise ValidationError(f'Format string does not resolve to a date.')
+        
+
 _only = [
     'flight_number',
     'origin_station',
+    'origin_departure_estimated_date_template',
     'origin_departure_estimated_time',
     'destination_station',
+    'destination_arrival_estimated_date_template',
     'destination_arrival_estimated_time',
     'is_active',
     'flight_type',
@@ -61,6 +85,16 @@ _field_args = dict(
             placeholder = 'Destination Station',
         ),
     ),
+    origin_departure_estimated_date_template = {
+        'label': 'ETD',
+        'validators': [
+            DateFormatString(),
+        ],
+        'render_kw': {
+            'class_': _class_names + ' origin data',
+            'placeholder': 'Date',
+        },
+    },
     origin_departure_estimated_time = dict(
         label = 'ETD',
         render_kw = dict(
@@ -68,6 +102,16 @@ _field_args = dict(
             placeholder = 'ETD',
         ),
     ),
+    destination_arrival_estimated_date_template = {
+        'label': 'ETA',
+        'validators': [
+            DateFormatString(),
+        ],
+        'render_kw': {
+            'class_': _class_names + ' origin data',
+            'placeholder': 'Date',
+        },
+    },
     destination_arrival_estimated_time = dict(
         label = 'ETA',
         render_kw = dict(

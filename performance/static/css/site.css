@@ -200,6 +200,15 @@ nav > *:last-child {
     margin-right: 0;
 }
 
+nav > ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    gap: 8rem;
+    width: 100%;
+}
+
 a.nav {
     padding: 0.5rem 1rem;
 }
@@ -890,6 +899,7 @@ form .performance-tiers {
     /* scheduled flight edit form container */
     position: sticky;
     top: 15px;
+    height: 20ch;
 }
 
 input[value="Update System Detail"] {
@@ -988,4 +998,8 @@ pre.external-results {
     max-width: 80ch;
     white-space: pre-wrap;
     overflow-wrap: break-word;
+}
+
+.form-note {
+    max-width: 40ch;
 }

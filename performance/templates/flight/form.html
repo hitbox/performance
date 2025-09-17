@@ -1,6 +1,7 @@
 {% extends 'pluggable/form.html' %}
 
 
+{% from 'macros.html' import string %}
 {% from 'macros.html' import render_date %}
 {% from 'macros.html' import render_diff_minutes_text %}
 
@@ -45,6 +46,14 @@ const destinationDelayCodesId = "{{ form.destination_delays_string.id }}";{# the
 {% block content %}
 <article>
     {% if form.errors %}<div>{{ form.errors }}</div>{% endif %}
+    {% if navflights %}<nav>
+        <ul>{% for other in navflights %}
+            <li>
+                {% set href = url_for('.edit', id=other.id) %}
+                <a class="data" href="{{ href }}">{{ other.tail_number or "(no tail)" }} {{ other.flight_number }} {{ other.origin_station }} {{ other.destination_station }}</a>
+            </li>{% endfor %}
+        </ul>
+    </nav>{% endif %}
     <form action="{{ url_for(request.endpoint, **request.view_args) }}" id="edit"{# create or update #} method="POST">
         {{ form.hidden_tag() }}
         <fieldset>

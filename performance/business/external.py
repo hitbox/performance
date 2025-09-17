@@ -1,5 +1,9 @@
+import math
+
 from datetime import date
+from datetime import datetime
 from datetime import time
+from datetime import timedelta
 from itertools import chain
 from itertools import groupby
 from operator import attrgetter
@@ -37,31 +41,22 @@ diff_attrs = [
     'weight',
 ]
 
-date_and_time_to_delays = {
-    'origin_departure_actual_date': 'origin_delays',
-    'origin_departure_actual_time': 'origin_delays',
-    'destination_arrival_actual_date': 'destination_delays',
-    'destination_arrival_actual_time': 'destination_delays',
-}
+def guess_date_needed(report_date, estimated_time, actual_time):
+    est_dt = datetime.combine(report_date, estimated_time)
+    act_dt = datetime.combine(report_date, actual_time)
+    delta = (act_dt - est_dt)
+    seconds = delta.total_seconds()
+    if abs(seconds) > 60 * 60 * 12:
+        return report_date - timedelta(days = math.copysign(1, seconds))
 
-def external_label(attrname):
-    for class_ in [Leg, LegPax]:
-        attr = getattr(class_, attrname, None)
-        if attr:
-            return attr.info['label']
-
-def external_index(row):
-    # enumerate-like for the external key
-    return (flight_key(row), row)
-
-def internal_index(flight):
-    # enumerate-like for the internal key
-    return (flight_key(flight), flight)
-
-def post_process_external_flights(external_flights):
-    for external_flight in external_flights:
-        fake_flight = FakeFlight(**external_flight._mapping)
-        yield fake_flight
+def get_flight_changes(report_date):
+    """
+    Return a list of sorted differences between internal and external flights.
+    """
+    joined = joined_external_flights(report_date)
+    flight_changes = make_diffs(report_date, joined)
+    flight_changes = sorted(flight_changes, key=changes_sort_key)
+    return flight_changes
 
 def joined_external_flights(report_date):
     """
@@ -132,13 +127,12 @@ def flight_diff(report_date, external_flight, internal_flight):
     Return list of differences between internal and external flights.
     """
     diffs = []
+    # Simple differences between attributes.
     for attr in diff_attrs:
-        old = getattr(internal_flight, attr)
-        new = getattr(external_flight, attr)
-
+        internal_value = getattr(internal_flight, attr)
+        external_value = getattr(external_flight, attr)
         diff_func = diff_funcs[attr]
-        is_diff = diff_func(report_date, old, new)
-
+        is_diff = diff_func(report_date, internal_value, external_value)
         if is_diff:
             internal_label = getattr(Flight, attr).info['label']
             diff = dict(
@@ -166,15 +160,9 @@ def make_diffs(report_date, joined):
     Return a list of internal and external flights that have differences for a
     given report date.
     """
-    # TODO
-    # - better function name
     changes = []
     for external_flight, internal_flight in joined:
-        diffs = flight_diff(
-            report_date,
-            external_flight,
-            internal_flight,
-        )
+        diffs = flight_diff(report_date, external_flight, internal_flight)
         if diffs:
             change = dict(
                 diffs = diffs,
@@ -217,7 +205,7 @@ def new_report_from_external(report_date, results_data):
         report.flights.append(flight)
     return report
 
-def update_from_flight_changes(flight_changes_list, clear_delay_minutes=False):
+def update_from_flight_changes(flight_changes_list):
     """
     Update flights' attributes from a list of differences.
     """
@@ -233,16 +221,6 @@ def update_from_flight_changes(flight_changes_list, clear_delay_minutes=False):
             external_attr = diff['external_attr']
             value = external_flight[external_attr]
             setattr(internal_flight, internal_attr, value)
-
-            if (
-                clear_delay_minutes
-                and internal_attr in date_and_time_to_delays
-            ):
-                # Remove delay minutes for updates to times.
-                delays_attr = date_and_time_to_delays[internal_attr]
-                delays = getattr(internal_flight, delays_attr)
-                for delay in delays:
-                    delay.minutes = None
 
 diff_funcs = {
     'weight': simple_is_changed,

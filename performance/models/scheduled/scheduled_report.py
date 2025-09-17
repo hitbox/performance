@@ -33,9 +33,9 @@ class ScheduledReport(
         ]),
     )
 
-    def active_scheduled_flights(self):
+    def active_scheduled_flights(self, report_date):
         return [
-            scheduled_flight.as_flight()
+            scheduled_flight.as_flight(report_date)
             for scheduled_flight in self.scheduled_flights
             if scheduled_flight.is_active
         ]
@@ -46,7 +46,7 @@ class ScheduledReport(
         """
         return Report(
             date = report_date,
-            flights = self.active_scheduled_flights(),
+            flights = self.active_scheduled_flights(report_date),
             show_lanes = self.show_lanes,
             show_chargeable_delays = self.show_chargeable_delays,
             show_delays_gt_30_count = self.show_delays_gt_30_count,

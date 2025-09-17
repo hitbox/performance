@@ -143,9 +143,17 @@ def create_context_processor():
 def update_delete_context_processor():
     flight_id = request.view_args['id']
     flight = Flight.query.get(flight_id)
+    report = flight.report
+
+    center = report.flights.index(flight)
+    radius = 1
+    indices = [(center + offset) for offset in range(-radius, radius + 1)]
+    navflights = [report.flights[index % len(report.flights)] for index in indices if index != center]
+
     context = dict(
         fallbackDate = flight.report.date,
         report = flight.report,
+        navflights = navflights,
     )
     return context
 

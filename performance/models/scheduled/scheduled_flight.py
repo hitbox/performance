@@ -1,3 +1,6 @@
+from datetime import date
+from datetime import timedelta
+
 from performance.extensions import db
 
 from performance.models.flight import FlightMixin
@@ -36,6 +39,18 @@ class ScheduledFlight(
         back_populates = 'scheduled_flights',
     )
 
+    origin_departure_estimated_date_template = db.Column(
+        db.String,
+        nullable = True,
+        doc = 'Format string for ISO format date.',
+    )
+
+    destination_arrival_estimated_date_template = db.Column(
+        db.String,
+        nullable = True,
+        doc = 'Format string for ISO format date.',
+    )
+
     is_active = db.Column(
         db.Boolean,
         default = True,
@@ -44,11 +59,52 @@ class ScheduledFlight(
         doc = 'Flight is loaded on new operation.',
     )
 
-    def as_flight(self):
+    @staticmethod
+    def resolve_date(literal, string_or_none, **context):
+        if literal:
+            return literal
+
+        if string_or_none:
+            string_or_none = string_or_none.strip()
+            if string_or_none:
+                date_string = string_or_none.format(**context)
+                date_value = date.fromisoformat(date_string)
+                return date_value
+
+    def resolve_estimated_departure_date(self, **context):
+        return self.resolve_date(
+            self.origin_departure_estimated_date,
+            self.origin_departure_estimated_date_template,
+            **context
+        )
+
+    def resolve_estimated_arrival_date(self, **context):
+        return self.resolve_date(
+            self.destination_arrival_estimated_date,
+            self.destination_arrival_estimated_date_template,
+            **context
+        )
+
+    @staticmethod
+    def context_for_dates(report_date):
+        context = {
+            'report_date': report_date,
+            'one_day': timedelta(days=1),
+            'date+1': report_date + timedelta(days=1),
+            'date-1': report_date - timedelta(days=1),
+        }
+        return context
+
+    def as_flight(self, report_date):
         """
         Instantiate flight from this scheduled flight.
         """
         from performance.models.flight import Flight
+
+        context = self.context_for_dates(report_date)
+        origin_departure_estimated_date = self.resolve_estimated_departure_date(**context)
+        destination_arrival_estimated_date = self.resolve_estimated_arrival_date(**context)
+
         return Flight(
             flight_number = self.flight_number,
             leg = self.leg,
@@ -56,10 +112,10 @@ class ScheduledFlight(
             weight = self.weight,
             comment = self.comment,
             origin_station = self.origin_station,
-            origin_departure_estimated_date = self.origin_departure_estimated_date,
+            origin_departure_estimated_date = origin_departure_estimated_date,
             origin_departure_estimated_time = self.origin_departure_estimated_time,
             destination_station = self.destination_station,
-            destination_arrival_estimated_date = self.destination_arrival_estimated_date,
+            destination_arrival_estimated_date = destination_arrival_estimated_date,
             destination_arrival_estimated_time = self.destination_arrival_estimated_time,
             flight_type = self.flight_type,
         )

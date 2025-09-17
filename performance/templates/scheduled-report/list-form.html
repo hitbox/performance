@@ -54,7 +54,7 @@
                 {{ render_scheduled_flights_table(scheduled_report.scheduled_flights, instance_endpoint='scheduled.flight.listform', backurl=thisurl, instance_kwargs=dict(scheduled_report_id=scheduled_report.id)) }}
             </table>
         </div>
-        <div>
+        <div class="scheduled-flight form-container">
             <h3 class="page">New Scheduled Flight</h3>
             {% if alert_for_default_flight_type %}{{ alert_for_default_flight_type }}{% endif %}
             {# no backurl given so that user can stay on the scheduled flights list-form page #}
