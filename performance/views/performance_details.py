@@ -1,6 +1,8 @@
 from flask import Blueprint
 from flask import render_template
 
+from performance.extensions import db
+
 from .. import business
 from ..models import Flight
 from ..models import Report
@@ -59,7 +61,7 @@ def for_range(
 
     context = dict(
         report = report,
-        flights = flight_query.all(),
+        flights = db.session.scalars(flight_query).all(),
         date_range_name = PERFORMANCE_DATE_RANGE_NICE_NAMES[date_range_key],
         key_name = PERFORMANCE_KEY_NICE[performance_key],
     )
