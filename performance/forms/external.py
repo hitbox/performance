@@ -110,6 +110,7 @@ class InternalFlightForm(
         )
     )
 
+    # Has to be nullable for updates to null fields.
     weight = IntegerField(
         validators = [
             Optional(),
@@ -174,7 +175,8 @@ class ExternalFlightForm(
     destination_arrival_actual_date = DateField()
     destination_arrival_actual_time = TimeField()
 
-    weight = IntegerField()
+    # Has to be nullable for updates to null fields.
+    weight = IntegerField(validators=[Optional()])
 
 
 class DiffForm(

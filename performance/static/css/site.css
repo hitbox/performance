@@ -947,6 +947,9 @@ form.delay-code #description {
 
 pre {
     font-size: 1rem;
+    max-width: 80ch;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 
 .sql-container pre {

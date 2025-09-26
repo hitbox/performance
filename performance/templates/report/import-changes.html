@@ -88,11 +88,6 @@
                 {# changes rows #}
                 {% for diff_form in flight_changes_form.diffs|sort(attribute='internal_attr_order') %}
                     {# minimally render the actual form fields #}
-                    <div class="hidden">
-                        {{ diff_form.hidden_tag() }}
-                        {{ flight_changes_form.internal_flight.hidden_tag() }}
-                        {{ flight_changes_form.external_flight.hidden_tag() }}
-                    </div>
                     <div class="flight-changes label">{{ diff_form.internal_label.data }}</div>
                     {# NOTES #}
                     {# - Cannot render all the fields from the internal and external flights forms. #}
@@ -102,19 +97,20 @@
                     {% set internal_attr = diff_form.internal_attr.data %}
                     {% set internal_val = internal_flight[internal_attr] %}
                     {% set internal_field = flight_changes_form.internal_field(internal_attr) %}
-
                     {% set external_attr = diff_form.external_attr.data %}
                     {% set external_val = external_flight[external_attr] %}
                     {% set external_field = flight_changes_form.external_field(external_attr) %}
-
+                    <div class="data">{{ render_by_type(internal_val, show_none) }}</div>
+                    <div class="data">{{ render_by_type(external_val, show_none) }}</div>
                     <div class="hidden">
+                        {{ diff_form.hidden_tag() }}
+                        {{ flight_changes_form.internal_flight.hidden_tag() }}
+                        {{ flight_changes_form.external_flight.hidden_tag() }}
                         {{ diff_form.internal_attr }}
                         {{ diff_form.external_attr }}
                         {{ internal_field }}
                         {{ external_field }}
                     </div>
-                    <div class="data">{{ render_by_type(internal_val, show_none) }}</div>
-                    <div class="data">{{ render_by_type(external_val, show_none) }}</div>
                     <div>{{ diff_form.do_update }}</div>
                 {% endfor %}
             {% endfor %}</div>
