@@ -25,6 +25,7 @@ def get_external_stmt(report_date, exclude_leg_state=_exclude_leg_state_default)
     Return select for external flight data.
     """
     if exclude_leg_state is _exclude_leg_state_default:
+        # Exclude new and scheduled and cancelled.
         exclude_leg_state = ('NEW', 'SKD')
     external_stmt = db.select(
         # flight number is string on this application's side
@@ -37,16 +38,20 @@ def get_external_stmt(report_date, exclude_leg_state=_exclude_leg_state_default)
         LegTimes.onblock_dt.label('actual_arrival_datetime'),
     ).outerjoin(
         LegPax,
-        Leg.leg_no == LegPax.leg_no,
+        db.and_(
+            Leg.leg_no == LegPax.leg_no,
+            LegPax.usage_flown,
+        ),
     ).outerjoin(
         LegTimes,
-        LegTimes.leg_no == Leg.leg_no,
+        db.and_(
+            LegTimes.leg_no == Leg.leg_no,
+            LegTimes.usage_movements,
+            LegTimes.what_if_underscore,
+        )
     ).where(
         # filter for airline
         Leg.fn_carrier == settings.external_fn_carrier(),
-        LegPax.usage_flown,
-        LegTimes.usage_movements,
-        LegTimes.what_if_underscore,
         # Compare as range for maximum database compatibility.
         Leg.dep_dt >= report_date,
         Leg.dep_dt < report_date + timedelta(days=1)
