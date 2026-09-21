@@ -33,6 +33,11 @@ class FakeFlight(
             return tail_number
 
     @property
+    def normalized_flight_number(self):
+        # This to match FlightMixin.normalized_flight_number
+        return self.flight_number
+
+    @property
     def origin_departure_actual_date(self):
         if self.actual_departure_datetime:
             return self.actual_departure_datetime.date()
