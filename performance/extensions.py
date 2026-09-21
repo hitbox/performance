@@ -3,7 +3,8 @@ import flask_assets as fa
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
-from .middleware import PrefixMiddleware
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.wrappers import Response
 
 assets = fa.Environment()
 db = SQLAlchemy()
@@ -65,4 +66,7 @@ def init_app(app):
     login_manager.init_app(app)
 
     if 'PREFIX' in app.config:
-        app.wsgi_app = PrefixMiddleware(app.wsgi_app, app.config['PREFIX'])
+        app.wsgi = DispatcherMiddleware(
+            Response('Not Found', status=404), {
+            '/performance/dhl-operations': app
+        })
