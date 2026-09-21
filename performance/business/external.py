@@ -15,12 +15,12 @@ from performance.models import Flight
 from performance.models import Leg
 from performance.models import LegPax
 from performance.models import Report
-from performance.queries import FakeFlight
+from performance.models import FakeFlight
 from performance.utils import popitem
 from performance.utils import sorted_groupby
 
 flight_key = attrgetter(
-    'flight_number',
+    'normalized_flight_number',
     'origin_station',
     'destination_station',
 )
