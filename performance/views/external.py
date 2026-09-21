@@ -183,11 +183,24 @@ def import_for_new(report_date):
     show_default = True,
     help = 'Show changes against internal flights.',
 )
-def query(report_date, changes):
+@click.option(
+    '--print-query/--no-print-query',
+)
+def query(report_date, changes, print_query):
     """
     Display the results of the external query for a given report date.
     """
     report_date = report_date.date()
+    if print_query:
+        engine = db.get_engine(bind='schedops')
+        external_query = queries.get_external_stmt(report_date)
+        compiled_query = external_query.compile(
+            dialect = engine.dialect,
+            compile_kwargs = {"literal_binds": True}
+        )
+        print(compiled_query)
+        return
+
     data = business.external.joined_external_flights(report_date)
     if changes:
         data = business.external.make_diffs(report_date, data)
