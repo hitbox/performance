@@ -1,4 +1,5 @@
 import datetime
+import sys
 
 from flask import Flask
 
@@ -58,17 +59,17 @@ def init_context_processor(app):
         )
         return context
 
-def create_app(silent_config=False):
+def create_app():
     """
     Performance report Flask app.
     """
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_envvar('PERFORMANCE_CONFIG', silent=silent_config)
+    app.config.from_envvar('PERFORMANCE_CONFIG')
     config.raise_for_config(app)
     setdefault_config(app)
 
     init_context_processor(app)
     init_app(app)
-    ensure_metadata(app)
+    #ensure_metadata(app)
 
     return app
