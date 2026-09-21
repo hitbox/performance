@@ -19,6 +19,17 @@ class FlightMixin:
         )
 
     @hybrid_property
+    def normalized_flight_number(self):
+        """
+        Flight numebr as string, removing leading zeros.
+        """
+        if self.flight_number:
+            try:
+                return str(int(self.flight_number))
+            except ValueError:
+                return self.flight_number
+
+    @hybrid_property
     def flight_number_as_integer(self):
         if self.flight_number:
             try:
