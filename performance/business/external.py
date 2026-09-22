@@ -32,6 +32,7 @@ _flight_sort_key_for_changes = attrgetter(
     'destination_station',
 )
 
+# The attributes to compare between internal and external flights
 diff_attrs = [
     'tail_number',
     'origin_departure_actual_date',
@@ -105,7 +106,6 @@ def simple_is_changed(report_date, old, new):
     return old != new
 
 def date_is_changed(report_date, olddate, newdate):
-
     if olddate is None and newdate is None:
         return False
 
@@ -135,12 +135,12 @@ def flight_diff(report_date, external_flight, internal_flight):
         is_diff = diff_func(report_date, internal_value, external_value)
         if is_diff:
             internal_label = getattr(Flight, attr).info['label']
-            diff = dict(
-                internal_attr = attr,
-                internal_attr_order = diff_attrs.index(attr),
-                internal_label = internal_label,
-                external_attr = attr,
-            )
+            diff = {
+                'internal_attr': attr,
+                'internal_attr_order': diff_attrs.index(attr),
+                'internal_label': internal_label,
+                'external_attr': attr,
+            }
             diffs.append(diff)
     return diffs
 
