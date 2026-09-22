@@ -125,11 +125,14 @@ def time_is_changed(report_date, oldtime, newtime):
 
 def do_update_for(external_flight, internal_flight, attr):
     # Default to whatever the query returned
-    do_update = external_flight.do_update
+    result = {
+        'do_update': external_flight.do_update,
+    }
     # auto uncheck updates to if internal flight is cancelled.
     if internal_flight.tail_number == CANCELLED:
-        do_update = False
-    return do_update
+        result['do_update'] = False
+        result['do_update_explanation'] = f'Unchecked because flight cancelled'
+    return result
 
 def flight_diff(report_date, external_flight, internal_flight):
     """
@@ -144,13 +147,15 @@ def flight_diff(report_date, external_flight, internal_flight):
         is_diff = diff_func(report_date, internal_value, external_value)
         if is_diff:
             internal_label = getattr(Flight, attr).info['label']
+            # Matching DiffForm attributes
             diff = {
                 'internal_attr': attr,
                 'internal_attr_order': diff_attrs.index(attr),
                 'internal_label': internal_label,
                 'external_attr': attr,
-                'do_update': do_update_for(external_flight, internal_flight, attr),
             }
+            # Update dict with do_update* fields
+            diff.update(do_update_for(external_flight, internal_flight, attr),)
             diffs.append(diff)
     return diffs
 
