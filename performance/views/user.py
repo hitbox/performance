@@ -13,6 +13,7 @@ from flask_login import logout_user
 from ..extensions import db
 from ..extensions import login_manager
 from ..models import User
+from ..forms import LoginForm
 
 login_manager.login_message_category = 'warning'
 login_manager.login_view = 'user.login'
@@ -29,12 +30,15 @@ def login():
     """
     Login page
     """
-    from ..forms import LoginForm
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter(
-            db.func.lower(User.username) == db.func.lower(form.username.data)
-        ).one_or_none()
+        query = (
+            db.select(User)
+            .where(
+                db.func.lower(User.username) == db.func.lower(form.username.data)
+            )
+        )
+        user = db.session.scalars(query).one_or_none()
         if user is None:
             flash('Invalid', 'error')
         elif user.password == form.password.data:
