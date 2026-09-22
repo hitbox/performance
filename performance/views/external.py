@@ -58,7 +58,7 @@ def update_report_from_external(report_id):
 
     results_form = None
     if request.method == 'POST':
-        # POST is only for doing final import of results
+        # POST for final import of results
         results_form = ChangesForm(formdata=request.form)
         if results_form.validate():
             # result form is valid
@@ -86,12 +86,6 @@ def update_report_from_external(report_id):
         # it may have been created and failed validation
         flight_changes = business.external.get_flight_changes(report.date)
 
-        if settings.show_external_query_results():
-            # Add external query results list to context.
-            context.update({
-                'external_query_results': flight_changes,
-            })
-
         results_form = ChangesForm(
             data = {
                 'flight_changes': flight_changes,
@@ -113,6 +107,13 @@ def update_report_from_external(report_id):
         'results_form': results_form,
         'show_param_form_title': False,
     })
+
+    if settings.show_external_query_results():
+        # Add external query results list to context.
+        results = business.external.external_results(report.date).mappings().all()
+        context.update({
+            'external_query_results': results,
+        })
 
     if settings.show_external_query_statement():
         # Add compiled, highlighted, external sql to context.
