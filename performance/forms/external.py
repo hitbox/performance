@@ -186,6 +186,9 @@ class DiffForm(
     """
     Single difference between flights.
     """
+    # This form is closely related to the data structures of:
+    # performance.queries
+    # performance.business.external:flight_diff
 
     internal_attr = StringField()
     internal_label = StringField()
