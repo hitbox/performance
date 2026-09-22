@@ -37,9 +37,29 @@
     {% endif %}
 
     {# External Query Results #}
-    {% if external_query_results %}<pre class="external-results">
-            {{ external_query_results }}
-    </pre>{% endif %}
+    {% if external_query_results %}
+    <h3>Data from external database</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Flight</th>
+                <th>Tail</th>
+                <th>Origin</th>
+                <th>Dest</th>
+                <th>Weight</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>{% for row in external_query_results %}
+            <tr>
+                <td>{{ row.flight_number }}</td>
+                <td>{{ row.tail_number_with_prefix }}</td>
+                <td>{{ row.origin_station }}</td>
+                <td>{{ row.destination_station }}</td>
+                <td>{{ row.weight }}</td>
+                <td>{{ row.do_update }}</td>
+            </tr>{% endfor %}
+    </table>{% endif %}
 
     <form action="{{ url_for('.update_report_from_external', report_id=report.id) }}" method="POST">
         {{ results_form.hidden_tag() }}
