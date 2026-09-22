@@ -75,6 +75,7 @@ def update_report_from_external(report_id):
 
     param_form = QueryParametersForm(data=request.args)
     javascript_injection = {}
+    context = {}
     if (
         param_form.submit.name in request.args
         and
@@ -84,6 +85,13 @@ def update_report_from_external(report_id):
         # only create results_form if it has not already been created
         # it may have been created and failed validation
         flight_changes = business.external.get_flight_changes(report.date)
+
+        if settings.show_external_query_results():
+            # Add external query results list to context.
+            context.update({
+                'external_query_results': flight_changes,
+            })
+
         results_form = ChangesForm(
             data = {
                 'flight_changes': flight_changes,
@@ -97,14 +105,14 @@ def update_report_from_external(report_id):
     if results_form and not results_form.flight_changes:
         del results_form.submit
 
-    context = {
+    context.update({
         'javascript_injection': javascript_injection,
         'kg_conversion_factor': settings.kilogram_conversion_factor(),
         'param_form': param_form,
         'report': report,
         'results_form': results_form,
         'show_param_form_title': False,
-    }
+    })
 
     if settings.show_external_query_statement():
         # Add compiled, highlighted, external sql to context.
@@ -118,12 +126,6 @@ def update_report_from_external(report_id):
         sql_html = highlighted_sql(compiled)
         context.update({
             'external_flights_stmt': sql_html,
-        })
-
-    if settings.show_external_query_results():
-        # Add external query results list to context.
-        context.update({
-            'external_query_results': flight_changes,
         })
 
     return render_template('report/import-changes.html', **context)
@@ -207,7 +209,6 @@ def query(report_date, changes, print_query):
     pprint(data)
 
 @external_bp.cli.command('load')
-@click.argument('type_', type=click.Choice(['csv']))
 @click.argument('file', type=click.File('r'))
 @click.argument('class_')
 @click.option(
@@ -231,13 +232,12 @@ def query(report_date, changes, print_query):
     default = None,
     help = 'Read from compressed gzip files.',
 )
-def load(type_, file, class_, lower_keys, ignore_unknown, commit, compressed):
+def load(file, class_, lower_keys, ignore_unknown, commit, compressed):
     """
     Load data from CSV.
 
-    TYPE: Type of file to read.
-    FILE: path to file.
-    CLASS_: Database model class name.
+    :param file: path to file.
+    :param class_: Database model class name.
     """
     if compressed is None:
         compressed = is_gzip_file(file.name)
@@ -245,24 +245,29 @@ def load(type_, file, class_, lower_keys, ignore_unknown, commit, compressed):
     if compressed:
         file = gzip.open(file.name, 'rt', encoding='utf8', newline='')
 
-    class_ = getattr(models, class_)
+    model = getattr(models, class_, None)
+    if model is None:
+        raise ValueError(f'Model class name {class_} not found.')
+
+    engine = db.engines['schedops']
+    model.__table__.create(bind=engine, checkfirst=True)
     coerce = None
     for data in csv.DictReader(file):
         if lower_keys:
             data = {k.lower(): v for k, v in data.items()}
         if ignore_unknown:
-            data = {k: v for k, v in data.items() if k in class_.__mapper__.columns}
+            data = {k: v for k, v in data.items() if k in model.__mapper__.columns}
 
         if coerce is None:
             coerce = {}
             for key in data:
-                attr = getattr(class_, key)
+                attr = getattr(model, key)
                 python_type = attr.type.python_type
                 if python_type is datetime:
                     python_type = datetime.fromisoformat
                 coerce[key] = python_type
 
-        instance = class_()
+        instance = model()
         for key, string_value in data.items():
             try:
                 value = coerce[key](string_value)
