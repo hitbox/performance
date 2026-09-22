@@ -2,15 +2,15 @@
 
 :root {
     /* body */
-    --background-color: default;
+    --background-color: inherit;
     /* links */
-    --a-color: default;
-    --a-unvisited-color: default;
-    --a-visited-color: default;
-    --a-hover-color: default;
-    --a-active-color: default;
+    --a-color: inherit;
+    --a-unvisited-color: inherit;
+    --a-visited-color: inherit;
+    --a-hover-color: inherit;
+    --a-active-color: inherit;
     --a-focus-background-color: Coral;
-    --a-focus-color: default;
+    --a-focus-color: inherit;
     /* data-href links */
     --data-href-hover-color: var(--a-color);
     --data-href-hover-background-color: Orange;
