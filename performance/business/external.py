@@ -18,6 +18,7 @@ from performance.models import Report
 from performance.models import FakeFlight
 from performance.utils import popitem
 from performance.utils import sorted_groupby
+from performance.parse import CANCELLED
 
 flight_key = attrgetter(
     'normalized_flight_number',
@@ -122,6 +123,14 @@ def time_is_changed(report_date, oldtime, newtime):
         return False
     return oldtime is None or newtime is not None and oldtime != newtime
 
+def do_update_for(external_flight, internal_flight, attr):
+    # Default to whatever the query returned
+    do_update = external_flight.do_update
+    # auto uncheck updates to if internal flight is cancelled.
+    if internal_flight.tail_number == CANCELLED:
+        do_update = False
+    return do_update
+
 def flight_diff(report_date, external_flight, internal_flight):
     """
     Return list of differences between internal and external flights.
@@ -140,6 +149,7 @@ def flight_diff(report_date, external_flight, internal_flight):
                 'internal_attr_order': diff_attrs.index(attr),
                 'internal_label': internal_label,
                 'external_attr': attr,
+                'do_update': do_update_for(external_flight, internal_flight, attr),
             }
             diffs.append(diff)
     return diffs

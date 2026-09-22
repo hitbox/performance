@@ -36,6 +36,8 @@ def get_external_stmt(report_date, exclude_leg_state=_exclude_leg_state_default)
         LegPax.baggage_weight_lbs_integer.label('weight'),
         LegTimes.offblock_dt.label('actual_departure_datetime'),
         LegTimes.onblock_dt.label('actual_arrival_datetime'),
+        # checkbox for selecting updates defaulting to checked.
+        db.literal(True).label('do_update'),
     ).outerjoin(
         LegPax,
         db.and_(

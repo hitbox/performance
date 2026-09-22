@@ -14,6 +14,7 @@ class FakeFlight(
             'weight',
             'actual_departure_datetime',
             'actual_arrival_datetime',
+            'do_update',
         ],
     )
 ):
