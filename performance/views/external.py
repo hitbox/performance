@@ -134,7 +134,7 @@ def update_report_from_external(report_id):
 @edit_check
 def import_for_new(report_date):
     """
-    Import flight data from external database and create a new report with it.
+    Create a new report from the external database.
     """
     if not settings.external_import():
         abort(404)
@@ -161,6 +161,7 @@ def import_for_new(report_date):
         return redirect(url_for(request.endpoint, report_date=report_date))
 
     if param_form.submit.name in request.args:
+        # The user has submitted GET method of the query form.
         results = business.external.external_results(report_date).mappings()
         results_form = ResultsForm(data=dict(rows=results))
     else:
