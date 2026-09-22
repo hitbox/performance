@@ -8,7 +8,6 @@ def first_working_url(url_list):
         try:
             engine = sa.create_engine(url)
             with engine.connect() as connection:
-                pass
-            return url
+                return url
         except Exception as e:
             pass
