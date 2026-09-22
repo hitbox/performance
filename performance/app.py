@@ -2,6 +2,8 @@ import datetime
 import sys
 
 from flask import Flask
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.wrappers import Response
 
 # ensure shared models defined
 from . import models
@@ -31,7 +33,7 @@ def ensure_metadata(app):
             db.session.add(models.Performance())
             db.session.commit()
 
-def init_app(app):
+def init_extensions(app):
     """
     Initialize other things that need to initialize against the app.
     """
@@ -59,6 +61,17 @@ def init_context_processor(app):
         )
         return context
 
+def init_prefix_middleware(app):
+    if 'PREFIX' in app.config:
+        # Overwrite app name with dispatch middleware for prefixing the url
+        prefix = app.config['PREFIX']
+        app.wsgi_app = DispatcherMiddleware(
+            Response('Not Found', status=404), {
+                prefix: app.wsgi_app
+        })
+
+    return app
+
 def create_app():
     """
     Performance report Flask app.
@@ -69,7 +82,8 @@ def create_app():
     setdefault_config(app)
 
     init_context_processor(app)
-    init_app(app)
-    #ensure_metadata(app)
+    init_extensions(app)
+
+    app = init_prefix_middleware(app)
 
     return app
