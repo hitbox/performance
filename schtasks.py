@@ -30,7 +30,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(
         description = 'Manage the mq filter scheduled tasks.',
     )
-    parser.add_argument('--config', nargs='+', default='instance/schtasks.ini')
+    parser.add_argument('--config', nargs='+', default=['instance/schtasks.ini'])
     choices = list(action2command.keys())
     parser.add_argument('action', nargs='?', default=choices[0], choices=choices)
     parser.add_argument('--machine', action='store_true')
